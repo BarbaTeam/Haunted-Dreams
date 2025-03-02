@@ -2,9 +2,14 @@
 ![Affiche du jeu](src/assets/images/HauntedDreams.png)
 
 ## Technos
-
-Vue : npm i -g @vue/cli
-Babylon.js : npm i @babylonjs/core 
+**Vue :** 
+```
+npm i -g @vue/cli
+```
+**Babylon.js :**
+```
+npm i @babylonjs/core 
+```
 
 ## Project setup
 ```
