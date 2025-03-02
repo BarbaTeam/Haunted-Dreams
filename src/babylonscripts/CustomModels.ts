@@ -74,7 +74,7 @@ export class CustomModels {
             camera.ellipsoid = new Vector3(3, 5, 3);
             camera.inertia = 0.8;
             camera.speed = 1.5;
-            camera.fov = 1.3;
+            camera.fov = 1.2;
             //AZERTY (hexa)
             camera.keysUp.push(90);
             camera.keysDown.push(83);

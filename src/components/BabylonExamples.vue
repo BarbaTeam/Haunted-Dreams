@@ -1,7 +1,5 @@
 <template>
-  <div>
     <canvas></canvas>
-  </div>
 </template>
 
 <script lang="ts">
@@ -19,7 +17,7 @@ export default defineComponent({
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-canvas {
+canvas{
   width: 100%;
   height: 100%;
 }
