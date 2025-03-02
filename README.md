@@ -1,4 +1,5 @@
 # haunteddreams-gameonweb-contest-24-25
+![Affiche du jeu](src/assets/images/HauntedDreams.png)
 
 ## Project setup
 ```
