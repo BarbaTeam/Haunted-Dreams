@@ -10,6 +10,7 @@ npm i -g @vue/cli
 ```
 npm i @babylonjs/core 
 npm i @babylonjs/loaders
+npm i @babylonjs/gui
 ```
 
 ## Project setup
