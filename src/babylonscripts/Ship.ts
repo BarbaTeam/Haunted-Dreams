@@ -1,4 +1,4 @@
-import { Scene, Engine, Vector3, MeshBuilder, SceneLoader, Color4, Camera } from '@babylonjs/core';
+import { Scene, Engine, Vector3, MeshBuilder, SceneLoader, Color4 } from '@babylonjs/core';
 import { createFPSCamera } from './Camera';
 import "@babylonjs/loaders"
 
