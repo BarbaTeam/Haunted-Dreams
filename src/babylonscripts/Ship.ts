@@ -1,4 +1,4 @@
-import { Scene, Engine, Vector3, MeshBuilder, SceneLoader, Color4 } from '@babylonjs/core';
+import { Scene, Engine, Vector3, MeshBuilder, SceneLoader, Color4, Sound } from '@babylonjs/core';
 import { createFPSCamera } from './Camera';
 import "@babylonjs/loaders"
 
@@ -57,6 +57,17 @@ export class Ship {
 
             });
         });
+        new Sound(
+                    "",
+                    "/sons/horror-ambience-01-66708.mp3",
+                    this.scene,
+                    null,
+                    {
+                        volume:0,
+                        autoplay: true,
+                    }
+                ).setVolume(1,30);
+        
     }
 
     createGround(): void {

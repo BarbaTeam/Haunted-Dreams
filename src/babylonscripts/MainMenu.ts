@@ -1,4 +1,4 @@
-import { Scene, Engine, Vector3, MeshBuilder, HemisphericLight, VideoTexture, StandardMaterial } from '@babylonjs/core';
+import { Scene, Engine, Vector3, MeshBuilder, HemisphericLight, VideoTexture, StandardMaterial, Sound } from '@babylonjs/core';
 import { AdvancedDynamicTexture, Button } from "@babylonjs/gui";
 import { createMenuCamera } from './Camera';
 import { Ship } from './Ship';
@@ -46,6 +46,16 @@ export class MainMenu {
         playButton.fontSize = 24;
         playButton.top = "300px";  
         advancedTexture.addControl(playButton); 
+        new Sound(
+            "",
+            "/sons/buzzing-sound-271564.mp3",
+            this.scene,
+            null,
+            {
+                volume:0,
+                autoplay: true,
+            }
+        ).setVolume(1,30);
 
         playButton.onPointerUpObservable.add(() => {
             this.startGame();
