@@ -129,6 +129,7 @@ export class Ship {
 
             // Paramètres de l'onde
             const centerY = 256; // Centre de l'écran
+            const centerX = -30; // Centre de l'écran
             const waveHeight = 80; // Hauteur visuelle ajustée
             const waveLength = Math.PI * 4; // Plus long pour meilleure visibilité
 
@@ -137,7 +138,7 @@ export class Ship {
             textureContext.beginPath();
 
             for (let i = 0; i < 512; i++) {
-                const x = i;
+                const x = centerX + i;
                 const y = centerY + this.amplitude * Math.sin(this.frequency * (i / 512) * waveLength) * waveHeight;
                 if (i === 0) {
                     textureContext.moveTo(x, y);
