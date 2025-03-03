@@ -41,21 +41,33 @@ export class MainMenu {
         const playButton = Button.CreateSimpleButton("playButton", "Jouer");
         playButton.width = "150px";
         playButton.height = "50px";
-        playButton.color = "white";
-        playButton.background = "green";
+        playButton.color = "black";
+        playButton.background = "gray";
         playButton.fontSize = 24;
         playButton.top = "300px";  
         advancedTexture.addControl(playButton); 
-        new Sound(
+        const buzzingSound = new Sound(
             "",
-            "/sons/buzzing-sound-271564.mp3",
+            "/sons/buzzing-sound.wav",
             this.scene,
             null,
             {
-                volume:0,
+                volume:0.15,
                 autoplay: true,
+                loop: true,
             }
-        ).setVolume(1,30);
+        )
+        const backGroundMusic = new Sound(
+            "",
+            "/sons/dark-horror-ambience-296781.mp3",
+            this.scene,
+            null,
+            {
+                volume:0.5,
+                autoplay: true,
+                loop: true,
+            }
+        )
 
         playButton.onPointerUpObservable.add(() => {
             this.startGame();
@@ -65,7 +77,7 @@ export class MainMenu {
     }
 
     createVideoTexture(menuPlane: any, scene: Scene) {
-        const videoTexture = new VideoTexture("videoTexture", ["/videos/main_menu_background.mp4"], scene, true, true);
+        const videoTexture = new VideoTexture("videoTexture", ["/videos/main_menu_background.mkv"], scene, true, true);
         videoTexture.video.muted = true;
 
         const videoMaterial = new StandardMaterial("videoMaterial", scene);
