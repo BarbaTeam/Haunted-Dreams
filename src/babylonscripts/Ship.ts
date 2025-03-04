@@ -11,12 +11,12 @@ export class Ship {
     
     scene: Scene;
     engine: Engine;
-    amplitude = 2;
-    frequency = 1;
+    amplitude = 0.01;
+    frequency = 5;
 
-    private readonly MAX_AMPLITUDE = 4;
-    private readonly MIN_AMPLITUDE = 0.5;
-    private readonly MAX_FREQUENCY = 3;
+    private readonly MAX_AMPLITUDE = 0.5;
+    private readonly MIN_AMPLITUDE = 0.01;
+    private readonly MAX_FREQUENCY = 10;
     private readonly MIN_FREQUENCY = 0.3;
 
     private screenTextureSelecteur: DynamicTexture | null = null;
@@ -84,11 +84,21 @@ export class Ship {
                 // Création de la texture dynamique pour l'écran du sélecteur
                 if (mesh.name === "selecteur_onde.screen") {
                     this.screenTextureSelecteur = this.createScreenMaterial(mesh);
+                    this.screenTextureSelecteur.wAng = (-1) *Math.PI / 2;
+                    this.screenTextureSelecteur.uScale = 1.55;
+                    this.screenTextureSelecteur.vScale = 1.55;
+                    this.screenTextureSelecteur.uOffset = -0.98;
+                    this.screenTextureSelecteur.vOffset = -0.55;
                 }
 
                 // Création de la texture dynamique pour l'écran de navigation
                 if (mesh.name === "poste_navigation.screen") {
                     this.screenTextureNav = this.createScreenMaterial(mesh);
+                    this.screenTextureNav.wAng = (-1) *Math.PI / 2;
+                    this.screenTextureNav.uScale = 1.55;
+                    this.screenTextureNav.vScale = 1.55;
+                    this.screenTextureNav.uOffset = -0.02;
+                    this.screenTextureNav.vOffset = -0.035;
                 }
             });
 
