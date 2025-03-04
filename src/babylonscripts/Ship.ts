@@ -2,11 +2,10 @@ import {
     Scene, Engine, Vector3, MeshBuilder, SceneLoader, Color4, Sound, StandardMaterial, 
     Color3, DynamicTexture, AbstractMesh, 
     ActionManager,
-    ExecuteCodeAction,
-    Matrix
+    ExecuteCodeAction
 } from '@babylonjs/core';
 import { createFPSCamera } from './Camera';
-import "@babylonjs/loaders"
+import "@babylonjs/loaders";
 
 export class Ship {
     
@@ -14,10 +13,15 @@ export class Ship {
     engine: Engine;
     amplitude = 2;
     frequency = 1;
-    
+
+    private readonly MAX_AMPLITUDE = 4;
+    private readonly MIN_AMPLITUDE = 0.5;
+    private readonly MAX_FREQUENCY = 3;
+    private readonly MIN_FREQUENCY = 0.3;
+
     private screenTextureSelecteur: DynamicTexture | null = null;
     private screenTextureNav: DynamicTexture | null = null;
-    
+
     private buttonAmplitude: AbstractMesh | null = null;
     private buttonFrequency: AbstractMesh | null = null;
     private isHoveringAmplitude = false;
@@ -48,7 +52,7 @@ export class Ship {
     createScene(): Scene {
         const scene = new Scene(this.engine);
         scene.clearColor = new Color4(0, 0, 0, 1); 
-        scene.gravity = new Vector3(0, -.75, 0);
+        scene.gravity = new Vector3(0, -0.75, 0);
         scene.collisionsEnabled = true;
         scene.enablePhysics();
 
@@ -68,10 +72,12 @@ export class Ship {
                 mesh.checkCollisions = true;
 
                 // Détection des boutons
-                if (mesh.name === "selecteur_onde.button_amplitude") {
+                if (mesh.name === "selecteur_onde.boutton_amplitude") {
+                    mesh.showBoundingBox = true;
                     this.buttonAmplitude = mesh;
                 } 
-                if (mesh.name === "selecteur_onde.button_frequence") {
+                if (mesh.name === "selecteur_onde.boutton_frequence") {
+                    mesh.showBoundingBox = true;
                     this.buttonFrequency = mesh;
                 }
 
@@ -111,6 +117,7 @@ export class Ship {
         material.diffuseTexture = dynamicTexture;
         material.specularColor = new Color3(0, 0, 0); 
         mesh.material = material;
+
         return dynamicTexture;
     }
 
@@ -129,7 +136,6 @@ export class Ship {
 
             // Paramètres de l'onde
             const centerY = 256; // Centre de l'écran
-            const centerX = -30; // Centre de l'écran
             const waveHeight = 80; // Hauteur visuelle ajustée
             const waveLength = Math.PI * 4; // Plus long pour meilleure visibilité
 
@@ -138,8 +144,8 @@ export class Ship {
             textureContext.beginPath();
 
             for (let i = 0; i < 512; i++) {
-                const x = centerX + i;
-                const y = centerY + this.amplitude * Math.sin(this.frequency * (i / 512) * waveLength) * waveHeight;
+                const x = i;
+                const y = centerY - this.amplitude * Math.sin(this.frequency * (i / 512) * waveLength) * waveHeight;
                 if (i === 0) {
                     textureContext.moveTo(x, y);
                 } else {
@@ -159,6 +165,11 @@ export class Ship {
             } else if (this.isHoveringFrequency) {
                 this.frequency += (event.deltaY < 0) ? 0.1 : -0.1;
             }
+
+            // Appliquer les limites
+            this.amplitude = Math.min(this.MAX_AMPLITUDE, Math.max(this.MIN_AMPLITUDE, this.amplitude));
+            this.frequency = Math.min(this.MAX_FREQUENCY, Math.max(this.MIN_FREQUENCY, this.frequency));
+
             this.updateSineWave();
         });
     }
