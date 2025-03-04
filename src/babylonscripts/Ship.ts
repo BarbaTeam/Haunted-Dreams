@@ -3,7 +3,9 @@ import {
     Color3, DynamicTexture, AbstractMesh, 
     ActionManager,
     ExecuteCodeAction,
-    Matrix
+    Matrix,
+    PBRMaterial,
+    PBRMetallicRoughnessMaterial
 } from '@babylonjs/core';
 import { createFPSCamera } from './Camera';
 import "@babylonjs/loaders";
@@ -12,13 +14,13 @@ export class Ship {
     
     scene: Scene;
     engine: Engine;
-    amplitude = 0.25;
-    frequency = 5;
+    amplitude = 0.5;
+    frequency = 2;
 
     private readonly MAX_AMPLITUDE = 1.5;
     private readonly MIN_AMPLITUDE = 0.01;
     private readonly MAX_FREQUENCY = 10;
-    private readonly MIN_FREQUENCY = 0.3;
+    private readonly MIN_FREQUENCY = 1;
 
     private screenTextureSelecteur: DynamicTexture | null = null;
     private screenTextureNav: DynamicTexture | null = null;
@@ -27,8 +29,19 @@ export class Ship {
 
     private buttonAmplitude: AbstractMesh | null = null;
     private buttonFrequency: AbstractMesh | null = null;
+
     private isHoveringAmplitude = false;
     private isHoveringFrequency = false;
+
+    private buttonUp: AbstractMesh | null = null;
+    private buttonDown: AbstractMesh | null = null;
+    private buttonLeft: AbstractMesh | null = null;
+    private buttonRight: AbstractMesh | null = null;
+
+    private isHoveringUp = false;
+    private isHoveringDown = false;
+    private isHoveringLeft = false;
+    private isHoveringRight = false;
 
     constructor(private canvas: HTMLCanvasElement) {
         this.engine = new Engine(this.canvas, true);
@@ -77,14 +90,32 @@ export class Ship {
                 console.log(mesh.name);
                 mesh.checkCollisions = true;
 
-                // Détection des boutons
+                // Détection des boutons du selecteur d'onde
                 if (mesh.name === "selecteur_onde.boutton_amplitude") {
-                    mesh.showBoundingBox = true;
+                    //mesh.showBoundingBox = true;
                     this.buttonAmplitude = mesh;
                 } 
                 if (mesh.name === "selecteur_onde.boutton_frequence") {
-                    mesh.showBoundingBox = true;
+                    //mesh.showBoundingBox = true;
                     this.buttonFrequency = mesh;
+                }
+
+                // Détection des boutons de la navigation
+                if (mesh.name === "nav.button_up") {
+                    //mesh.showBoundingBox = true;
+                    this.buttonUp = mesh;
+                }
+                if (mesh.name === "nav.button_down") {
+                    //mesh.showBoundingBox = true;
+                    this.buttonDown = mesh;
+                }
+                if (mesh.name === "nav.button_left") {
+                    //mesh.showBoundingBox = true;
+                    this.buttonLeft = mesh;
+                }
+                if (mesh.name === "nav.button_right") {
+                    //mesh.showBoundingBox = true;
+                    this.buttonRight = mesh;
                 }
 
                 // Création de la texture dynamique pour l'écran du sélecteur
@@ -108,19 +139,11 @@ export class Ship {
                 // Création de la texture dynamique pour l'écran de l'amplitude
                 if (mesh.name === "amplitude_screen") {
                     this.screenTextureAmp = this.createScreenMaterial(mesh);
-                    //this.screenTextureAmp.uScale = 0;
-                    //this.screenTextureAmp.vScale = 0;
-                    //this.screenTextureAmp.uOffset = 0;
-                    //this.screenTextureAmp.vOffset = 0;
                 }
 
                  // Création de la texture dynamique pour l'écran des fréquences
                  if (mesh.name === "frequence_screen") {
                     this.screenTextureFreq = this.createScreenMaterial(mesh);
-                    //this.screenTextureFreq.uScale = -1;
-                    //this.screenTextureFreq.vScale = 0;
-                    //this.screenTextureFreq.uOffset = 0;
-                    //this.screenTextureFreq.vOffset = 0;
                 }
             });
 
@@ -202,28 +225,42 @@ updateSineWave(): void {
             this.screenTextureAmp.clear();
             this.screenTextureAmp.drawText(
                 `A : ${this.amplitude.toFixed(2)}`,
-                80, 150, "100px Arial",
+                70, 150, "80px Arial",
                 "lime", "transparent", false, true
             );
         }
-    
+        
         if (this.screenTextureFreq) {
             this.screenTextureFreq.clear();
             this.screenTextureFreq.drawText(
-                `f : ${this.frequency.toFixed(2)}`,
-                80, 150, "100px Arial",
+                `f : ${this.frequency.toFixed(2)} Hz`,
+                70, 150, "80px Arial",
                 "lime", "transparent", false, true
             );
         }
     }
-    
+
+
+    setupMoveEvents(): void {
+        this.canvas.addEventListener("click", (event) => {
+            if (this.isHoveringUp) {
+                //highLightButton(this.buttonUp);
+            } else if (this.isHoveringDown) {
+                //highLightButton(this.buttonDown);
+            } else if (this.isHoveringLeft) {
+                //highLightButton(this.buttonLeft);
+            } else if (this.isHoveringRight) {
+                //highLightButton(this.buttonRight);
+            }
+        });
+    }
 
     setupScrollEvents(): void {
         this.canvas.addEventListener("wheel", (event) => {
             if (this.isHoveringAmplitude) {
-                this.amplitude += (event.deltaY < 0) ? 0.01 : -0.01;
+                this.amplitude += (event.deltaY < 0) ? 0.1 : -0.1;
             } else if (this.isHoveringFrequency) {
-                this.frequency += (event.deltaY < 0) ? 0.05 : -0.05;
+                this.frequency += (event.deltaY < 0) ? 0.1 : -0.1;
             }
     
             // Appliquer les limites
@@ -244,7 +281,61 @@ updateSineWave(): void {
     
             this.isHoveringAmplitude = hit?.pickedMesh === this.buttonAmplitude;
             this.isHoveringFrequency = hit?.pickedMesh === this.buttonFrequency;
+            this.isHoveringUp = hit?.pickedMesh === this.buttonUp;
+            this.isHoveringDown = hit?.pickedMesh === this.buttonDown;
+            this.isHoveringLeft = hit?.pickedMesh === this.buttonLeft;
+            this.isHoveringRight = hit?.pickedMesh === this.buttonRight;
         };
+        this.setupButtonMaterials();
+
+    }
+    
+    setupButtonMaterials(): void {
+        if (!this.scene) return;
+    
+        const buttonMaterial = this.buttonDown?.material as StandardMaterial;
+        if (!buttonMaterial) return;
+        buttonMaterial.diffuseColor = new Color3(1, 0, 0); 
+    
+        const highlightMaterial = new PBRMetallicRoughnessMaterial("highlightMat", this.scene);
+        highlightMaterial.baseColor = new Color3(1, 1, 1); 
+        highlightMaterial.metallic = 0;
+
+        const buttons = [
+            this.buttonAmplitude,
+            this.buttonFrequency,
+            this.buttonUp,
+            this.buttonDown,
+            this.buttonLeft,
+            this.buttonRight
+        ];
+    
+        buttons.forEach((button) => {
+            if (button) {
+                button.material = buttonMaterial;
+            }
+        });
+    
+        this.scene.onBeforeRenderObservable.add(() => {
+            if (this.buttonAmplitude) {
+                this.buttonAmplitude.material = this.isHoveringAmplitude ? highlightMaterial : buttonMaterial;
+            }
+            if (this.buttonFrequency) {
+                this.buttonFrequency.material = this.isHoveringFrequency ? highlightMaterial : buttonMaterial;
+            }
+            if (this.buttonUp) {
+                this.buttonUp.material = this.isHoveringUp ? highlightMaterial : buttonMaterial;
+            }
+            if (this.buttonDown) {
+                this.buttonDown.material = this.isHoveringDown ? highlightMaterial : buttonMaterial;
+            }
+            if (this.buttonLeft) {
+                this.buttonLeft.material = this.isHoveringLeft ? highlightMaterial : buttonMaterial;
+            }
+            if (this.buttonRight) {
+                this.buttonRight.material = this.isHoveringRight ? highlightMaterial : buttonMaterial;
+            }
+        });
     }
     
 }
