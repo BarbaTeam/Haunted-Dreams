@@ -2,7 +2,8 @@ import {
     Scene, Engine, Vector3, MeshBuilder, SceneLoader, Color4, Sound, StandardMaterial, 
     Color3, DynamicTexture, AbstractMesh, 
     ActionManager,
-    ExecuteCodeAction
+    ExecuteCodeAction,
+    Matrix
 } from '@babylonjs/core';
 import { createFPSCamera } from './Camera';
 import "@babylonjs/loaders";
@@ -56,7 +57,9 @@ export class Ship {
         scene.collisionsEnabled = true;
         scene.enablePhysics();
 
-        createFPSCamera(scene, this.canvas);
+        const camera = createFPSCamera(scene, this.canvas);
+        camera.metadata = { isFPSCamera: true }; // Marque la caméra comme FPS pour le Raycast
+
             
         return scene;
     }
@@ -176,37 +179,42 @@ export class Ship {
             } else if (this.isHoveringFrequency) {
                 this.frequency += (event.deltaY < 0) ? 0.05 : -0.05;
             }
-
+    
             // Appliquer les limites
             this.amplitude = Math.min(this.MAX_AMPLITUDE, Math.max(this.MIN_AMPLITUDE, this.amplitude));
             this.frequency = Math.min(this.MAX_FREQUENCY, Math.max(this.MIN_FREQUENCY, this.frequency));
-
-            this.updateSineWave();
+    
+            if (this.isHoveringAmplitude || this.isHoveringFrequency) {
+                this.updateSineWave();
+            }
         });
     }
     
+    
     setupButtonHoverDetection(): void {
         if (!this.buttonAmplitude || !this.buttonFrequency) return;
-
-        this.buttonAmplitude.actionManager = new ActionManager(this.scene);
-        this.buttonFrequency.actionManager = new ActionManager(this.scene);
-
-        this.buttonAmplitude.actionManager.registerAction(new ExecuteCodeAction(
-            ActionManager.OnPointerOverTrigger,
-            () => { this.isHoveringAmplitude = true; }
-        ));
-        this.buttonAmplitude.actionManager.registerAction(new ExecuteCodeAction(
-            ActionManager.OnPointerOutTrigger,
-            () => { this.isHoveringAmplitude = false; }
-        ));
-
-        this.buttonFrequency.actionManager.registerAction(new ExecuteCodeAction(
-            ActionManager.OnPointerOverTrigger,
-            () => { this.isHoveringFrequency = true; }
-        ));
-        this.buttonFrequency.actionManager.registerAction(new ExecuteCodeAction(
-            ActionManager.OnPointerOutTrigger,
-            () => { this.isHoveringFrequency = false; }
-        ));
+    
+        this.scene.onBeforeRenderObservable.add(() => {
+            const camera = this.scene.activeCamera!;
+            if (!camera) return;
+    
+            // Lancer un raycast depuis le centre de l'écran
+            const hit = this.scene.pick(this.scene.getEngine().getRenderWidth() / 2, this.scene.getEngine().getRenderHeight() / 2);
+    
+            // Réinitialiser l'état des boutons
+            this.isHoveringAmplitude = false;
+            this.isHoveringFrequency = false;
+    
+            // Si un objet est détecté, vérifier s'il s'agit d'un bouton
+            if (hit && hit.pickedMesh) {
+                if (hit.pickedMesh === this.buttonAmplitude) {
+                    this.isHoveringAmplitude = true;
+                } 
+                if (hit.pickedMesh === this.buttonFrequency) {
+                    this.isHoveringFrequency = true;
+                }
+            }
+        });
     }
+    
 }
