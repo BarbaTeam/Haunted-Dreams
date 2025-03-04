@@ -41,9 +41,10 @@ export class MainMenu {
         const playButton = Button.CreateSimpleButton("playButton", "Jouer");
         playButton.width = "150px";
         playButton.height = "50px";
-        playButton.color = "black";
-        playButton.background = "gray";
-        playButton.fontSize = 24;
+        playButton.color = "white";
+        playButton.thickness = 0;
+        playButton.background = "";
+        playButton.fontSize = 40;
         playButton.top = "300px";  
         advancedTexture.addControl(playButton); 
         const buzzingSound = new Sound(

@@ -11,7 +11,7 @@ export class Ship {
     
     scene: Scene;
     engine: Engine;
-    amplitude = 0.01;
+    amplitude = 0.25;
     frequency = 5;
 
     private readonly MAX_AMPLITUDE = 0.5;
@@ -69,6 +69,7 @@ export class Ship {
             
             spaceship.checkCollisions = true; 
             spaceship.getChildMeshes().forEach(mesh => {
+                console.log(mesh.name);
                 mesh.checkCollisions = true;
 
                 // Détection des boutons
@@ -171,9 +172,9 @@ export class Ship {
     setupScrollEvents(): void {
         this.canvas.addEventListener("wheel", (event) => {
             if (this.isHoveringAmplitude) {
-                this.amplitude += (event.deltaY < 0) ? 0.1 : -0.1;
+                this.amplitude += (event.deltaY < 0) ? 0.01 : -0.01;
             } else if (this.isHoveringFrequency) {
-                this.frequency += (event.deltaY < 0) ? 0.1 : -0.1;
+                this.frequency += (event.deltaY < 0) ? 0.05 : -0.05;
             }
 
             // Appliquer les limites
