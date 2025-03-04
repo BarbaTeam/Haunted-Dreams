@@ -15,13 +15,15 @@ export class Ship {
     amplitude = 0.25;
     frequency = 5;
 
-    private readonly MAX_AMPLITUDE = 0.5;
+    private readonly MAX_AMPLITUDE = 1.5;
     private readonly MIN_AMPLITUDE = 0.01;
     private readonly MAX_FREQUENCY = 10;
     private readonly MIN_FREQUENCY = 0.3;
 
     private screenTextureSelecteur: DynamicTexture | null = null;
     private screenTextureNav: DynamicTexture | null = null;
+    private screenTextureAmp: DynamicTexture | null = null;
+    private screenTextureFreq: DynamicTexture | null = null;
 
     private buttonAmplitude: AbstractMesh | null = null;
     private buttonFrequency: AbstractMesh | null = null;
@@ -88,26 +90,43 @@ export class Ship {
                 // Création de la texture dynamique pour l'écran du sélecteur
                 if (mesh.name === "selecteur_onde.screen") {
                     this.screenTextureSelecteur = this.createScreenMaterial(mesh);
-                    this.screenTextureSelecteur.wAng = (-1) *Math.PI / 2;
-                    this.screenTextureSelecteur.uScale = 1.55;
-                    this.screenTextureSelecteur.vScale = 1.55;
-                    this.screenTextureSelecteur.uOffset = -0.98;
-                    this.screenTextureSelecteur.vOffset = -0.55;
+                    this.screenTextureSelecteur.uScale = 4.6;
+                    this.screenTextureSelecteur.vScale = 5;
+                    this.screenTextureSelecteur.uOffset = -0.005;
+                    this.screenTextureSelecteur.vOffset = 0.25;
                 }
 
                 // Création de la texture dynamique pour l'écran de navigation
                 if (mesh.name === "poste_navigation.screen") {
                     this.screenTextureNav = this.createScreenMaterial(mesh);
-                    this.screenTextureNav.wAng = (-1) *Math.PI / 2;
-                    this.screenTextureNav.uScale = 1.55;
-                    this.screenTextureNav.vScale = 1.55;
-                    this.screenTextureNav.uOffset = -0.02;
-                    this.screenTextureNav.vOffset = -0.035;
+                    this.screenTextureNav.uScale = 5;
+                    this.screenTextureNav.vScale = 5;
+                    this.screenTextureNav.uOffset = 0;
+                    this.screenTextureNav.vOffset = 0.2;
+                }
+
+                // Création de la texture dynamique pour l'écran de l'amplitude
+                if (mesh.name === "amplitude_screen") {
+                    this.screenTextureAmp = this.createScreenMaterial(mesh);
+                    //this.screenTextureAmp.uScale = 0;
+                    //this.screenTextureAmp.vScale = 0;
+                    //this.screenTextureAmp.uOffset = 0;
+                    //this.screenTextureAmp.vOffset = 0;
+                }
+
+                 // Création de la texture dynamique pour l'écran des fréquences
+                 if (mesh.name === "frequence_screen") {
+                    this.screenTextureFreq = this.createScreenMaterial(mesh);
+                    //this.screenTextureFreq.uScale = -1;
+                    //this.screenTextureFreq.vScale = 0;
+                    //this.screenTextureFreq.uOffset = 0;
+                    //this.screenTextureFreq.vOffset = 0;
                 }
             });
 
             this.setupButtonHoverDetection();
-            this.updateSineWave(); // Dessiner l'onde au démarrage
+            this.updateSineWave();   // Dessiner l'onde au démarrage
+            this.updateDataScreen(); // Afficher les valeurs par défaut
         });
 
         // Sons d'ambiance
@@ -138,39 +157,66 @@ export class Ship {
     /**
      * Met à jour l'onde sur les deux écrans et centre correctement l'affichage
      */
-    updateSineWave(): void {
-        [this.screenTextureSelecteur, this.screenTextureNav].forEach((screenTexture) => {
-            if (!screenTexture) return;
-            const textureContext = screenTexture.getContext();
-            if (!textureContext) return;
+    private lastAmplitude = 0;
+    private lastFrequency = 0;
 
-            // Nettoyage de l'écran
-            textureContext.fillStyle = "black";
-            textureContext.fillRect(0, 0, 512, 512);
-
-            // Paramètres de l'onde
-            const centerY = 256; // Centre de l'écran
-            const waveHeight = 80; // Hauteur visuelle ajustée
-            const waveLength = Math.PI * 4; // Plus long pour meilleure visibilité
-
-            textureContext.strokeStyle = "lime"; 
-            textureContext.lineWidth = 3;
-            textureContext.beginPath();
-
-            for (let i = 0; i < 512; i++) {
-                const x = i;
-                const y = centerY - this.amplitude * Math.sin(this.frequency * (i / 512) * waveLength) * waveHeight;
-                if (i === 0) {
-                    textureContext.moveTo(x, y);
-                } else {
-                    textureContext.lineTo(x, y);
-                }
-            }
-
-            textureContext.stroke();
-            screenTexture.update(); 
-        });
+updateSineWave(): void {
+    if (this.amplitude === this.lastAmplitude && this.frequency === this.lastFrequency) {
+        return; // Skip unnecessary updates
     }
+
+    this.lastAmplitude = this.amplitude;
+    this.lastFrequency = this.frequency;
+
+    [this.screenTextureSelecteur, this.screenTextureNav].forEach((screenTexture) => {
+        if (!screenTexture) return;
+        const textureContext = screenTexture.getContext();
+        if (!textureContext) return;
+
+        // Clear screen
+        textureContext.fillStyle = "black";
+        textureContext.fillRect(0, 0, 512, 512);
+
+        // Draw Sine Wave
+        const centerY = 256;
+        const waveHeight = 80;
+        const waveLength = Math.PI * 4;
+
+        textureContext.strokeStyle = "lime";
+        textureContext.lineWidth = 3;
+        textureContext.beginPath();
+
+        for (let i = 0; i < 512; i++) {
+            const x = i;
+            const y = centerY - this.amplitude * Math.sin(this.frequency * (i / 512) * waveLength) * waveHeight;
+            i === 0 ? textureContext.moveTo(x, y) : textureContext.lineTo(x, y);
+        }
+
+        textureContext.stroke();
+        screenTexture.update();
+    });
+}
+
+    updateDataScreen(): void {
+        if (this.screenTextureAmp) {
+            this.screenTextureAmp.clear();
+            this.screenTextureAmp.drawText(
+                `A : ${this.amplitude.toFixed(2)}`,
+                80, 150, "100px Arial",
+                "lime", "transparent", false, true
+            );
+        }
+    
+        if (this.screenTextureFreq) {
+            this.screenTextureFreq.clear();
+            this.screenTextureFreq.drawText(
+                `f : ${this.frequency.toFixed(2)}`,
+                80, 150, "100px Arial",
+                "lime", "transparent", false, true
+            );
+        }
+    }
+    
 
     setupScrollEvents(): void {
         this.canvas.addEventListener("wheel", (event) => {
@@ -186,35 +232,19 @@ export class Ship {
     
             if (this.isHoveringAmplitude || this.isHoveringFrequency) {
                 this.updateSineWave();
+                this.updateDataScreen();
             }
         });
     }
     
     
     setupButtonHoverDetection(): void {
-        if (!this.buttonAmplitude || !this.buttonFrequency) return;
-    
-        this.scene.onBeforeRenderObservable.add(() => {
-            const camera = this.scene.activeCamera!;
-            if (!camera) return;
-    
-            // Lancer un raycast depuis le centre de l'écran
+        this.scene.onPointerMove = (event) => {
             const hit = this.scene.pick(this.scene.getEngine().getRenderWidth() / 2, this.scene.getEngine().getRenderHeight() / 2);
     
-            // Réinitialiser l'état des boutons
-            this.isHoveringAmplitude = false;
-            this.isHoveringFrequency = false;
-    
-            // Si un objet est détecté, vérifier s'il s'agit d'un bouton
-            if (hit && hit.pickedMesh) {
-                if (hit.pickedMesh === this.buttonAmplitude) {
-                    this.isHoveringAmplitude = true;
-                } 
-                if (hit.pickedMesh === this.buttonFrequency) {
-                    this.isHoveringFrequency = true;
-                }
-            }
-        });
+            this.isHoveringAmplitude = hit?.pickedMesh === this.buttonAmplitude;
+            this.isHoveringFrequency = hit?.pickedMesh === this.buttonFrequency;
+        };
     }
     
 }
