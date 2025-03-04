@@ -77,7 +77,7 @@ export class MainMenu {
     }
 
     createVideoTexture(menuPlane: any, scene: Scene) {
-        const videoTexture = new VideoTexture("videoTexture", ["/videos/main_menu_background.mkv"], scene, true, true);
+        const videoTexture = new VideoTexture("videoTexture", ["/videos/main_menu_background.mp4"], scene, true, true);
         videoTexture.video.muted = true;
 
         const videoMaterial = new StandardMaterial("videoMaterial", scene);
