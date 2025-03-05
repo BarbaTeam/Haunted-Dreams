@@ -5,7 +5,9 @@ import {
     ExecuteCodeAction,
     Matrix,
     PBRMaterial,
-    PBRMetallicRoughnessMaterial
+    PBRMetallicRoughnessMaterial,
+    PointLight,
+    SpotLight
 } from '@babylonjs/core';
 import { createFPSCamera } from './Camera';
 import "@babylonjs/loaders";
@@ -72,6 +74,24 @@ export class Ship {
         scene.collisionsEnabled = true;
         scene.enablePhysics();
 
+        
+        const entrance_light = new SpotLight("spotLight", new Vector3(0, 24, 0), new Vector3(0, -1, 0), Math.PI / 2, 10, scene);
+        entrance_light.intensity = 1;
+        entrance_light.diffuse = new Color3(255,218,100);
+
+        const table_light = new SpotLight("spotLight", new Vector3(0, 24, 20), new Vector3(0, -1, 0), Math.PI / 2, 10, scene);
+        table_light.intensity = 1;
+        table_light.diffuse = new Color3(255,218,100);
+
+        const nav_light = new SpotLight("spotLight", new Vector3(25, 24, 14), new Vector3(0, -1, 0), Math.PI / 2, 10, scene);
+        nav_light.intensity = 1;
+        nav_light.diffuse = new Color3(255,218,100);
+
+        const motor_light = new SpotLight("spotLight", new Vector3(-20, 24, 14), new Vector3(0, -1, 0), Math.PI / 2, 10, scene);
+        motor_light.intensity = 1;
+        motor_light.diffuse = new Color3(255,218,100);
+        
+
         const camera = createFPSCamera(scene, this.canvas);
         camera.metadata = { isFPSCamera: true }; // Marque la caméra comme FPS pour le Raycast
 
@@ -80,7 +100,7 @@ export class Ship {
     }
 
     createSpaceShip(): void {
-        SceneLoader.ImportMeshAsync("", "/models/", "spaceship.glb", this.scene).then((result) => {
+        SceneLoader.ImportMeshAsync("", "/models/", "spaceship_without_lights.glb", this.scene).then((result) => {
             const spaceship = result.meshes[0];
 
             console.log("Le vaisseau est bien chargé");
@@ -144,6 +164,10 @@ export class Ship {
                  // Création de la texture dynamique pour l'écran des fréquences
                  if (mesh.name === "frequence_screen") {
                     this.screenTextureFreq = this.createScreenMaterial(mesh);
+                }
+
+                if (mesh.name === "walls.door"){
+                   //mesh.isVisible = false; 
                 }
             });
 
