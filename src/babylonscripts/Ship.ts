@@ -47,6 +47,10 @@ export class Ship {
     private buttonLeft: AbstractMesh | null = null;
     private buttonRight: AbstractMesh | null = null;
 
+    private buttonPhoto: AbstractMesh | null = null;
+
+    private isHoveringPhoto = false;
+
     private isHoveringUp = false;
     private isHoveringDown = false;
     private isHoveringLeft = false;
@@ -146,6 +150,10 @@ export class Ship {
                     this.buttonRight = mesh;
                 }
 
+                if(mesh.name === "appareil_photo.boutton"){
+                    this.buttonPhoto = mesh;
+                }
+
                 // Création de la texture dynamique pour l'écran du sélecteur
                 if (mesh.name === "selecteur_onde.screen") {
                     this.screenTextureSelecteur = this.createScreenMaterial(mesh);
@@ -216,7 +224,7 @@ export class Ship {
 
     updateSineWave(): void {
 
-        //if(!this.isHoveringSomeButton() || !this.isStartOfGame){
+        //if(!this.isHoveringSomeButtonForNavigation() || !this.isStartOfGame){
         //    return;
         //} 
         // à creuser pour ecnomiser des ressources
@@ -364,12 +372,13 @@ export class Ship {
             this.isHoveringDown = hit?.pickedMesh === this.buttonDown;
             this.isHoveringLeft = hit?.pickedMesh === this.buttonLeft;
             this.isHoveringRight = hit?.pickedMesh === this.buttonRight;
+            this.isHoveringPhoto = hit?.pickedMesh === this.buttonPhoto;
         };
         this.setupButtonMaterials();
 
     }
     
-    isHoveringSomeButton() {
+    isHoveringSomeButtonForNavigation() {
         return this.isHoveringAmplitude || this.isHoveringFrequency || this.isHoveringUp || this.isHoveringDown || this.isHoveringLeft || this.isHoveringRight;
     }
 
@@ -418,7 +427,10 @@ export class Ship {
             if (this.buttonRight) {
                 this.buttonRight.material = this.isHoveringRight ? highlightMaterial : buttonMaterial;
             }
-        });
+            if (this.buttonPhoto) {
+                this.buttonPhoto.material = this.isHoveringPhoto ? highlightMaterial : buttonMaterial;
+        }}
+    );
     }
     
 }
