@@ -7,7 +7,8 @@ import {
     PBRMaterial,
     PBRMetallicRoughnessMaterial,
     PointLight,
-    SpotLight
+    SpotLight,
+    ICanvasRenderingContext
 } from '@babylonjs/core';
 import { createFPSCamera } from './Camera';
 import "@babylonjs/loaders";
@@ -16,8 +17,14 @@ export class Ship {
     
     scene: Scene;
     engine: Engine;
+
+    isStartOfGame = true;
+
     amplitude = 0.5;
     frequency = 2;
+
+    amplitudePos = 0.2;
+    frequencyPos = 5;
 
     private readonly MAX_AMPLITUDE = 1.5;
     private readonly MIN_AMPLITUDE = 0.01;
@@ -65,6 +72,7 @@ export class Ship {
         });
 
         this.setupScrollEvents();
+        this.setupMoveEvents();
     }
     
     createScene(): Scene {
@@ -74,7 +82,7 @@ export class Ship {
         scene.collisionsEnabled = true;
         scene.enablePhysics();
 
-        
+        /*
         const entrance_light = new SpotLight("spotLight", new Vector3(0, 24, 0), new Vector3(0, -1, 0), Math.PI / 2, 10, scene);
         entrance_light.intensity = 1;
         entrance_light.diffuse = new Color3(255,218,100);
@@ -90,7 +98,7 @@ export class Ship {
         const motor_light = new SpotLight("spotLight", new Vector3(-20, 24, 14), new Vector3(0, -1, 0), Math.PI / 2, 10, scene);
         motor_light.intensity = 1;
         motor_light.diffuse = new Color3(255,218,100);
-        
+        */
 
         const camera = createFPSCamera(scene, this.canvas);
         camera.metadata = { isFPSCamera: true }; // Marque la caméra comme FPS pour le Raycast
@@ -100,7 +108,7 @@ export class Ship {
     }
 
     createSpaceShip(): void {
-        SceneLoader.ImportMeshAsync("", "/models/", "spaceship_without_lights.glb", this.scene).then((result) => {
+        SceneLoader.ImportMeshAsync("", "/models/", "spaceship.glb", this.scene).then((result) => {
             const spaceship = result.meshes[0];
 
             console.log("Le vaisseau est bien chargé");
@@ -172,6 +180,7 @@ export class Ship {
             });
 
             this.setupButtonHoverDetection();
+            this.setupMoveEvents();
             this.updateSineWave();   // Dessiner l'onde au démarrage
             this.updateDataScreen(); // Afficher les valeurs par défaut
         });
@@ -204,45 +213,60 @@ export class Ship {
     /**
      * Met à jour l'onde sur les deux écrans et centre correctement l'affichage
      */
-    private lastAmplitude = 0;
-    private lastFrequency = 0;
 
-updateSineWave(): void {
-    if (this.amplitude === this.lastAmplitude && this.frequency === this.lastFrequency) {
-        return; // Skip unnecessary updates
-    }
+    updateSineWave(): void {
 
-    this.lastAmplitude = this.amplitude;
-    this.lastFrequency = this.frequency;
+        //if(!this.isHoveringSomeButton() || !this.isStartOfGame){
+        //    return;
+        //} 
+        // à creuser pour ecnomiser des ressources
 
-    [this.screenTextureSelecteur, this.screenTextureNav].forEach((screenTexture) => {
-        if (!screenTexture) return;
-        const textureContext = screenTexture.getContext();
-        if (!textureContext) return;
-
-        // Clear screen
-        textureContext.fillStyle = "black";
-        textureContext.fillRect(0, 0, 512, 512);
-
-        // Draw Sine Wave
         const centerY = 256;
         const waveHeight = 80;
         const waveLength = Math.PI * 4;
-
-        textureContext.strokeStyle = "lime";
-        textureContext.lineWidth = 3;
-        textureContext.beginPath();
-
-        for (let i = 0; i < 512; i++) {
-            const x = i;
-            const y = centerY - this.amplitude * Math.sin(this.frequency * (i / 512) * waveLength) * waveHeight;
-            i === 0 ? textureContext.moveTo(x, y) : textureContext.lineTo(x, y);
+    
+        // Fonction pour dessiner une sinusoïde sur un contexte de texture
+        const drawSineWave = (context: ICanvasRenderingContext, amplitude: number, frequency: number, color: string): void => {
+            context.strokeStyle = color;
+            context.lineWidth = 3;
+            context.beginPath();
+    
+            for (let i = 0; i < 512; i++) {
+                const x = i;
+                const y = centerY - amplitude * Math.sin(frequency * (i / 512) * waveLength) * waveHeight;
+                i === 0 ? context.moveTo(x, y) : context.lineTo(x, y);
+            }
+    
+            context.stroke();
+        };
+    
+        // Met à jour les textures
+        [this.screenTextureSelecteur, this.screenTextureNav].forEach((screenTexture) => {
+            if (!screenTexture) return;
+            const ctx = screenTexture.getContext();
+            if (!ctx) return;
+    
+            ctx.fillStyle = "black";
+            ctx.fillRect(0, 0, 512, 512);
+    
+            // Utilisation du vert normal pour `screenTextureSelecteur`
+            drawSineWave(ctx, this.amplitude, this.frequency, "lime");
+    
+            screenTexture.update();
+        });
+    
+        // Onde liée à la position du vaisseau (en vert clair)
+        if (this.screenTextureNav) {
+            const ctx = this.screenTextureNav.getContext();
+            if (ctx) {
+                drawSineWave(ctx, this.amplitudePos, this.frequencyPos, "#90EE90"); // Vert clair (light green)
+                this.screenTextureNav.update();
+            }
         }
 
-        textureContext.stroke();
-        screenTexture.update();
-    });
-}
+        this.isStartOfGame = false; //Ppour le premier affichage
+    }
+    
 
     updateDataScreen(): void {
         if (this.screenTextureAmp) {
@@ -265,26 +289,57 @@ updateSineWave(): void {
     }
 
 
+    private intervalId: number | null = null; // Stocke l'intervalle en cours
+
     setupMoveEvents(): void {
-        this.canvas.addEventListener("click", (event) => {
-            if (this.isHoveringUp) {
-                //highLightButton(this.buttonUp);
-            } else if (this.isHoveringDown) {
-                //highLightButton(this.buttonDown);
-            } else if (this.isHoveringLeft) {
-                //highLightButton(this.buttonLeft);
-            } else if (this.isHoveringRight) {
-                //highLightButton(this.buttonRight);
-            }
+        this.canvas.addEventListener("mousedown", (event) => {
+            this.startIncrementing();
+        });
+
+        this.canvas.addEventListener("mouseup", () => {
+            this.stopIncrementing();
+        });
+
+        this.canvas.addEventListener("mouseleave", () => {
+            this.stopIncrementing(); // Arrêter si la souris quitte la zone
         });
     }
+
+    private startIncrementing(): void {
+        if (this.intervalId !== null) return; // Évite de créer plusieurs intervals
+
+        this.intervalId = setInterval(() => {
+            if (this.isHoveringUp) {
+                this.amplitudePos += 0.01; 
+            } else if (this.isHoveringDown) {
+                this.amplitudePos -= 0.01; 
+            } else if (this.isHoveringRight) {
+                this.frequencyPos += 0.01;
+            } else if (this.isHoveringLeft) {
+                this.frequencyPos -= 0.01;
+            }
+
+            this.amplitudePos = Math.max(0, Math.min(this.amplitudePos, 1));
+            this.frequencyPos = Math.max(0.1, Math.min(this.frequencyPos, 10));
+
+            this.updateSineWave(); 
+        }, 50); // Met à jour toutes les 50ms
+    }
+
+    private stopIncrementing(): void {
+        if (this.intervalId !== null) {
+            clearInterval(this.intervalId);
+            this.intervalId = null;
+        }
+    }
+    
 
     setupScrollEvents(): void {
         this.canvas.addEventListener("wheel", (event) => {
             if (this.isHoveringAmplitude) {
-                this.amplitude += (event.deltaY < 0) ? 0.1 : -0.1;
+                this.amplitude += (event.deltaY < 0) ? 0.05 : -0.05;
             } else if (this.isHoveringFrequency) {
-                this.frequency += (event.deltaY < 0) ? 0.1 : -0.1;
+                this.frequency += (event.deltaY < 0) ? 0.05 : -0.05;
             }
     
             // Appliquer les limites
@@ -314,6 +369,10 @@ updateSineWave(): void {
 
     }
     
+    isHoveringSomeButton() {
+        return this.isHoveringAmplitude || this.isHoveringFrequency || this.isHoveringUp || this.isHoveringDown || this.isHoveringLeft || this.isHoveringRight;
+    }
+
     setupButtonMaterials(): void {
         if (!this.scene) return;
     
