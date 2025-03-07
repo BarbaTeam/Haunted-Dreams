@@ -86,23 +86,23 @@ export class Ship {
         scene.collisionsEnabled = true;
         scene.enablePhysics();
 
-        /*
+        
         const entrance_light = new SpotLight("spotLight", new Vector3(0, 24, 0), new Vector3(0, -1, 0), Math.PI / 2, 10, scene);
-        entrance_light.intensity = 1;
+        entrance_light.intensity = 1.5;
         entrance_light.diffuse = new Color3(255,218,100);
 
-        const table_light = new SpotLight("spotLight", new Vector3(0, 24, 20), new Vector3(0, -1, 0), Math.PI / 2, 10, scene);
-        table_light.intensity = 1;
+        const table_light = new SpotLight("spotLight", new Vector3(0, 24, 25), new Vector3(0, -1, 0), Math.PI / 2, 10, scene);
+        table_light.intensity = 1.5;
         table_light.diffuse = new Color3(255,218,100);
 
-        const nav_light = new SpotLight("spotLight", new Vector3(25, 24, 14), new Vector3(0, -1, 0), Math.PI / 2, 10, scene);
-        nav_light.intensity = 1;
+        const nav_light = new SpotLight("spotLight", new Vector3(28, 24, 14), new Vector3(0, -1, 0), Math.PI / 2, 10, scene);
+        nav_light.intensity = 1.5;
         nav_light.diffuse = new Color3(255,218,100);
 
         const motor_light = new SpotLight("spotLight", new Vector3(-20, 24, 14), new Vector3(0, -1, 0), Math.PI / 2, 10, scene);
-        motor_light.intensity = 1;
+        motor_light.intensity = 1.5;
         motor_light.diffuse = new Color3(255,218,100);
-        */
+        
 
         const camera = createFPSCamera(scene, this.canvas);
         camera.metadata = { isFPSCamera: true }; // Marque la caméra comme FPS pour le Raycast
@@ -157,17 +157,17 @@ export class Ship {
                 // Création de la texture dynamique pour l'écran du sélecteur
                 if (mesh.name === "selecteur_onde.screen") {
                     this.screenTextureSelecteur = this.createScreenMaterial(mesh);
-                    this.screenTextureSelecteur.uScale = 4.6;
-                    this.screenTextureSelecteur.vScale = 5;
-                    this.screenTextureSelecteur.uOffset = -0.005;
-                    this.screenTextureSelecteur.vOffset = 0.25;
+                    this.screenTextureSelecteur.uScale = 1;
+                    this.screenTextureSelecteur.vScale = 1;
+                    this.screenTextureSelecteur.uOffset = 0;
+                    this.screenTextureSelecteur.vOffset = 0.26;
                 }
 
                 // Création de la texture dynamique pour l'écran de navigation
                 if (mesh.name === "poste_navigation.screen") {
                     this.screenTextureNav = this.createScreenMaterial(mesh);
-                    this.screenTextureNav.uScale = 5;
-                    this.screenTextureNav.vScale = 5;
+                    this.screenTextureNav.uScale = 1;
+                    this.screenTextureNav.vScale = 1;
                     this.screenTextureNav.uOffset = 0;
                     this.screenTextureNav.vOffset = 0.2;
                 }
@@ -327,8 +327,8 @@ export class Ship {
                 this.frequencyPos -= 0.01;
             }
 
-            this.amplitudePos = Math.max(0, Math.min(this.amplitudePos, 1));
-            this.frequencyPos = Math.max(0.1, Math.min(this.frequencyPos, 10));
+            this.amplitudePos = Math.max(this.MIN_AMPLITUDE, Math.min(this.amplitudePos, this.MAX_AMPLITUDE));
+            this.frequencyPos = Math.max(this.MIN_FREQUENCY, Math.min(this.frequencyPos, this.MAX_FREQUENCY));
 
             this.updateSineWave(); 
         }, 50); // Met à jour toutes les 50ms
