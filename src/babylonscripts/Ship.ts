@@ -8,7 +8,8 @@ import {
     PBRMetallicRoughnessMaterial,
     PointLight,
     SpotLight,
-    ICanvasRenderingContext
+    ICanvasRenderingContext,
+    ShadowGenerator
 } from '@babylonjs/core';
 import { createFPSCamera } from './Camera';
 import "@babylonjs/loaders";
@@ -56,9 +57,12 @@ export class Ship {
     private isHoveringLeft = false;
     private isHoveringRight = false;
 
+    private metalfootstep: Sound | undefined;
+
     constructor(private canvas: HTMLCanvasElement) {
         this.engine = new Engine(this.canvas, true);
         this.scene = this.createScene();
+
         this.createSpaceShip();
         this.createGround();
 
@@ -76,7 +80,8 @@ export class Ship {
         });
 
         this.setupScrollEvents();
-        this.setupMoveEvents();
+        this.setupNavEvents();
+        this.setupMoveEvents()
     }
     
     createScene(): Scene {
@@ -107,7 +112,7 @@ export class Ship {
         const camera = createFPSCamera(scene, this.canvas);
         camera.metadata = { isFPSCamera: true }; // Marque la caméra comme FPS pour le Raycast
 
-            
+        
         return scene;
     }
 
@@ -188,7 +193,8 @@ export class Ship {
             });
 
             this.setupButtonHoverDetection();
-            this.setupMoveEvents();
+            this.setupNavEvents();
+            this.setupPhotoEvent();
             this.updateSineWave();   // Dessiner l'onde au démarrage
             this.updateDataScreen(); // Afficher les valeurs par défaut
         });
@@ -196,6 +202,7 @@ export class Ship {
         // Sons d'ambiance
         new Sound("", "/sons/buzzing-sound.wav", this.scene, null, { volume: 0.05, autoplay: true, loop: true });
         new Sound("", "/sons/horror-ambience-01-66708.mp3", this.scene, null, { volume: 0.5, autoplay: true, loop: true });
+        this.metalfootstep = new Sound("", "/sons/metal-footsteps.mp3", this.scene, null, { volume: 0.5, autoplay: false, loop: true });
     }
 
     createGround(): void {
@@ -296,10 +303,34 @@ export class Ship {
         }
     }
 
+    private pressedKeys: Set<string> = new Set();
+
+    setupMoveEvents(): void {
+        window.addEventListener("keydown", (event) => {
+            const key = event.key.toLowerCase();
+            if (["z", "q", "s", "d"].includes(key)) {
+                this.pressedKeys.add(key);
+                if (this.metalfootstep && !this.metalfootstep.isPlaying) {
+                    this.metalfootstep.play();
+                }
+        }
+        });
+    
+        window.addEventListener("keyup", (event) => {
+            const key = event.key.toLowerCase();
+            if (["z", "q", "s", "d"].includes(key)) {
+                this.pressedKeys.delete(key);
+                if (this.pressedKeys.size === 0 && this.metalfootstep && this.metalfootstep.isPlaying) {
+                    this.metalfootstep.stop();
+                }
+            }
+        });
+    }
+
 
     private intervalId: number | null = null; // Stocke l'intervalle en cours
 
-    setupMoveEvents(): void {
+    setupNavEvents(): void {
         this.canvas.addEventListener("mousedown", (event) => {
             this.startIncrementing();
         });
@@ -361,7 +392,21 @@ export class Ship {
         });
     }
     
-    
+    setupPhotoEvent(): void {
+        this.canvas.addEventListener("mousedown", (event) => {
+            if(this.isHoveringPhoto){
+                if(this.isOverlap()){
+                    console.log("cauchemar photographié !");
+                }
+                else{
+                    console.log("rêve photographié !");
+                    console.log("amplitude : " + this.amplitudePos + " fréquence : " + this.frequencyPos);
+                }
+
+            }
+        });
+        }
+
     setupButtonHoverDetection(): void {
         this.scene.onPointerMove = (event) => {
             const hit = this.scene.pick(this.scene.getEngine().getRenderWidth() / 2, this.scene.getEngine().getRenderHeight() / 2);
@@ -431,6 +476,10 @@ export class Ship {
                 this.buttonPhoto.material = this.isHoveringPhoto ? highlightMaterial : buttonMaterial;
         }}
     );
+    }
+
+    isOverlap() {
+        return Math.abs(this.amplitudePos - this.amplitude) < 0.01 && Math.abs(this.frequencyPos - this.frequency) < 0.01;
     }
     
 }
