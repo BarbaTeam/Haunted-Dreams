@@ -9,7 +9,8 @@ import {
     PointLight,
     SpotLight,
     ICanvasRenderingContext,
-    ShadowGenerator
+    ShadowGenerator,
+    Texture
 } from '@babylonjs/core';
 import { createFPSCamera } from './Camera';
 import "@babylonjs/loaders";
@@ -32,32 +33,44 @@ export class Ship {
     private readonly MAX_FREQUENCY = 10;
     private readonly MIN_FREQUENCY = 1;
 
-    private screenTextureSelecteur: DynamicTexture | null = null;
-    private screenTextureNav: DynamicTexture | null = null;
-    private screenTextureAmp: DynamicTexture | null = null;
-    private screenTextureFreq: DynamicTexture | null = null;
+    private screenTextureSelecteur!: DynamicTexture;
+    private screenTextureNav!: DynamicTexture;
+    private screenTextureAmp!: DynamicTexture;
+    private screenTextureFreq!: DynamicTexture;
+    private motorTextureOn!: Texture;
+    private motorTextureOff!: Texture;
+    private motorMaterial!: StandardMaterial;
 
-    private buttonAmplitude: AbstractMesh | null = null;
-    private buttonFrequency: AbstractMesh | null = null;
+    private buttonAmplitude!: AbstractMesh;
+    private buttonFrequency!: AbstractMesh;
 
     private isHoveringAmplitude = false;
     private isHoveringFrequency = false;
 
-    private buttonUp: AbstractMesh | null = null;
-    private buttonDown: AbstractMesh | null = null;
-    private buttonLeft: AbstractMesh | null = null;
-    private buttonRight: AbstractMesh | null = null;
+    private buttonUp!: AbstractMesh;
+    private buttonDown!: AbstractMesh;
+    private buttonLeft!: AbstractMesh;
+    private buttonRight!: AbstractMesh;
 
-    private buttonPhoto: AbstractMesh | null = null;
+    private buttonPhoto!: AbstractMesh;
+    
+    private engineState = true;
+    private buttonMotor!: AbstractMesh;
+    private motor_control_screen!: AbstractMesh;
+    private door!: AbstractMesh
+    private lightList: SpotLight[] = [];
 
     private isHoveringPhoto = false;
-
+    private isHoveringMotor = false
     private isHoveringUp = false;
     private isHoveringDown = false;
     private isHoveringLeft = false;
     private isHoveringRight = false;
 
-    private metalfootstep: Sound | undefined;
+    private metalfootstep!: Sound;
+    private buzzingSound!: Sound;
+    private motorSound!: Sound;
+    private horrorSound!: Sound;
 
     constructor(private canvas: HTMLCanvasElement) {
         this.engine = new Engine(this.canvas, true);
@@ -81,7 +94,8 @@ export class Ship {
 
         this.setupScrollEvents();
         this.setupNavEvents();
-        this.setupMoveEvents()
+        this.setupMoveEvents();
+        this.setupMotorEvents();
     }
     
     createScene(): Scene {
@@ -91,23 +105,28 @@ export class Ship {
         scene.collisionsEnabled = true;
         scene.enablePhysics();
 
-        
         const entrance_light = new SpotLight("spotLight", new Vector3(0, 24, 0), new Vector3(0, -1, 0), Math.PI / 2, 10, scene);
         entrance_light.intensity = 1.5;
-        entrance_light.diffuse = new Color3(255,218,100);
 
         const table_light = new SpotLight("spotLight", new Vector3(0, 24, 25), new Vector3(0, -1, 0), Math.PI / 2, 10, scene);
         table_light.intensity = 1.5;
-        table_light.diffuse = new Color3(255,218,100);
 
         const nav_light = new SpotLight("spotLight", new Vector3(28, 24, 14), new Vector3(0, -1, 0), Math.PI / 2, 10, scene);
         nav_light.intensity = 1.5;
-        nav_light.diffuse = new Color3(255,218,100);
 
         const motor_light = new SpotLight("spotLight", new Vector3(-20, 24, 14), new Vector3(0, -1, 0), Math.PI / 2, 10, scene);
         motor_light.intensity = 1.5;
-        motor_light.diffuse = new Color3(255,218,100);
         
+        this.lightList = [
+            entrance_light,
+            table_light,
+            nav_light,
+            motor_light
+        ];
+
+        this.lightList.forEach((light) => {
+            light.diffuse = new Color3(140,166,155);
+        });
 
         const camera = createFPSCamera(scene, this.canvas);
         camera.metadata = { isFPSCamera: true }; // Marque la caméra comme FPS pour le Raycast
@@ -159,6 +178,31 @@ export class Ship {
                     this.buttonPhoto = mesh;
                 }
 
+                if(mesh.name === "motor_controle.boutton"){
+                    this.buttonMotor = mesh;
+                }
+
+                if(mesh.name === "motor_controle.screen"){
+                    this.motor_control_screen = mesh;
+                    this.motorMaterial = new StandardMaterial("motor_control_screen", this.scene);
+                    this.motorTextureOn = new Texture("/images/power_on.png", this.scene);
+                    this.motorTextureOff = new Texture("/images/power_off.png", this.scene);
+
+                    this.motorTextureOn.wAng = Math.PI/2;
+                    this.motorTextureOn.uScale = -1.1;
+                    this.motorTextureOn.vScale = 1.1;
+                    this.motorTextureOn.uOffset = -50;
+                    this.motorTextureOn.vOffset = 1;
+                    this.motorTextureOff.wAng = Math.PI/2;
+                    this.motorTextureOff.uScale = -1.1;
+                    this.motorTextureOff.vScale = 1.1;
+                    this.motorTextureOff.uOffset = -50;
+                    this.motorTextureOff.vOffset = 1;
+                    mesh.material = this.motorMaterial;
+                    this.motorMaterial.diffuseTexture = this.motorTextureOn;
+
+                }
+
                 // Création de la texture dynamique pour l'écran du sélecteur
                 if (mesh.name === "selecteur_onde.screen") {
                     this.screenTextureSelecteur = this.createScreenMaterial(mesh);
@@ -188,7 +232,7 @@ export class Ship {
                 }
 
                 if (mesh.name === "walls.door"){
-                   //mesh.isVisible = false; 
+                    this.door = mesh;
                 }
             });
 
@@ -200,9 +244,10 @@ export class Ship {
         });
 
         // Sons d'ambiance
-        new Sound("", "/sons/buzzing-sound.wav", this.scene, null, { volume: 0.05, autoplay: true, loop: true });
-        new Sound("", "/sons/horror-ambience-01-66708.mp3", this.scene, null, { volume: 0.5, autoplay: true, loop: true });
+        this.buzzingSound = new Sound("", "/sons/buzzing-sound.wav", this.scene, null, { volume: 0.05, autoplay: true, loop: true });
+        this.motorSound = new Sound("", "/sons/horror-ambience-01-66708.mp3", this.scene, null, { volume: 0.5, autoplay: true, loop: true });
         this.metalfootstep = new Sound("", "/sons/metal-footsteps.mp3", this.scene, null, { volume: 0.5, autoplay: false, loop: true });
+        this.horrorSound = new Sound("", "/sons/spooky-ambience-sound.mp3",this.scene, null, { volume : 0.5, autoplay: false, loop: true});
     }
 
     createGround(): void {
@@ -301,6 +346,19 @@ export class Ship {
                 "lime", "transparent", false, true
             );
         }
+    }
+
+    setupMotorEvents(): void {
+        this.canvas.addEventListener("mousedown", (event) => {
+            if(this.isHoveringMotor){
+                if(this.engineState){
+                    this.shutDownEngine();
+                }
+                else{
+                    this.powerEngine();
+                }
+            }
+        });
     }
 
     private pressedKeys: Set<string> = new Set();
@@ -418,6 +476,7 @@ export class Ship {
             this.isHoveringLeft = hit?.pickedMesh === this.buttonLeft;
             this.isHoveringRight = hit?.pickedMesh === this.buttonRight;
             this.isHoveringPhoto = hit?.pickedMesh === this.buttonPhoto;
+            this.isHoveringMotor = hit?.pickedMesh === this.buttonMotor;
         };
         this.setupButtonMaterials();
 
@@ -444,7 +503,9 @@ export class Ship {
             this.buttonUp,
             this.buttonDown,
             this.buttonLeft,
-            this.buttonRight
+            this.buttonRight,
+            this.buttonPhoto,
+            this.buttonMotor
         ];
     
         buttons.forEach((button) => {
@@ -474,12 +535,47 @@ export class Ship {
             }
             if (this.buttonPhoto) {
                 this.buttonPhoto.material = this.isHoveringPhoto ? highlightMaterial : buttonMaterial;
-        }}
+            }
+            if (this.buttonMotor) {
+                this.buttonMotor.material = this.isHoveringMotor ? highlightMaterial : buttonMaterial;
+            }
+        }
     );
     }
 
     isOverlap() {
         return Math.abs(this.amplitudePos - this.amplitude) < 0.01 && Math.abs(this.frequencyPos - this.frequency) < 0.01;
     }
-    
+
+    powerEngine() {
+        this.engineState = true;
+        this.buzzingSound?.play();
+        this.motorSound?.play();
+        if (this.door) {
+            this.door.isVisible = true;
+        }
+        if (this.motorMaterial) {
+            this.motorMaterial.diffuseTexture = this.motorTextureOn;
+        }
+        this.lightList.forEach((light) => {
+            light.diffuse = new Color3(140,166,155);
+        });
+        this.horrorSound.stop();
+    }
+
+    shutDownEngine() {
+        this.engineState = false;
+        this.buzzingSound?.stop();
+        this.motorSound?.stop();
+        if (this.door) {
+            this.door.isVisible = false;
+        }
+        if (this.motorMaterial) {
+            this.motorMaterial.diffuseTexture = this.motorTextureOff;
+        }
+        this.lightList.forEach((light) => {
+            light.diffuse = new Color3(175,0,0);
+        });
+        this.horrorSound?.play();
+    }
 }
