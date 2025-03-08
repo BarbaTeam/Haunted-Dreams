@@ -26,11 +26,15 @@ export class Ship {
 
     isStartOfGame = true;
 
-    amplitude = 0.5;
-    frequency = 2;
+    amplitude = Math.random() * 1.5; 
+    frequency = Math.random() * 10; 
 
-    amplitudePos = 0.2;
-    frequencyPos = 5;
+    amplitudePos = Math.random() * 1.5; 
+    frequencyPos =Math.random() * 10; 
+
+    angle = Math.random() * Math.PI * 2;
+    points: { x: number, y: number }[] = [];
+    angle_points: number[] = [];
 
     private readonly MAX_AMPLITUDE = 1.5;
     private readonly MIN_AMPLITUDE = 0.01;
@@ -41,6 +45,7 @@ export class Ship {
     private screenTextureNav!: DynamicTexture;
     private screenTextureAmp!: DynamicTexture;
     private screenTextureFreq!: DynamicTexture;
+    private screenTextureBoussole!: DynamicTexture;
     private motorTextureOn!: Texture;
     private motorTextureOff!: Texture;
     private motorMaterial!: StandardMaterial;
@@ -240,6 +245,9 @@ export class Ship {
                     this.screenTextureNav.vOffset = 0.2;
                 }
 
+                if (mesh.name ==="boussole.screen"){
+                    this.screenTextureBoussole = this.createScreenMaterial(mesh);
+                }
                 // Création de la texture dynamique pour l'écran de l'amplitude
                 if (mesh.name === "amplitude_screen") {
                     this.screenTextureAmp = this.createScreenMaterial(mesh);
@@ -260,6 +268,7 @@ export class Ship {
             this.setupPhotoEvent();
             this.updateSineWave();   // Dessiner l'onde au démarrage
             this.updateDataScreen(); // Afficher les valeurs par défaut
+            this.updateBoussoleScreen();
         });
 
         // Sons d'ambiance
@@ -367,6 +376,98 @@ export class Ship {
         }
     }
 
+    updateBoussoleScreen(): void {
+
+        const drawCircle = (context: ICanvasRenderingContext, color: string): void => {
+            const centerX = 256;
+            const centerY = 256;
+            const radius = 220;
+        
+            for (let i = 0; i < 21; i++) {
+                const angle = (i / 21) * 2 * Math.PI; // Diviser l'angle en 21 parts égales
+                const x = centerX + radius * Math.cos(angle); // Calculer la position X
+                const y = centerY + radius * Math.sin(angle); // Calculer la position Y
+        
+                this.points.push({ x, y }); // Stocker les coordonnées dans le tableau
+                this.angle_points.push(angle);
+
+                // Dessiner un petit cercle pour chaque point
+                context.beginPath();
+                
+                context.arc(x, y, 20, 0, 2 * Math.PI);
+                if(this.angle_points[i].toFixed(1) === this.angle.toFixed(1)){
+                    context.fillStyle = "#FF0000"; // Remplir avec la couleur
+                }
+                else{
+                    context.fillStyle = color; // Remplir avec la couleur
+                }
+                context.fill();
+            }
+            console.log(this.angle_points);
+            console.log(this.angle);
+        
+        };
+
+        const drawArrow = (context: ICanvasRenderingContext, angle: number): void => {
+            const startX = 256; 
+            const startY = 256; 
+            const arrowHeadLength = 100; 
+            const arrowHeadWidth = 70;
+            const color = "#FF0000";
+        
+            // Sauvegarde l'état du contexte (pour ne pas affecter les autres dessins)
+            context.save();
+
+            // Déplacer le point de référence au centre de la flèche
+            context.translate(startX, startY);
+            // Appliquer la rotation en fonction de l'angle
+            context.rotate(angle);
+
+            context.beginPath();
+            context.arc(0, 0, 150, 0, 2 * Math.PI);
+            context.fillStyle = "#000000"; // Remplir avec la couleur
+            context.fill();
+
+            // Dessiner la tête de la flèche sous forme de triangle allongé
+            context.strokeStyle = color;
+            context.lineWidth = 3;
+            context.beginPath();
+
+            context.moveTo(130, 0); 
+        
+            // Point à gauche de la base du triangle (base de la flèche)
+            context.lineTo(-arrowHeadLength, -arrowHeadWidth); 
+        
+            // Point à droite de la base du triangle
+            context.lineTo(-arrowHeadLength, arrowHeadWidth); 
+        
+            // Retour au centre de la flèche
+            context.closePath();
+        
+            // Dessiner le triangle
+            context.stroke();
+        
+            // Remplir le triangle avec la couleur
+            context.fillStyle = color;
+            context.fill();
+        
+            // Restaure l'état du contexte (pour ne pas affecter d'autres dessins)
+            context.restore();
+        };
+        
+        
+        if (this.screenTextureBoussole) {
+            const context = this.screenTextureBoussole.getContext(); // Récupère le contexte de dessin 2D du canvas
+            if (context) {
+                drawCircle(context, "#013500",);
+                drawArrow(context, this.angle);
+            }
+        }
+        this.screenTextureBoussole.update();
+    }
+    
+    
+
     setupMotorEvents(): void {
         this.canvas.addEventListener("mousedown", (event) => {
             if(this.isHoveringMotor){
@@ -430,15 +531,22 @@ export class Ship {
             } else if (this.isHoveringDown) {
                 this.amplitudePos -= 0.01; 
             } else if (this.isHoveringRight) {
-                this.frequencyPos += 0.01;
+                this.angle -= Math.PI / 180;
             } else if (this.isHoveringLeft) {
-                this.frequencyPos -= 0.01;
+                this.angle += Math.PI / 180;            
+            }
+            if (this.angle > 2 * Math.PI) {
+                this.angle -= 2 * Math.PI; 
+            }
+            if (this.angle < -2 * Math.PI) {
+                this.angle += 2 * Math.PI; 
             }
 
             this.amplitudePos = Math.max(this.MIN_AMPLITUDE, Math.min(this.amplitudePos, this.MAX_AMPLITUDE));
             this.frequencyPos = Math.max(this.MIN_FREQUENCY, Math.min(this.frequencyPos, this.MAX_FREQUENCY));
 
             this.updateSineWave(); 
+            this.updateBoussoleScreen();
         }, 50); // Met à jour toutes les 50ms
     }
 
