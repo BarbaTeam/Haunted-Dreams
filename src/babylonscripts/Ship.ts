@@ -10,7 +10,11 @@ import {
     SpotLight,
     ICanvasRenderingContext,
     ShadowGenerator,
-    Texture
+    Texture,
+    DefaultRenderingPipeline,
+    DepthOfFieldEffectBlurLevel,
+    ColorCorrectionPostProcess,
+    SSAO2RenderingPipeline
 } from '@babylonjs/core';
 import { createFPSCamera } from './Camera';
 import "@babylonjs/loaders";
@@ -105,34 +109,52 @@ export class Ship {
         scene.collisionsEnabled = true;
         scene.enablePhysics();
 
-        const entrance_light = new SpotLight("spotLight", new Vector3(0, 24, 0), new Vector3(0, -1, 0), Math.PI / 2, 10, scene);
-        entrance_light.intensity = 1.5;
+        const entrance_light = new SpotLight("spotLight", new Vector3(0, 16, -6), new Vector3(0, -1, 0), Math.PI / 2, 10, scene);
+        const entrance_light2 = new SpotLight("spotLight", new Vector3(0, 16, -6), new Vector3(0.5, -1, 0.5), Math.PI / 2, 10, scene);
+        const entrance_light3 = new SpotLight("spotLight", new Vector3(0, 16, -6), new Vector3(-0.5, -1, 0.5), Math.PI / 2, 10, scene);
 
-        const table_light = new SpotLight("spotLight", new Vector3(0, 24, 25), new Vector3(0, -1, 0), Math.PI / 2, 10, scene);
-        table_light.intensity = 1.5;
+        
+        const table_light = new SpotLight("spotLight", new Vector3(0, 16, 34), new Vector3(0, -1, 0), Math.PI / 2, 5, scene);
+        const table_light2 = new SpotLight("spotLight", new Vector3(0, 16, 34), new Vector3(0.5, -1, -0.5), Math.PI / 2, 10, scene);
+        const table_light3 = new SpotLight("spotLight", new Vector3(0, 16, 34), new Vector3(-0.5, -1, -0.5), Math.PI / 2, 10, scene);
 
-        const nav_light = new SpotLight("spotLight", new Vector3(28, 24, 14), new Vector3(0, -1, 0), Math.PI / 2, 10, scene);
-        nav_light.intensity = 1.5;
+        const nav_light = new SpotLight("spotLight", new Vector3(13, 16, 13.5), new Vector3(0.2, -1, 0), Math.PI * (2/3), 10, scene);
+        const nav_light2 = new SpotLight("spotLight", new Vector3(41, 16, 13.5), new Vector3(-1, -1, 0), Math.PI * (2/3), 10, scene);
 
-        const motor_light = new SpotLight("spotLight", new Vector3(-20, 24, 14), new Vector3(0, -1, 0), Math.PI / 2, 10, scene);
-        motor_light.intensity = 1.5;
+        const motor_light = new SpotLight("spotLight", new Vector3(-14, 16, 13.5), new Vector3(-1, -1, 0), Math.PI * (2/3), 10, scene);
+        
         
         this.lightList = [
             entrance_light,
+            entrance_light2,
+            entrance_light3,
             table_light,
+            table_light2,
+            table_light3,
             nav_light,
+            nav_light2,
             motor_light
         ];
 
         this.lightList.forEach((light) => {
-            light.shadowEnabled = true;
-            light.diffuse = new Color3(140,166,155);
+            light.intensity = 1;
+            light.diffuse = new Color3(106, 143, 63);
+            light.range = 2;
         });
 
         const camera = createFPSCamera(scene, this.canvas);
         camera.metadata = { isFPSCamera: true }; // Marque la caméra comme FPS pour le Raycast
 
-        
+        // POST-PROCESSING 
+
+        // profondeur de champ
+        const pipeline = new DefaultRenderingPipeline("pipeline", true, scene, [camera]);
+        pipeline.depthOfFieldEnabled = true;
+        pipeline.depthOfFieldBlurLevel = DepthOfFieldEffectBlurLevel.Low;
+        pipeline.depthOfField.focalLength = 1; 
+        pipeline.depthOfField.fStop = 2; 
+        pipeline.depthOfField.focusDistance = 1000; 
+
         return scene;
     }
 
@@ -146,7 +168,7 @@ export class Ship {
             spaceship.getChildMeshes().forEach(mesh => {
                 console.log(mesh.name);
                 mesh.checkCollisions = true;
-
+                
                 // Détection des boutons du selecteur d'onde
                 if (mesh.name === "selecteur_onde.boutton_amplitude") {
                     //mesh.showBoundingBox = true;
@@ -195,7 +217,8 @@ export class Ship {
                     this.motorTextureOff.uScale = -1;
                     
                     mesh.material = this.motorMaterial;
-                    this.motorMaterial.diffuseTexture = this.motorTextureOn;
+                    this.motorMaterial.emissiveTexture = this.motorTextureOn;
+                    this.motorMaterial.specularColor = new Color3(0, 0, 0);
 
                 }
 
@@ -259,7 +282,7 @@ export class Ship {
     createScreenMaterial(mesh: AbstractMesh): DynamicTexture {
         const dynamicTexture = new DynamicTexture("waveTexture", { width: 512, height: 512 }, this.scene, true);
         const material = new StandardMaterial("screenMaterial", this.scene);
-        material.diffuseTexture = dynamicTexture;
+        material.emissiveTexture = dynamicTexture;
         material.specularColor = new Color3(0, 0, 0); 
         mesh.material = material;
 
@@ -554,7 +577,8 @@ export class Ship {
             this.motorMaterial.diffuseTexture = this.motorTextureOn;
         }
         this.lightList.forEach((light) => {
-            light.diffuse = new Color3(140,166,155);
+            light.diffuse = new Color3(106, 143, 63);
+            light.intensity = 1;
         });
         this.horrorSound.stop();
     }
@@ -571,6 +595,7 @@ export class Ship {
         }
         this.lightList.forEach((light) => {
             light.diffuse = new Color3(175,0,0);
+            light.intensity = 0.5;
         });
         this.horrorSound?.play();
     }
