@@ -125,6 +125,7 @@ export class Ship {
         ];
 
         this.lightList.forEach((light) => {
+            light.shadowEnabled = true;
             light.diffuse = new Color3(140,166,155);
         });
 
@@ -189,15 +190,10 @@ export class Ship {
                     this.motorTextureOff = new Texture("/images/power_off.png", this.scene);
 
                     this.motorTextureOn.wAng = Math.PI/2;
-                    this.motorTextureOn.uScale = -1.1;
-                    this.motorTextureOn.vScale = 1.1;
-                    this.motorTextureOn.uOffset = -50;
-                    this.motorTextureOn.vOffset = 1;
+                    this.motorTextureOn.uScale = -1;
                     this.motorTextureOff.wAng = Math.PI/2;
-                    this.motorTextureOff.uScale = -1.1;
-                    this.motorTextureOff.vScale = 1.1;
-                    this.motorTextureOff.uOffset = -50;
-                    this.motorTextureOff.vOffset = 1;
+                    this.motorTextureOff.uScale = -1;
+                    
                     mesh.material = this.motorMaterial;
                     this.motorMaterial.diffuseTexture = this.motorTextureOn;
 
