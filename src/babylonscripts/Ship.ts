@@ -538,7 +538,7 @@ export class Ship {
             if (this.angle > 2 * Math.PI) {
                 this.angle -= 2 * Math.PI; 
             }
-            if (this.angle < -2 * Math.PI) {
+            if (this.angle < 0) {
                 this.angle += 2 * Math.PI; 
             }
 
