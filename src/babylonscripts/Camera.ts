@@ -1,6 +1,6 @@
 
-import { Scene, Vector3, UniversalCamera, ArcRotateCamera } from "@babylonjs/core";
-import { AdvancedDynamicTexture, Button } from "@babylonjs/gui";
+import { Scene, Vector3, UniversalCamera, ArcRotateCamera, BlurPostProcess } from "@babylonjs/core";
+import { AdvancedDynamicTexture, Button, Rectangle, Image } from "@babylonjs/gui";
 
 
 export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement): UniversalCamera {
@@ -41,15 +41,29 @@ export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement): Univer
         camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x)); // Limite pour éviter un retournement total
     }
     
-    // **Ajout d'un curseur (réticule)**
+    // **Création de l'interface UI unique**
     const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("UI");
+
+    // **Ajout du curseur (réticule)**
     const crosshair = Button.CreateImageOnlyButton("crosshair", "/images/circle.svg");
     crosshair.width = "15px";
     crosshair.height = "15px";
     crosshair.color = "transparent";
     advancedTexture.addControl(crosshair);
 
+    // **Ajout de l'image du casque**
+    const helmetOverlay = new Rectangle("helmetOverlay");
+    helmetOverlay.width = "100%";
+    helmetOverlay.height = "100%";
+    helmetOverlay.thickness = 0;
+    advancedTexture.addControl(helmetOverlay);
+
+    const helmetImage = new Image("helmetImage", "/images/casque.png");
+    helmetImage.stretch = Image.STRETCH_FILL;
+    helmetOverlay.addControl(helmetImage);
+
     return camera;
+
 }
 
 
