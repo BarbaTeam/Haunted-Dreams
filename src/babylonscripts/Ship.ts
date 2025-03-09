@@ -107,6 +107,22 @@ export class Ship {
         this.setupMotorEvents();
     }
     
+
+
+
+
+
+
+
+
+
+   
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //                                                                                                            //                                  
+    //                                         GESTION DE LA SCENE                                                //
+    //                                                                                                            //
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     createScene(): Scene {
         const scene = new Scene(this.engine);
         scene.clearColor = new Color4(0, 0, 0, 1); 
@@ -298,9 +314,22 @@ export class Ship {
         return dynamicTexture;
     }
 
-    /**
-     * Met à jour l'onde sur les deux écrans et centre correctement l'affichage
-     */
+
+
+
+
+
+
+
+
+
+   
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //                                                                                                            //                                  
+    //                                            GESTION DES ECRANS                                              //
+    //                                                                                                            //
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
     updateSineWave(): void {
 
@@ -468,43 +497,15 @@ export class Ship {
     
     
 
-    setupMotorEvents(): void {
-        this.canvas.addEventListener("mousedown", (event) => {
-            if(this.isHoveringMotor){
-                if(this.engineState){
-                    this.shutDownEngine();
-                }
-                else{
-                    this.powerEngine();
-                }
-            }
-        });
-    }
 
-    private pressedKeys: Set<string> = new Set();
 
-    setupMoveEvents(): void {
-        window.addEventListener("keydown", (event) => {
-            const key = event.key.toLowerCase();
-            if (["z", "q", "s", "d"].includes(key)) {
-                this.pressedKeys.add(key);
-                if (this.metalfootstep && !this.metalfootstep.isPlaying) {
-                    this.metalfootstep.play();
-                }
-        }
-        });
+
     
-        window.addEventListener("keyup", (event) => {
-            const key = event.key.toLowerCase();
-            if (["z", "q", "s", "d"].includes(key)) {
-                this.pressedKeys.delete(key);
-                if (this.pressedKeys.size === 0 && this.metalfootstep && this.metalfootstep.isPlaying) {
-                    this.metalfootstep.stop();
-                }
-            }
-        });
-    }
-
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //                                                                                                            //                                  
+    //                                         GESTION DES EVENEMENTS                                             //
+    //                                                                                                            //
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private intervalId: number | null = null; // Stocke l'intervalle en cours
 
@@ -521,7 +522,7 @@ export class Ship {
             this.stopIncrementing(); // Arrêter si la souris quitte la zone
         });
     }
-
+    
     private startIncrementing(): void {
         if (this.intervalId !== null) return; // Évite de créer plusieurs intervals
 
@@ -556,7 +557,30 @@ export class Ship {
             this.intervalId = null;
         }
     }
+
+    private pressedKeys: Set<string> = new Set();
+
+    setupMoveEvents(): void {
+        window.addEventListener("keydown", (event) => {
+            const key = event.key.toLowerCase();
+            if (["z", "q", "s", "d"].includes(key)) {
+                this.pressedKeys.add(key);
+                if (this.metalfootstep && !this.metalfootstep.isPlaying) {
+                    this.metalfootstep.play();
+                }
+        }
+        });
     
+        window.addEventListener("keyup", (event) => {
+            const key = event.key.toLowerCase();
+            if (["z", "q", "s", "d"].includes(key)) {
+                this.pressedKeys.delete(key);
+                if (this.pressedKeys.size === 0 && this.metalfootstep && this.metalfootstep.isPlaying) {
+                    this.metalfootstep.stop();
+                }
+            }
+        });
+    }
 
     setupScrollEvents(): void {
         this.canvas.addEventListener("wheel", (event) => {
@@ -590,7 +614,7 @@ export class Ship {
 
             }
         });
-        }
+    }
 
     setupButtonHoverDetection(): void {
         this.scene.onPointerMove = (event) => {
@@ -607,10 +631,6 @@ export class Ship {
         };
         this.setupButtonMaterials();
 
-    }
-    
-    isHoveringSomeButtonForNavigation() {
-        return this.isHoveringAmplitude || this.isHoveringFrequency || this.isHoveringUp || this.isHoveringDown || this.isHoveringLeft || this.isHoveringRight;
     }
 
     setupButtonMaterials(): void {
@@ -672,6 +692,23 @@ export class Ship {
 
     isOverlap() {
         return Math.abs(this.amplitudePos - this.amplitude) < 0.01 && Math.abs(this.frequencyPos - this.frequency) < 0.01;
+    }
+
+    isHoveringSomeButtonForNavigation() {
+        return this.isHoveringAmplitude || this.isHoveringFrequency || this.isHoveringUp || this.isHoveringDown || this.isHoveringLeft || this.isHoveringRight;
+    }
+
+    setupMotorEvents(): void {
+        this.canvas.addEventListener("mousedown", (event) => {
+            if(this.isHoveringMotor){
+                if(this.engineState){
+                    this.shutDownEngine();
+                }
+                else{
+                    this.powerEngine();
+                }
+            }
+        });
     }
 
     powerEngine() {
