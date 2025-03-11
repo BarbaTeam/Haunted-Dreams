@@ -4,7 +4,6 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { Ship } from '@/babylonscripts/Ship';
 import { MainMenu } from '@/babylonscripts/MainMenu';
 
 export default defineComponent({
