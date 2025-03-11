@@ -52,15 +52,15 @@ export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement): Univer
     advancedTexture.addControl(crosshair);
 
     // **Ajout de l'image du casque**
-    const helmetOverlay = new Rectangle("helmetOverlay");
-    helmetOverlay.width = "100%";
-    helmetOverlay.height = "100%";
-    helmetOverlay.thickness = 0;
-    advancedTexture.addControl(helmetOverlay);
+    //const helmetOverlay = new Rectangle("helmetOverlay");
+    //helmetOverlay.width = "100%";
+    //helmetOverlay.height = "100%";
+    //helmetOverlay.thickness = 0;
+    //advancedTexture.addControl(helmetOverlay);
 
-    const helmetImage = new Image("helmetImage", "/images/casque.png");
-    helmetImage.stretch = Image.STRETCH_FILL;
-    helmetOverlay.addControl(helmetImage);
+    //const helmetImage = new Image("helmetImage", "/images/casque.png");
+    //helmetImage.stretch = Image.STRETCH_FILL;
+    //helmetOverlay.addControl(helmetImage);
 
     return camera;
 
