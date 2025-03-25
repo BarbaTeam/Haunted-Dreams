@@ -47,10 +47,16 @@ export class Ship {
     nightmares: Nightmare[] = [
         {
         nmAmplitude : 1.00,
-        nmFrequency : 5.00,
+        nmFrequency : 1.02,
         nmAngle : 5.10
+    },
+    {
+        nmAmplitude : 0.45,
+        nmFrequency : 3.42,
+        nmAngle : 16.5
     }]
-    currentNightmare = this.nightmares[0];
+    nightMareIndex = 0;
+    currentNightmare = this.nightmares[this.nightMareIndex];
 
 
     private readonly MAX_AMPLITUDE = 1.5;
@@ -354,7 +360,10 @@ export class Ship {
     updateObjectives(){
         if(this.currentNightmare.nmAmplitude.toFixed(2)===this.amplitude.toFixed(2) && this.currentNightmare.nmFrequency.toFixed(2) === this.frequency.toFixed(2)){
             this.angleToAim = this.currentNightmare.nmAngle;
-            this.isDistorted = false;
+            if(this.angle.toFixed(1) === this.angleToAim.toFixed(1)){
+                this.frequencyPos = this.frequency;
+                this.isDistorted = false;
+            }
         }
         else {
             this.angleToAim = undefined;
@@ -396,11 +405,14 @@ export class Ship {
             
             for (let i = 0; i < 512; i++) {
                 const x = i;
-                let y = centerY - amplitude * Math.sin(frequency * (i / 512) * waveLength) * waveHeight;
 
-                if (this.isDistorted && allowDistorded) {
-                    y +=  Math.sin(i * 0.2 +  Math.random() * 100) * (Math.random() - 0.5) * 20;
-                }
+                const y = this.isDistorted && allowDistorded
+                    ? centerY + 
+                        Math.sin(i * 0.1 + Math.random() * 50) * (Math.random() * 50) + 
+                        Math.cos(i * 0.05 + Math.random() * 30) * (Math.random() * 30) +
+                        (Math.random() - 0.5) * 10
+                    : centerY - amplitude * Math.sin(frequency * (i / 512) * waveLength) * waveHeight;
+
 
                 i === 0 ? context.moveTo(x, y) : context.lineTo(x, y);
             }
@@ -475,8 +487,8 @@ export class Ship {
                 context.beginPath();
                 
                 context.arc(x, y, 20, 0, 2 * Math.PI);
-                console.log("angle point: " +this.angle_points[i].toFixed(1))
-                console.log("angle to aim: "+ this.angleToAim?.toFixed(1))
+                //console.log("angle point: " +this.angle_points[i].toFixed(1))
+                //console.log("angle to aim: "+ this.angleToAim?.toFixed(1))
                 if(this.angleToAim && this.angle_points[i].toFixed(1) === this.angleToAim.toFixed(1)){
                     context.fillStyle = "lime"; // Remplir avec la couleur
                 }
@@ -485,8 +497,8 @@ export class Ship {
                 }
                 context.fill();
             }
-            console.log(this.angle_points);
-            console.log(this.angle);
+            //console.log(this.angle_points);
+            //console.log(this.angle);
         
         };
 
@@ -661,10 +673,14 @@ export class Ship {
             if(this.isHoveringPhoto){
                 if(this.isOverlap()){
                     console.log("cauchemar photographié !");
+                    if(this.nightMareIndex < this.nightmares.length){
+                        this.nightMareIndex++;
+                        console.log("Nouveau cauchemar : "+ this.nightMareIndex);
+                        this.currentNightmare = this.nightmares[this.nightMareIndex];
+                    }
                 }
                 else{
                     console.log("rêve photographié !");
-                    console.log("amplitude : " + this.amplitudePos + " fréquence : " + this.frequencyPos);
                 }
 
             }
