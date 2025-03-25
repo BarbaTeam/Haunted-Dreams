@@ -19,6 +19,12 @@ import {
 import { createFPSCamera } from './Camera';
 import "@babylonjs/loaders";
 
+type Nightmare = {
+    nmAmplitude: number;
+    nmFrequency: number;
+    nmAngle: number;
+}
+
 export class Ship {
     
     scene: Scene;
@@ -35,6 +41,16 @@ export class Ship {
     angle = Math.random() * Math.PI * 2;
     points: { x: number, y: number }[] = [];
     angle_points: number[] = [];
+    angleToAim: number | undefined;
+
+    nightmares: Nightmare[] = [
+        {
+        nmAmplitude : 1.00,
+        nmFrequency : 5.00,
+        nmAngle : 5.10
+    }]
+    currentNightmare = this.nightmares[0];
+
 
     private readonly MAX_AMPLITUDE = 1.5;
     private readonly MIN_AMPLITUDE = 0.01;
@@ -323,6 +339,30 @@ export class Ship {
 
 
 
+
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //                                                                                                            //                                  
+    //                                         GESTION DES OBJECTIFS                                              //
+    //                                                                                                            //
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    updateObjectives(){
+        if(this.currentNightmare.nmAmplitude.toFixed(1)===this.amplitude.toFixed(1) && this.currentNightmare.nmFrequency.toFixed(1) === this.frequency.toFixed(1)){
+            this.angleToAim = this.currentNightmare.nmAngle;
+        }
+        else {
+            this.angleToAim = undefined;
+        }
+        this.updateBoussoleScreen();
+    }
+
+
+
+
+
+
    
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //                                                                                                            //                                  
@@ -347,7 +387,7 @@ export class Ship {
             context.strokeStyle = color;
             context.lineWidth = 3;
             context.beginPath();
-    
+            
             for (let i = 0; i < 512; i++) {
                 const x = i;
                 const y = centerY - amplitude * Math.sin(frequency * (i / 512) * waveLength) * waveHeight;
@@ -424,8 +464,10 @@ export class Ship {
                 context.beginPath();
                 
                 context.arc(x, y, 20, 0, 2 * Math.PI);
-                if(this.angle_points[i].toFixed(1) === this.angle.toFixed(1)){
-                    context.fillStyle = "#FF0000"; // Remplir avec la couleur
+                console.log("angle point: " +this.angle_points[i].toFixed(1))
+                console.log("angle to aim: "+ this.angleToAim?.toFixed(1))
+                if(this.angleToAim && this.angle_points[i].toFixed(1) === this.angleToAim.toFixed(1)){
+                    context.fillStyle = "lime"; // Remplir avec la couleur
                 }
                 else{
                     context.fillStyle = color; // Remplir avec la couleur
@@ -546,6 +588,7 @@ export class Ship {
             this.amplitudePos = Math.max(this.MIN_AMPLITUDE, Math.min(this.amplitudePos, this.MAX_AMPLITUDE));
             this.frequencyPos = Math.max(this.MIN_FREQUENCY, Math.min(this.frequencyPos, this.MAX_FREQUENCY));
 
+            this.updateObjectives();
             this.updateSineWave(); 
             this.updateBoussoleScreen();
         }, 50); // Met à jour toutes les 50ms
@@ -585,9 +628,9 @@ export class Ship {
     setupScrollEvents(): void {
         this.canvas.addEventListener("wheel", (event) => {
             if (this.isHoveringAmplitude) {
-                this.amplitude += (event.deltaY < 0) ? 0.05 : -0.05;
+                this.amplitude += (event.deltaY < 0) ? 0.01 : -0.01;
             } else if (this.isHoveringFrequency) {
-                this.frequency += (event.deltaY < 0) ? 0.05 : -0.05;
+                this.frequency += (event.deltaY < 0) ? 0.01 : -0.01;
             }
     
             // Appliquer les limites
@@ -597,6 +640,7 @@ export class Ship {
             if (this.isHoveringAmplitude || this.isHoveringFrequency) {
                 this.updateSineWave();
                 this.updateDataScreen();
+                this.updateObjectives();
             }
         });
     }
