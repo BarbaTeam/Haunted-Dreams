@@ -16,6 +16,7 @@ import {
     ColorCorrectionPostProcess,
     SSAO2RenderingPipeline
 } from '@babylonjs/core';
+
 import { createFPSCamera } from './Camera';
 import "@babylonjs/loaders";
 
@@ -115,8 +116,10 @@ export class Ship {
 
         this.engine.runRenderLoop(() => {
             this.scene.render();
+            setTimeout(() => {
+                this.updateSineWave();
+            }, 50);
         });
-
         this.setupScrollEvents();
         this.setupNavEvents();
         this.setupMoveEvents();
@@ -349,11 +352,13 @@ export class Ship {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     updateObjectives(){
-        if(this.currentNightmare.nmAmplitude.toFixed(1)===this.amplitude.toFixed(1) && this.currentNightmare.nmFrequency.toFixed(1) === this.frequency.toFixed(1)){
+        if(this.currentNightmare.nmAmplitude.toFixed(2)===this.amplitude.toFixed(2) && this.currentNightmare.nmFrequency.toFixed(2) === this.frequency.toFixed(2)){
             this.angleToAim = this.currentNightmare.nmAngle;
+            this.isDistorted = false;
         }
         else {
             this.angleToAim = undefined;
+            this.isDistorted = true;
         }
         this.updateBoussoleScreen();
     }
@@ -369,7 +374,8 @@ export class Ship {
     //                                            GESTION DES ECRANS                                              //
     //                                                                                                            //
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+    
+    isDistorted = true;
 
     updateSineWave(): void {
 
@@ -383,14 +389,19 @@ export class Ship {
         const waveLength = Math.PI * 4;
     
         // Fonction pour dessiner une sinusoïde sur un contexte de texture
-        const drawSineWave = (context: ICanvasRenderingContext, amplitude: number, frequency: number, color: string): void => {
+        const drawSineWave = (context: ICanvasRenderingContext, amplitude: number, frequency: number, color: string, allowDistorded: boolean): void => {
             context.strokeStyle = color;
             context.lineWidth = 3;
             context.beginPath();
             
             for (let i = 0; i < 512; i++) {
                 const x = i;
-                const y = centerY - amplitude * Math.sin(frequency * (i / 512) * waveLength) * waveHeight;
+                let y = centerY - amplitude * Math.sin(frequency * (i / 512) * waveLength) * waveHeight;
+
+                if (this.isDistorted && allowDistorded) {
+                    y +=  Math.sin(i * 0.2 +  Math.random() * 100) * (Math.random() - 0.5) * 20;
+                }
+
                 i === 0 ? context.moveTo(x, y) : context.lineTo(x, y);
             }
     
@@ -407,7 +418,7 @@ export class Ship {
             ctx.fillRect(0, 0, 512, 512);
     
             // Utilisation du vert normal pour `screenTextureSelecteur`
-            drawSineWave(ctx, this.amplitude, this.frequency, "lime");
+            drawSineWave(ctx, this.amplitude, this.frequency, "lime", false);
     
             screenTexture.update();
         });
@@ -416,7 +427,7 @@ export class Ship {
         if (this.screenTextureNav) {
             const ctx = this.screenTextureNav.getContext();
             if (ctx) {
-                drawSineWave(ctx, this.amplitudePos, this.frequencyPos, "#90EE90"); // Vert clair (light green)
+                drawSineWave(ctx, this.amplitudePos, this.frequencyPos, "#90EE90", true); // Vert clair (light green)
                 this.screenTextureNav.update();
             }
         }
