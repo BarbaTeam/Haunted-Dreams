@@ -673,7 +673,7 @@ export class Ship {
             if(this.isHoveringPhoto){
                 if(this.isOverlap()){
                     console.log("cauchemar photographié !");
-                    if(this.nightMareIndex < this.nightmares.length){
+                    if(this.nightMareIndex < this.nightmares.length-1){
                         this.nightMareIndex++;
                         console.log("Nouveau cauchemar : "+ this.nightMareIndex);
                         this.currentNightmare = this.nightmares[this.nightMareIndex];
@@ -762,7 +762,7 @@ export class Ship {
     }
 
     isOverlap() {
-        return Math.abs(this.amplitudePos - this.amplitude) < 0.01 && Math.abs(this.frequencyPos - this.frequency) < 0.01;
+        return Math.abs(this.amplitudePos - this.currentNightmare.nmAmplitude) < 0.01 && Math.abs(this.frequencyPos - this.currentNightmare.nmFrequency) < 0.01;
     }
 
     isHoveringSomeButtonForNavigation() {
