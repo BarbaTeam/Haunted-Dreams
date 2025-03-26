@@ -53,7 +53,7 @@ export class Ship {
     {
         nmAmplitude : 0.45,
         nmFrequency : 3.42,
-        nmAngle : 16.5
+        nmAngle : 1.50
     }]
     nightMareIndex = 0;
     currentNightmare = this.nightmares[this.nightMareIndex];
@@ -179,7 +179,7 @@ export class Ship {
             
             spaceship.checkCollisions = true; 
             spaceship.getChildMeshes().forEach(mesh => {
-                console.log(mesh.name);
+                //console.log(mesh.name);
                 mesh.checkCollisions = true;
                 
                 // Détection des boutons du selecteur d'onde
