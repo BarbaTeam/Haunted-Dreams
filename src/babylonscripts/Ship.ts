@@ -179,97 +179,112 @@ export class Ship {
             
             spaceship.checkCollisions = true; 
             spaceship.getChildMeshes().forEach(mesh => {
-                //console.log(mesh.name);
                 mesh.checkCollisions = true;
-                
-                // Détection des boutons du selecteur d'onde
-                if (mesh.name === "selecteur_onde.boutton_amplitude") {
-                    //mesh.showBoundingBox = true;
-                    this.buttonAmplitude = mesh;
-                } 
-                if (mesh.name === "selecteur_onde.boutton_frequence") {
-                    //mesh.showBoundingBox = true;
-                    this.buttonFrequency = mesh;
-                }
+            
+                switch (mesh.name) {
+                    case "selecteur_onde.boutton_amplitude":
+                        this.buttonAmplitude = mesh;
+                        break;
+                    case "selecteur_onde.boutton_frequence":
+                        this.buttonFrequency = mesh;
+                        break;
 
-                // Détection des boutons de la navigation
-                if (mesh.name === "nav.button_up") {
-                    //mesh.showBoundingBox = true;
-                    this.buttonUp = mesh;
-                }
-                if (mesh.name === "nav.button_down") {
-                    //mesh.showBoundingBox = true;
-                    this.buttonDown = mesh;
-                }
-                if (mesh.name === "nav.button_left") {
-                    //mesh.showBoundingBox = true;
-                    this.buttonLeft = mesh;
-                }
-                if (mesh.name === "nav.button_right") {
-                    //mesh.showBoundingBox = true;
-                    this.buttonRight = mesh;
-                }
+                    case "nav.button_up":
+                        this.buttonUp = mesh;
+                        break;
+                    case "nav.button_down":
+                        this.buttonDown = mesh;
+                        break;
+                    case "nav.button_left":
+                        this.buttonLeft = mesh;
+                        break;
+                    case "nav.button_right":
+                        this.buttonRight = mesh;
+                        break;
+            
+                    case "appareil_photo.boutton":
+                        this.buttonPhoto = mesh;
+                        break;
+            
+                    case "motor_controle.boutton":
+                        this.buttonMotor = mesh;
+                        break;
+            
+                    case "motor_controle.screen":
+                        this.motor_control_screen = mesh;
+                        this.motorMaterial = new StandardMaterial("motor_control_screen", this.scene);
+                        this.motorTextureOn = new Texture("/images/power_on.png", this.scene);
+                        this.motorTextureOff = new Texture("/images/power_off.png", this.scene);
+            
+                        this.motorTextureOn.wAng = Math.PI / 2;
+                        this.motorTextureOn.uScale = -1;
+                        this.motorTextureOff.wAng = Math.PI / 2;
+                        this.motorTextureOff.uScale = -1;
+            
+                        mesh.material = this.motorMaterial;
+                        this.motorMaterial.emissiveTexture = this.motorTextureOn;
+                        this.motorMaterial.specularColor = new Color3(0, 0, 0);
+                        break;
+            
+                    case "selecteur_onde.screen":
+                        this.screenTextureSelecteur = this.createScreenMaterial(mesh);
+                        this.screenTextureSelecteur.uScale = 1;
+                        this.screenTextureSelecteur.vScale = 1;
+                        this.screenTextureSelecteur.uOffset = 0;
+                        this.screenTextureSelecteur.vOffset = 0.26;
+                        break;
+            
+                    case "poste_navigation.screen":
+                        this.screenTextureNav = this.createScreenMaterial(mesh);
+                        this.screenTextureNav.uScale = 1;
+                        this.screenTextureNav.vScale = 1;
+                        this.screenTextureNav.uOffset = 0;
+                        this.screenTextureNav.vOffset = 0.2;
+                        break;
+            
+                    case "boussole.screen":
+                        this.screenTextureBoussole = this.createScreenMaterial(mesh);
+                        break;
+            
+                    case "amplitude_screen":
+                        this.screenTextureAmp = this.createScreenMaterial(mesh);
+                        break;
+            
+                    case "frequence_screen":
+                        this.screenTextureFreq = this.createScreenMaterial(mesh);
+                        break;
+            
+                    case "walls.door":
+                        this.door = mesh;
+                        break;
+                    case "photo1":
+                        mesh.visibility = 0;
+                        this.photos.push(mesh);
+                        break;
+                    case "photo2":
+                        mesh.visibility = 0;
+                        this.photos.push(mesh);
+                        break;
+                    case "photo3":
+                        mesh.visibility = 0;
+                        this.photos.push(mesh);
+                        break;
+                    case "photo4":
+                        mesh.visibility = 0;
+                        this.photos.push(mesh);
+                        break;
+                    case "photo5":
+                        mesh.visibility = 0;
+                        this.photos.push(mesh);
+                        break;
+                    case "photo6":
+                        mesh.visibility = 0;
+                        this.photos.push(mesh);
+                        break;
 
-                if(mesh.name === "appareil_photo.boutton"){
-                    this.buttonPhoto = mesh;
-                }
-
-                if(mesh.name === "motor_controle.boutton"){
-                    this.buttonMotor = mesh;
-                }
-
-                if(mesh.name === "motor_controle.screen"){
-                    this.motor_control_screen = mesh;
-                    this.motorMaterial = new StandardMaterial("motor_control_screen", this.scene);
-                    this.motorTextureOn = new Texture("/images/power_on.png", this.scene);
-                    this.motorTextureOff = new Texture("/images/power_off.png", this.scene);
-
-                    this.motorTextureOn.wAng = Math.PI/2;
-                    this.motorTextureOn.uScale = -1;
-                    this.motorTextureOff.wAng = Math.PI/2;
-                    this.motorTextureOff.uScale = -1;
-                    
-                    mesh.material = this.motorMaterial;
-                    this.motorMaterial.emissiveTexture = this.motorTextureOn;
-                    this.motorMaterial.specularColor = new Color3(0, 0, 0);
-
-                }
-
-                // Création de la texture dynamique pour l'écran du sélecteur
-                if (mesh.name === "selecteur_onde.screen") {
-                    this.screenTextureSelecteur = this.createScreenMaterial(mesh);
-                    this.screenTextureSelecteur.uScale = 1;
-                    this.screenTextureSelecteur.vScale = 1;
-                    this.screenTextureSelecteur.uOffset = 0;
-                    this.screenTextureSelecteur.vOffset = 0.26;
-                }
-
-                // Création de la texture dynamique pour l'écran de navigation
-                if (mesh.name === "poste_navigation.screen") {
-                    this.screenTextureNav = this.createScreenMaterial(mesh);
-                    this.screenTextureNav.uScale = 1;
-                    this.screenTextureNav.vScale = 1;
-                    this.screenTextureNav.uOffset = 0;
-                    this.screenTextureNav.vOffset = 0.2;
-                }
-
-                if (mesh.name ==="boussole.screen"){
-                    this.screenTextureBoussole = this.createScreenMaterial(mesh);
-                }
-                // Création de la texture dynamique pour l'écran de l'amplitude
-                if (mesh.name === "amplitude_screen") {
-                    this.screenTextureAmp = this.createScreenMaterial(mesh);
-                }
-
-                 // Création de la texture dynamique pour l'écran des fréquences
-                 if (mesh.name === "frequence_screen") {
-                    this.screenTextureFreq = this.createScreenMaterial(mesh);
-                }
-
-                if (mesh.name === "walls.door"){
-                    this.door = mesh;
                 }
             });
+            
 
             this.setupButtonHoverDetection();
             this.setupNavEvents();
@@ -310,6 +325,7 @@ export class Ship {
         const entrance_light = new SpotLight("spotLight", new Vector3(0, 16, -6), new Vector3(0, -1, 0), Math.PI / 2, 10, this.scene);
         const entrance_light2 = new SpotLight("spotLight", new Vector3(0, 16, -6), new Vector3(0.5, -1, 0.5), Math.PI / 2, 10, this.scene);
         const entrance_light3 = new SpotLight("spotLight", new Vector3(0, 16, -6), new Vector3(-0.5, -1, 0.5), Math.PI / 2, 10, this.scene);
+        const entrance_light4 = new SpotLight("spotLight", new Vector3(1, 20, 2), new Vector3(0.6, -1, 0), Math.PI / 2, 10, this.scene);
 
         
         const table_light = new SpotLight("spotLight", new Vector3(0, 16, 34), new Vector3(0, -1, 0), Math.PI / 2, 5, this.scene);
@@ -326,6 +342,7 @@ export class Ship {
             entrance_light,
             entrance_light2,
             entrance_light3,
+            entrance_light4,
             table_light,
             table_light2,
             table_light3,
@@ -357,6 +374,7 @@ export class Ship {
     //                                                                                                            //
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    photos : AbstractMesh[] = []
     updateObjectives(){
         if(this.currentNightmare.nmAmplitude.toFixed(2)===this.amplitude.toFixed(2) && this.currentNightmare.nmFrequency.toFixed(2) === this.frequency.toFixed(2)){
             this.angleToAim = this.currentNightmare.nmAngle;
@@ -371,6 +389,8 @@ export class Ship {
         }
         this.updateBoussoleScreen();
     }
+
+
 
 
 
@@ -673,6 +693,7 @@ export class Ship {
             if(this.isHoveringPhoto){
                 if(this.isOverlap()){
                     console.log("cauchemar photographié !");
+                    this.photos[this.nightMareIndex].visibility = 1;
                     if(this.nightMareIndex < this.nightmares.length-1){
                         this.nightMareIndex++;
                         console.log("Nouveau cauchemar : "+ this.nightMareIndex);
