@@ -85,7 +85,8 @@ export class Ship {
     private buttonRight!: AbstractMesh;
 
     private buttonPhoto!: AbstractMesh;
-    
+    private paperSheet!: AbstractMesh;
+
     private engineState = true;
     private buttonMotor!: AbstractMesh;
     private motor_control_screen!: AbstractMesh;
@@ -93,6 +94,7 @@ export class Ship {
     private lightList: SpotLight[] = [];
 
     private isHoveringPhoto = false;
+    private isHoveringPaperSheet = false;
     private isHoveringMotor = false
     private isHoveringUp = false;
     private isHoveringDown = false;
@@ -130,6 +132,7 @@ export class Ship {
         this.setupNavEvents();
         this.setupMoveEvents();
         this.setupMotorEvents();
+        this.setupPaperSheetEvent();
     }
     
 
@@ -204,6 +207,9 @@ export class Ship {
             
                     case "appareil_photo.boutton":
                         this.buttonPhoto = mesh;
+                        break;
+                    case "papersheet":
+                        this.paperSheet = mesh;
                         break;
             
                     case "motor_controle.boutton":
@@ -708,6 +714,15 @@ export class Ship {
         });
     }
 
+    //CODE POUR TOM
+    setupPaperSheetEvent(): void {
+        this.canvas.addEventListener("mousedown", (event) => {
+            if(this.isHoveringPaperSheet){
+                console.log("l'interface s'affiche")
+            }
+        });
+    }
+
     setupButtonHoverDetection(): void {
         this.scene.onPointerMove = (event) => {
             const hit = this.scene.pick(this.scene.getEngine().getRenderWidth() / 2, this.scene.getEngine().getRenderHeight() / 2);
@@ -720,6 +735,7 @@ export class Ship {
             this.isHoveringRight = hit?.pickedMesh === this.buttonRight;
             this.isHoveringPhoto = hit?.pickedMesh === this.buttonPhoto;
             this.isHoveringMotor = hit?.pickedMesh === this.buttonMotor;
+            this.isHoveringPaperSheet = hit?.pickedMesh === this.paperSheet;
         };
         this.setupButtonMaterials();
 
@@ -746,12 +762,14 @@ export class Ship {
             this.buttonPhoto,
             this.buttonMotor
         ];
-    
+        
         buttons.forEach((button) => {
             if (button) {
                 button.material = buttonMaterial;
             }
         });
+
+        const paperSheetMaterial = this.paperSheet.material;
     
         this.scene.onBeforeRenderObservable.add(() => {
             if (this.buttonAmplitude) {
@@ -774,6 +792,9 @@ export class Ship {
             }
             if (this.buttonPhoto) {
                 this.buttonPhoto.material = this.isHoveringPhoto ? highlightMaterial : buttonMaterial;
+            }
+            if (this.paperSheet) {
+                this.paperSheet.material = this.isHoveringPaperSheet ? highlightMaterial : paperSheetMaterial;
             }
             if (this.buttonMotor) {
                 this.buttonMotor.material = this.isHoveringMotor ? highlightMaterial : buttonMaterial;
