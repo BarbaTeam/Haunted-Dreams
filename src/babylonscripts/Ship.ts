@@ -295,7 +295,7 @@ export class Ship {
 
         // Sons d'ambiance
         this.buzzingSound = new Sound("", "/sons/buzzing-sound.wav", this.scene, null, { volume: 0.05, autoplay: true, loop: true });
-        this.motorSound = new Sound("", "/sons/horror-ambience-01-66708.mp3", this.scene, null, { volume: 0.5, autoplay: true, loop: true });
+        this.motorSound = new Sound("", "/sons/horror-ambience-01-66708.mp3", this.scene, null, { volume: 0.25, autoplay: true, loop: true });
         this.metalfootstep = new Sound("", "/sons/metal-footsteps.mp3", this.scene, null, { volume: 0.5, autoplay: false, loop: true });
         this.horrorSound = new Sound("", "/sons/spooky-ambience-sound.mp3",this.scene, null, { volume : 0.5, autoplay: false, loop: true});
     }
