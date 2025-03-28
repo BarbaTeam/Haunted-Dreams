@@ -374,15 +374,21 @@ export class Ship {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     photos : AbstractMesh[] = []
+    beenPlayed = false;
     updateObjectives(){
         if(this.currentNightmare.nmAmplitude.toFixed(2)===this.amplitude.toFixed(2) && this.currentNightmare.nmFrequency.toFixed(2) === this.frequency.toFixed(2)){
             this.angleToAim = this.currentNightmare.nmAngle;
+            if(!this.beenPlayed){
+                this.beenPlayed = true;
+                new Sound("", "/sons/beep.mp3", this.scene, null, { volume: 0.5, autoplay: true, loop: false });
+            }
             if(this.angle.toFixed(1) === this.angleToAim.toFixed(1)){
                 this.frequencyPos = this.frequency;
                 this.isDistorted = false;
             }
         }
         else {
+            this.beenPlayed = false;
             this.angleToAim = undefined;
             this.isDistorted = true;
         }
@@ -509,10 +515,10 @@ export class Ship {
                 //console.log("angle point: " +this.angle_points[i].toFixed(1))
                 //console.log("angle to aim: "+ this.angleToAim?.toFixed(1))
                 if(this.angleToAim && this.angle_points[i].toFixed(1) === this.angleToAim.toFixed(1)){
-                    context.fillStyle = "lime"; // Remplir avec la couleur
+                    context.fillStyle = "lime"; 
                 }
                 else{
-                    context.fillStyle = color; // Remplir avec la couleur
+                    context.fillStyle = color; 
                 }
                 context.fill();
             }
@@ -591,56 +597,101 @@ export class Ship {
     //                                                                                                            //
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private intervalId: number | null = null; // Stocke l'intervalle en cours
+    private wasHovering = false;
+    private intervalId: number | null = null;
+    private isAnimating = false;
+
+
+    private isHoveringSomeButtonForNavigation(): boolean {
+        return this.isHoveringAmplitude || this.isHoveringFrequency || this.isHoveringUp || this.isHoveringDown || this.isHoveringLeft || this.isHoveringRight;
+    }
+
 
     setupNavEvents(): void {
         this.canvas.addEventListener("mousedown", () => {
-            this.startIncrementing();
+            this.onMouseDown();
         });
 
         this.canvas.addEventListener("mouseup", () => {
-            this.stopIncrementing();
+            this.onMouseUp();
         });
 
         this.canvas.addEventListener("mouseleave", () => {
-            this.stopIncrementing(); // Arrêter si la souris quitte la zone
+            this.onMouseUp();
         });
     }
+
+    //private lastButton!: AbstractMesh | null;
+    //private initalButtonY!: number;
+
+    private onMouseDown(): void {
+        //console.log("Initial Y:", this.initalButtonY, "Current Y:", this.lastButton?.position.y);
+
+        if (this.isHoveringSomeButtonForNavigation()) {
+            this.wasHovering = true;
+            //this.lastButton = this.getCurrentButton();
+            //if(this.lastButton){
+            //    this.initalButtonY = this.lastButton.position.y;
+            //    this.updateButtonPosition(this.lastButton, -0.05);
+            //}
+            this.playSound("/sons/pressdown.mp3");
+        }
+        this.startIncrementing();
+    }
     
+    private onMouseUp(): void {
+        //console.log("Initial Y:", this.initalButtonY, "Current Y:", this.lastButton?.position.y);
+
+        if (this.wasHovering) {
+            this.wasHovering = false;
+            //if(this.lastButton){
+            //    this.lastButton.position.y = this.initalButtonY;
+            //}
+            this.playSound("/sons/pressup.mp3");
+        }
+        this.stopIncrementing();
+    }
+    
+    private updateButtonPosition(button: AbstractMesh, offset: number): void {
+        button.position.y += offset;
+    }
+    
+    private playSound(url: string): void {
+        new Sound("", url, this.scene, null, { volume: 0.5, autoplay: true, loop: false });
+    }
+    
+    private getCurrentButton(): AbstractMesh | null {
+        if (this.isHoveringUp) return this.buttonUp;
+        if (this.isHoveringDown) return this.buttonDown;
+        if (this.isHoveringRight) return this.buttonRight;
+        if (this.isHoveringLeft) return this.buttonLeft;
+        return null;
+    }
+
     private startIncrementing(): void {
-        if (this.intervalId !== null) return; // Évite de créer plusieurs intervals
+        if (this.isAnimating) return; 
+        this.isAnimating = true;
 
-        this.intervalId = setInterval(() => {
-            if (this.isHoveringUp) {
-                this.amplitudePos += 0.01; 
-            } else if (this.isHoveringDown) {
-                this.amplitudePos -= 0.01; 
-            } else if (this.isHoveringRight) {
-                this.angle -= Math.PI / 180;
-            } else if (this.isHoveringLeft) {
-                this.angle += Math.PI / 180;            
-            }
-            if (this.angle > 2 * Math.PI) {
-                this.angle -= 2 * Math.PI; 
-            }
-            if (this.angle < 0) {
-                this.angle += 2 * Math.PI; 
-            }
+        const updateLoop = () => {
+            if (!this.isAnimating) return;
 
-            this.amplitudePos = Math.max(this.MIN_AMPLITUDE, Math.min(this.amplitudePos, this.MAX_AMPLITUDE));
-            this.frequencyPos = Math.max(this.MIN_FREQUENCY, Math.min(this.frequencyPos, this.MAX_FREQUENCY));
+            if (this.isHoveringUp) this.amplitudePos = Math.min(this.amplitudePos + 0.001, this.MAX_AMPLITUDE);
+            else if (this.isHoveringDown) this.amplitudePos = Math.max(this.amplitudePos - 0.001, this.MIN_AMPLITUDE);
+            else if (this.isHoveringRight) this.angle = (this.angle - Math.PI / 1000) % (2 * Math.PI);
+            else if (this.isHoveringLeft) this.angle = (this.angle + Math.PI / 1000) % (2 * Math.PI);
 
             this.updateObjectives();
-            this.updateSineWave(); 
+            this.updateSineWave();
             this.updateBoussoleScreen();
-        }, 50); // Met à jour toutes les 50ms
+
+            requestAnimationFrame(updateLoop);
+        };
+
+        requestAnimationFrame(updateLoop);
     }
 
     private stopIncrementing(): void {
-        if (this.intervalId !== null) {
-            clearInterval(this.intervalId);
-            this.intervalId = null;
-        }
+        this.isAnimating = false;
     }
 
     private pressedKeys: Set<string> = new Set();
@@ -692,12 +743,18 @@ export class Ship {
             if(this.isHoveringPhoto){
                 if(this.isOverlap()){
                     console.log("cauchemar photographié !");
-                    this.photos[this.nightMareIndex].visibility = 1;
-                    if(this.nightMareIndex < this.nightmares.length-1){
-                        this.nightMareIndex++;
-                        console.log("Nouveau cauchemar : "+ this.nightMareIndex);
-                        this.currentNightmare = this.nightmares[this.nightMareIndex];
-                    }
+                    new Sound("", "/sons/photo.mp3", this.scene, null, { volume: 0.5, autoplay: true, loop: false });
+                    setTimeout(() => {
+                        new Sound("", "/sons/thumb-tack.mp3", this.scene, null, { volume: 1, autoplay: true, loop: false });
+                      }, 2000);  
+                    setTimeout(() => {
+                        this.photos[this.nightMareIndex].visibility = 1;
+                        if(this.nightMareIndex < this.nightmares.length-1){
+                            this.nightMareIndex++;
+                            console.log("Nouveau cauchemar : "+ this.nightMareIndex);
+                            this.currentNightmare = this.nightmares[this.nightMareIndex];
+                        }
+                      }, 4000);  
                 }
                 else{
                     console.log("rêve photographié !");
@@ -773,9 +830,7 @@ export class Ship {
         return Math.abs(this.amplitudePos - this.currentNightmare.nmAmplitude) < 0.01 && Math.abs(this.frequencyPos - this.currentNightmare.nmFrequency) < 0.01;
     }
 
-    isHoveringSomeButtonForNavigation() {
-        return this.isHoveringAmplitude || this.isHoveringFrequency || this.isHoveringUp || this.isHoveringDown || this.isHoveringLeft || this.isHoveringRight;
-    }
+    
 
     setupMotorEvents(): void {
         this.canvas.addEventListener("mousedown", () => {
