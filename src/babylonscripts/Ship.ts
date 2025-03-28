@@ -385,6 +385,8 @@ export class Ship {
             if(this.angle.toFixed(1) === this.angleToAim.toFixed(1)){
                 this.frequencyPos = this.frequency;
                 this.isDistorted = false;
+            } else {
+                this.isDistorted = true;
             }
         }
         else {
@@ -393,6 +395,43 @@ export class Ship {
             this.isDistorted = true;
         }
         this.updateBoussoleScreen();
+    }
+
+
+
+
+
+
+
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //                                                                                                            //                                  
+    //                                         GESTION DES HOSTILITE                                              //
+    //                                                                                                            //
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    setupHostile(shutdownTimer: number){
+        if(this.nightMareIndex>0){
+            this.setUpShutDownEvents(shutdownTimer);
+            this.setUpKnockingEvents();
+        }
+    }
+
+    setUpShutDownEvents(shutdownTimer: number){
+        const randomDelay = shutdownTimer*1000 - Math.random() * 0.3*shutdownTimer*1000;
+        setTimeout(() => {
+            console.log("Événement de shutdown activé");
+            this.shutDownEngine();
+        }, randomDelay);
+    }
+    
+    setUpKnockingEvents(){
+        const randomDelay = Math.random() * 5000; 
+        setTimeout(() => {
+            console.log("Événement de frappe à la porte activé");
+
+        }, randomDelay);
     }
 
 
@@ -598,9 +637,7 @@ export class Ship {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private wasHovering = false;
-    private intervalId: number | null = null;
     private isAnimating = false;
-
 
     private isHoveringSomeButtonForNavigation(): boolean {
         return this.isHoveringAmplitude || this.isHoveringFrequency || this.isHoveringUp || this.isHoveringDown || this.isHoveringLeft || this.isHoveringRight;
@@ -748,6 +785,7 @@ export class Ship {
                         new Sound("", "/sons/thumb-tack.mp3", this.scene, null, { volume: 1, autoplay: true, loop: false });
                       }, 2000);  
                     setTimeout(() => {
+                        this.setupHostile(60);
                         this.photos[this.nightMareIndex].visibility = 1;
                         if(this.nightMareIndex < this.nightmares.length-1){
                             this.nightMareIndex++;
@@ -758,6 +796,7 @@ export class Ship {
                 }
                 else{
                     console.log("rêve photographié !");
+                    this.setupHostile(10);
                 }
 
             }
@@ -860,6 +899,7 @@ export class Ship {
             light.intensity = 1;
         });
         this.horrorSound.stop();
+        this.setupHostile(120);
     }
 
     shutDownEngine() {
