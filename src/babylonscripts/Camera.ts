@@ -1,6 +1,6 @@
 
-import { Scene, Vector3, UniversalCamera, ArcRotateCamera, BlurPostProcess } from "@babylonjs/core";
-import { AdvancedDynamicTexture, Button, Rectangle, Image } from "@babylonjs/gui";
+import { Scene, Vector3, UniversalCamera, ArcRotateCamera } from "@babylonjs/core";
+import { AdvancedDynamicTexture, Button } from "@babylonjs/gui";
 
 
 export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement): UniversalCamera {

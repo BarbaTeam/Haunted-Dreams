@@ -1,4 +1,4 @@
-import { Scene, Engine, Vector3, MeshBuilder, HemisphericLight, VideoTexture, StandardMaterial, Sound } from '@babylonjs/core';
+import { Scene, Engine, Vector3, MeshBuilder, HemisphericLight, VideoTexture, StandardMaterial, Sound, Mesh } from '@babylonjs/core';
 import { AdvancedDynamicTexture, Button } from "@babylonjs/gui";
 import { createMenuCamera } from './Camera';
 import { Ship } from './Ship';
@@ -34,7 +34,7 @@ export class MainMenu {
         menuPlane.position = new Vector3(0, 0, 0);  
         this.createVideoTexture(menuPlane, scene);
 
-        const camera = createMenuCamera(scene, canvas);
+        createMenuCamera(scene, canvas);
 
         const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("UI", true, scene);
 
@@ -47,7 +47,7 @@ export class MainMenu {
         playButton.fontSize = 40;
         playButton.top = "300px";  
         advancedTexture.addControl(playButton); 
-        const buzzingSound = new Sound(
+        new Sound(
             "",
             "/sons/buzzing-sound.wav",
             this.scene,
@@ -58,7 +58,7 @@ export class MainMenu {
                 loop: true,
             }
         )
-        const backGroundMusic = new Sound(
+        new Sound(
             "",
             "/sons/dark-horror-ambience-296781.mp3",
             this.scene,
@@ -77,7 +77,7 @@ export class MainMenu {
         return scene;
     }
 
-    createVideoTexture(menuPlane: any, scene: Scene) {
+    createVideoTexture(menuPlane: Mesh, scene: Scene) {
         const videoTexture = new VideoTexture("videoTexture", ["/videos/main_menu_background.mp4"], scene, true, true);
         videoTexture.video.muted = true;
 

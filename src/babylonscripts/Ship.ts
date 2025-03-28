@@ -1,20 +1,13 @@
 import { 
     Scene, Engine, Vector3, MeshBuilder, SceneLoader, Color4, Sound, StandardMaterial, 
     Color3, DynamicTexture, AbstractMesh, 
-    ActionManager,
-    ExecuteCodeAction,
-    Matrix,
-    PBRMaterial,
-    PBRMetallicRoughnessMaterial,
-    PointLight,
     SpotLight,
     ICanvasRenderingContext,
-    ShadowGenerator,
     Texture,
     DefaultRenderingPipeline,
     DepthOfFieldEffectBlurLevel,
-    ColorCorrectionPostProcess,
-    SSAO2RenderingPipeline
+    HighlightLayer,
+    Mesh
 } from '@babylonjs/core';
 
 import { createFPSCamera } from './Camera';
@@ -33,11 +26,11 @@ export class Ship {
 
     isStartOfGame = true;
 
-    amplitude = Math.random() * 1.5; 
-    frequency = Math.random() * 10; 
+    amplitude = 0.01; 
+    frequency = 1; 
 
-    amplitudePos = Math.random() * 1.5; 
-    frequencyPos =Math.random() * 10; 
+    amplitudePos = 0.1; 
+    frequencyPos = 1; 
 
     angle = Math.random() * Math.PI * 2;
     points: { x: number, y: number }[] = [];
@@ -295,8 +288,8 @@ export class Ship {
             this.setupButtonHoverDetection();
             this.setupNavEvents();
             this.setupPhotoEvent();
-            this.updateSineWave();   // Dessiner l'onde au démarrage
-            this.updateDataScreen(); // Afficher les valeurs par défaut
+            this.updateSineWave();   
+            this.updateDataScreen(); 
             this.updateBoussoleScreen();
         });
 
@@ -601,7 +594,7 @@ export class Ship {
     private intervalId: number | null = null; // Stocke l'intervalle en cours
 
     setupNavEvents(): void {
-        this.canvas.addEventListener("mousedown", (event) => {
+        this.canvas.addEventListener("mousedown", () => {
             this.startIncrementing();
         });
 
@@ -695,7 +688,7 @@ export class Ship {
     }
     
     setupPhotoEvent(): void {
-        this.canvas.addEventListener("mousedown", (event) => {
+        this.canvas.addEventListener("mousedown", () => {
             if(this.isHoveringPhoto){
                 if(this.isOverlap()){
                     console.log("cauchemar photographié !");
@@ -716,7 +709,7 @@ export class Ship {
 
     //CODE POUR TOM
     setupPaperSheetEvent(): void {
-        this.canvas.addEventListener("mousedown", (event) => {
+        this.canvas.addEventListener("mousedown", () => {
             if(this.isHoveringPaperSheet){
                 console.log("l'interface s'affiche")
             }
@@ -724,7 +717,7 @@ export class Ship {
     }
 
     setupButtonHoverDetection(): void {
-        this.scene.onPointerMove = (event) => {
+        this.scene.onPointerMove = () => {
             const hit = this.scene.pick(this.scene.getEngine().getRenderWidth() / 2, this.scene.getEngine().getRenderHeight() / 2);
     
             this.isHoveringAmplitude = hit?.pickedMesh === this.buttonAmplitude;
@@ -743,64 +736,37 @@ export class Ship {
 
     setupButtonMaterials(): void {
         if (!this.scene) return;
-    
-        const buttonMaterial = this.buttonDown?.material as StandardMaterial;
-        if (!buttonMaterial) return;
-        buttonMaterial.diffuseColor = new Color3(1, 0, 0); 
-    
-        const highlightMaterial = new PBRMetallicRoughnessMaterial("highlightMat", this.scene);
-        highlightMaterial.baseColor = new Color3(1, 1, 1); 
-        highlightMaterial.metallic = 0;
+            
+        const highlightLayer = new HighlightLayer("hl1", this.scene);
+        highlightLayer.outerGlow = false; 
+        highlightLayer.innerGlow = true; 
 
-        const buttons = [
-            this.buttonAmplitude,
-            this.buttonFrequency,
-            this.buttonUp,
-            this.buttonDown,
-            this.buttonLeft,
-            this.buttonRight,
-            this.buttonPhoto,
-            this.buttonMotor
-        ];
-        
-        buttons.forEach((button) => {
-            if (button) {
-                button.material = buttonMaterial;
-            }
-        });
 
-        const paperSheetMaterial = this.paperSheet.material;
-    
         this.scene.onBeforeRenderObservable.add(() => {
-            if (this.buttonAmplitude) {
-                this.buttonAmplitude.material = this.isHoveringAmplitude ? highlightMaterial : buttonMaterial;
-            }
-            if (this.buttonFrequency) {
-                this.buttonFrequency.material = this.isHoveringFrequency ? highlightMaterial : buttonMaterial;
-            }
-            if (this.buttonUp) {
-                this.buttonUp.material = this.isHoveringUp ? highlightMaterial : buttonMaterial;
-            }
-            if (this.buttonDown) {
-                this.buttonDown.material = this.isHoveringDown ? highlightMaterial : buttonMaterial;
-            }
-            if (this.buttonLeft) {
-                this.buttonLeft.material = this.isHoveringLeft ? highlightMaterial : buttonMaterial;
-            }
-            if (this.buttonRight) {
-                this.buttonRight.material = this.isHoveringRight ? highlightMaterial : buttonMaterial;
-            }
-            if (this.buttonPhoto) {
-                this.buttonPhoto.material = this.isHoveringPhoto ? highlightMaterial : buttonMaterial;
-            }
-            if (this.paperSheet) {
-                this.paperSheet.material = this.isHoveringPaperSheet ? highlightMaterial : paperSheetMaterial;
-            }
-            if (this.buttonMotor) {
-                this.buttonMotor.material = this.isHoveringMotor ? highlightMaterial : buttonMaterial;
-            }
-        }
-    );
+            const elements = [
+                { mesh: this.buttonAmplitude, isHovering: this.isHoveringAmplitude },
+                { mesh: this.buttonFrequency, isHovering: this.isHoveringFrequency },
+                { mesh: this.buttonUp, isHovering: this.isHoveringUp },
+                { mesh: this.buttonDown, isHovering: this.isHoveringDown },
+                { mesh: this.buttonLeft, isHovering: this.isHoveringLeft },
+                { mesh: this.buttonRight, isHovering: this.isHoveringRight },
+                { mesh: this.buttonPhoto, isHovering: this.isHoveringPhoto },
+                { mesh: this.buttonMotor, isHovering: this.isHoveringMotor },
+                { mesh: this.paperSheet, isHovering: this.isHoveringPaperSheet }
+            ];
+            
+            elements.forEach(({ mesh, isHovering }) => {
+                if (mesh) {
+                    if (isHovering) {
+                        if (!highlightLayer.hasMesh(mesh as Mesh)) {
+                            highlightLayer.addMesh(mesh as Mesh, Color3.White());
+                        }
+                    } else {
+                        highlightLayer.removeMesh(mesh as Mesh);
+                    }
+                }
+            });
+        });
     }
 
     isOverlap() {
@@ -812,7 +778,7 @@ export class Ship {
     }
 
     setupMotorEvents(): void {
-        this.canvas.addEventListener("mousedown", (event) => {
+        this.canvas.addEventListener("mousedown", () => {
             if(this.isHoveringMotor){
                 if(this.engineState){
                     this.shutDownEngine();
