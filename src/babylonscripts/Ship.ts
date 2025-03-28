@@ -796,6 +796,10 @@ export class Ship {
                 }
                 else{
                     console.log("rêve photographié !");
+                    new Sound("", "/sons/photo.mp3", this.scene, null, { volume: 0.5, autoplay: true, loop: false });
+                    setTimeout(() => {
+                        new Sound("", "/sons/paper-ripping.mp3", this.scene, null, { volume: 1.5, autoplay: true, loop: false });
+                      }, 3000); 
                     this.setupHostile(10);
                 }
 
