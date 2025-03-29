@@ -7,7 +7,8 @@ import {
     DefaultRenderingPipeline,
     DepthOfFieldEffectBlurLevel,
     HighlightLayer,
-    Mesh
+    Mesh,
+    Animation
 } from '@babylonjs/core';
 
 import { createFPSCamera } from './Camera';
@@ -17,6 +18,12 @@ type Nightmare = {
     nmAmplitude: number;
     nmFrequency: number;
     nmAngle: number;
+}
+
+type Door = {
+    name: string;
+    mesh: AbstractMesh;
+    isOpen: boolean;
 }
 
 export class Ship {
@@ -39,15 +46,36 @@ export class Ship {
 
     nightmares: Nightmare[] = [
         {
-        nmAmplitude : 1.00,
-        nmFrequency : 1.02,
-        nmAngle : 5.10
-    },
-    {
-        nmAmplitude : 0.45,
-        nmFrequency : 3.42,
-        nmAngle : 1.50
-    }]
+            nmAmplitude : 1.00,
+            nmFrequency : 1.02,
+            nmAngle : 5.10
+        },
+        {
+            nmAmplitude : 0.45,
+            nmFrequency : 2.42,
+            nmAngle : 3.30
+        },
+        {
+            nmAmplitude : 0.12,
+            nmFrequency : 3.98,
+            nmAngle : 1.20
+        },
+        {
+            nmAmplitude : 0.97,
+            nmFrequency : 5.23,
+            nmAngle : 5.70
+        },
+        {
+            nmAmplitude : 1.44,
+            nmFrequency : 6.57,
+            nmAngle : 2.70
+        },
+        {
+            nmAmplitude : 1.17,
+            nmFrequency : 8.11,
+            nmAngle : 6.00
+        }
+    ]
     nightMareIndex = 0;
     currentNightmare = this.nightmares[this.nightMareIndex];
 
@@ -80,10 +108,26 @@ export class Ship {
     private buttonPhoto!: AbstractMesh;
     private paperSheet!: AbstractMesh;
 
+    private buttonDoorNav1!: AbstractMesh
+    private buttonDoorNav2!: AbstractMesh
+    private buttonDoorMotor1!: AbstractMesh
+    private buttonDoorMotor2!: AbstractMesh
+
+    private isHoveringbuttonDoorNav1= false;
+    private isHoveringbuttonDoorNav2= false;
+    private isHoveringbuttonDoorMotor1= false;
+    private isHoveringbuttonDoorMotor2= false;
+
     private engineState = true;
     private buttonMotor!: AbstractMesh;
     private motor_control_screen!: AbstractMesh;
-    private door!: AbstractMesh
+
+
+    private doorExterior!: AbstractMesh;
+    private doorNav!: AbstractMesh;
+    private doorMotor!: AbstractMesh;
+    private doorList: Door[] = []
+
     private lightList: SpotLight[] = [];
 
     private isHoveringPhoto = false;
@@ -251,9 +295,29 @@ export class Ship {
                         this.screenTextureFreq = this.createScreenMaterial(mesh);
                         break;
             
-                    case "walls.door":
-                        this.door = mesh;
+                    case "door_exterieur":
+                        this.doorExterior = mesh;
                         break;
+                    case "door_navigation":
+                        this.doorNav = mesh;
+                        break;
+                    case "door_navigation_button1":
+                        this.buttonDoorNav1 = mesh;
+                        break;
+                    case "door_navigation_button2":
+                        this.buttonDoorNav2 = mesh;
+                        break;
+                    case "door_motor":
+                        this.doorMotor = mesh;
+                        break;
+                    case "door_motor_button1":
+                        this.buttonDoorMotor1 = mesh;
+                        break;
+                    case "door_motor_button2":
+                        this.buttonDoorMotor2 = mesh;
+                        break;
+                    
+                    
                     case "photo1":
                         mesh.visibility = 0;
                         this.photos.push(mesh);
@@ -282,6 +346,23 @@ export class Ship {
                 }
             });
             
+            this.doorList = [
+                {
+                    name: "exterior",
+                    mesh: this.doorExterior,
+                    isOpen: false
+                },
+                {
+                    name: "nav",
+                    mesh: this.doorNav,
+                    isOpen: false
+                },
+                {
+                    name: "motor",
+                    mesh: this.doorMotor,
+                    isOpen: false
+                }
+            ]
 
             this.setupButtonHoverDetection();
             this.setupEvents();
@@ -437,14 +518,90 @@ export class Ship {
         }, randomDelay);
     }
 
+    
+    private initialMeshesPositions: Map<AbstractMesh, number> = new Map();
 
+    openDoors(): void {
+        this.doorList.forEach((door) => {
+            if (door.mesh && !door.isOpen) {
+                this.openDoor(door);
+            }
+        });
+    }
 
+    closeDoors(): void {
+        this.doorList.forEach((door) => {
+            if (door.mesh && door.isOpen) {
+                this.closeDoor(door);
+            }
+        });
+    }
 
+    toggleDoor(door: Door): void {
+        if (door) {
+            if (door.isOpen) {
+                this.closeDoor(door);
+            } else {
+                this.openDoor(door);
+            }
+        }
+    }
 
+    openDoor(door: Door): void {
+        if (!this.initialMeshesPositions.has(door.mesh)) {
+            this.initialMeshesPositions.set(door.mesh, door.mesh.position.y);
+        }
+        this.playSound("/sons/door.mp3",0.25);
+        door.isOpen = true;
+        this.updateMeshPositionY(door.mesh, 12.5, 30);
+    }
 
+    closeDoor(door: Door): void {
+        if (door && this.initialMeshesPositions.has(door.mesh)) {
+            const initialY = this.initialMeshesPositions.get(door.mesh);
+            
+            if (initialY !== undefined) {
+                const offset = initialY - door.mesh.position.y;
+                this.playSound("/sons/door.mp3",0.25);
+                door.isOpen=false;
+                this.updateMeshPositionY(door.mesh, offset, 30);
+            } else {
+                console.warn('Position initiale non définie pour la porte.', door);
+            }
+        } else {
+            console.warn('Impossible de fermer la porte : la position initiale n\'est pas enregistrée.', door);
+        }
+    }
+        
+    deathInitiated() {
+        this.deathTimeOut = setTimeout(() => {
+            this.engineRestartAllowed = false;
+            this.runningDeathSound = this.playSound("/sons/runningdeath.mp3", 1);
 
+            this.runningDeathSound.onEndedObservable.add(() => {
+                this.kill();
+            });
+        }, 7000);
+    }
 
-   
+    kill() {
+        const blackScreen = document.createElement("div");
+        blackScreen.style.position = "fixed";
+        blackScreen.style.top = "0";
+        blackScreen.style.left = "0";
+        blackScreen.style.width = "100vw";
+        blackScreen.style.height = "100vh";
+        blackScreen.style.backgroundColor = "black";
+        blackScreen.style.zIndex = "9999";
+        document.body.appendChild(blackScreen);
+    
+        const beepSound = this.playSound("/sons/kill.mp3", 2);
+    
+        beepSound.onEndedObservable.add(() => {
+            location.reload();
+        });
+    }
+    
 
 
 
@@ -490,6 +647,20 @@ export class Ship {
     
             context.stroke();
         };
+
+        if(!this.engineState){
+            [this.screenTextureSelecteur, this.screenTextureNav].forEach((screenTexture) => {
+                if (!screenTexture) return;
+                const ctx = screenTexture.getContext();
+                if (!ctx) return;
+    
+                ctx.fillStyle = "black"; 
+                ctx.fillRect(0, 0, 512, 512);
+                screenTexture.update();
+            });
+    
+            return;
+        }
     
         // Met à jour les textures
         [this.screenTextureSelecteur, this.screenTextureNav].forEach((screenTexture) => {
@@ -516,11 +687,18 @@ export class Ship {
             
         }
 
-        this.isStartOfGame = false; //Ppour le premier affichage
+        this.isStartOfGame = false; // Ppour le premier affichage
     }
     
 
     updateDataScreen(): void {
+        if(!this.engineState){
+            this.screenTextureAmp.clear();
+            this.screenTextureAmp.update();
+            this.screenTextureFreq.clear();
+            this.screenTextureFreq.update();
+            return;
+        }
         if (this.screenTextureAmp) {
             this.screenTextureAmp.clear();
             this.screenTextureAmp.drawText(
@@ -541,7 +719,7 @@ export class Ship {
     }
 
     updateBoussoleScreen(): void {
-        
+
         const drawCircle = (context: ICanvasRenderingContext, color: string): void => {
             const centerX = 256;
             const centerY = 256;
@@ -554,7 +732,6 @@ export class Ship {
         
                 this.points.push({ x, y }); // Stocker les coordonnées dans le tableau
                 this.angle_points.push(angle);
-
                 // Dessiner un petit cercle pour chaque point
                 context.beginPath();
                 
@@ -569,8 +746,8 @@ export class Ship {
                 }
                 context.fill();
             }
-            //console.log(this.angle_points);
-            //console.log(this.angle);
+            console.log(this.angle_points);
+            console.log("currentangle = "+ this.angle + "angle to aim = "+ this.angleToAim);
         
         };
 
@@ -621,7 +798,18 @@ export class Ship {
             context.restore();
         };
         
-        
+        if(!this.engineState){
+            if (!this.screenTextureBoussole) return;
+            const ctx = this.screenTextureBoussole.getContext();
+            if (!ctx) return;
+
+            ctx.fillStyle = "black"; 
+            ctx.fillRect(0, 0, 512, 512);
+            this.screenTextureBoussole.update();
+    
+            return;
+        }
+
         if (this.screenTextureBoussole) {
             const context = this.screenTextureBoussole.getContext(); // Récupère le contexte de dessin 2D du canvas
             if (context) {
@@ -629,6 +817,8 @@ export class Ship {
                 drawArrow(context, this.angle);
             }
         }
+        
+
         this.screenTextureBoussole.update();
     }
     
@@ -674,6 +864,13 @@ export class Ship {
         return this.isHoveringAmplitude || this.isHoveringFrequency || this.isHoveringUp || this.isHoveringDown || this.isHoveringLeft || this.isHoveringRight;
     }
 
+    isHoveringSomeButtonForNavDoor(): boolean {
+        return this.isHoveringbuttonDoorNav1 || this.isHoveringbuttonDoorNav2;
+    }
+    isHoveringSomeButtonForMotorDoor(): boolean {
+        return this.isHoveringbuttonDoorMotor1 || this.isHoveringbuttonDoorMotor2;
+    }
+
     handleMouseDown(): void {
         if (this.isHoveringSomeButtonForNavigation()) {
             this.startIncrementing();
@@ -682,16 +879,24 @@ export class Ship {
         } else if (this.isHoveringPaperSheet) { 
             console.log("L'interface s'affiche"); //mets ta methode ici tom
         } else if (this.isHoveringMotor) {
-            
             this.toggleEngine();
+        }
+        else if (this.isHoveringSomeButtonForNavDoor()) {
+            this.toggleDoor(this.doorList.find(door => door.name === "nav")!);
+        }
+        else if (this.isHoveringSomeButtonForMotorDoor()) {
+            this.toggleDoor(this.doorList.find(door => door.name === "motor")!);
         }
 
         this.lastButton = this.getCurrentButton();
         if (this.lastButton) {
             this.wasHovering = true;
-            this.playSound("/sons/pressdown.mp3");
-            this.initalButtonY = this.lastButton.position.y;
-            this.updateButtonPosition(this.lastButton, -0.15);
+            this.playSound("/sons/pressdown.mp3", 0.5);
+            if (!this.initialMeshesPositions.has(this.lastButton)) {
+                this.initialMeshesPositions.set(this.lastButton, this.lastButton.position.y);
+            }
+        
+            this.updateMeshPositionY(this.lastButton, -0.15, 120);
         }
 
     }
@@ -699,10 +904,13 @@ export class Ship {
     handleMouseUp(): void {
         if (this.wasHovering) {
             this.wasHovering = false;
-            this.playSound("/sons/pressup.mp3");
+            this.playSound("/sons/pressup.mp3", 0.5);
         }
-        if (this.lastButton) {
-            this.updateButtonPosition(this.lastButton, 0.15); // Remonte le bouton
+        if (this.lastButton && this.initialMeshesPositions.has(this.lastButton)) {
+            const initialY = this.initialMeshesPositions.get(this.lastButton)!;
+            const offset = initialY - this.lastButton.position.y;
+    
+            this.updateMeshPositionY(this.lastButton, offset, 120);
         }
         this.stopIncrementing();
     }
@@ -743,20 +951,26 @@ export class Ship {
     //
 
 
-    private isAnimating = false;
+    private isIncrementing = false;
 
     startIncrementing(): void {
-        if (this.isAnimating) return; 
-        this.isAnimating = true;
+        if (this.isIncrementing) return; 
+        this.isIncrementing = true;
 
         const updateLoop = () => {
-            if (!this.isAnimating) return;
+            if (!this.isIncrementing) return;
 
             if (this.isHoveringUp) this.amplitudePos = Math.min(this.amplitudePos + 0.001, this.MAX_AMPLITUDE);
             else if (this.isHoveringDown) this.amplitudePos = Math.max(this.amplitudePos - 0.001, this.MIN_AMPLITUDE);
-            else if (this.isHoveringRight) this.angle = (this.angle - Math.PI / 1000) % (2 * Math.PI);
-            else if (this.isHoveringLeft) this.angle = (this.angle + Math.PI / 1000) % (2 * Math.PI);
-
+            else if (this.isHoveringRight) {
+                this.angle = (this.angle - Math.PI / 1000) % (2 * Math.PI);
+            }
+            else if (this.isHoveringLeft) {
+                this.angle = (this.angle + Math.PI / 1000) % (2 * Math.PI);
+            }
+            if (this.angle < 0) {
+                this.angle += 2 * Math.PI;
+            }
             this.updateObjectives();
             this.updateSineWave();
             this.updateBoussoleScreen();
@@ -768,7 +982,7 @@ export class Ship {
     }
 
     stopIncrementing(): void {
-        this.isAnimating = false;
+        this.isIncrementing = false;
     }
 
     scrollIncrements(event: WheelEvent): void {
@@ -830,13 +1044,23 @@ export class Ship {
         }
     }
 
+    private deathSound!: Sound;
+    private runningDeathSound!: Sound; 
+    private deathTimeOut: any;
+    private engineRestartAllowed = true; 
+
     powerEngine() {
+        if (!this.engineRestartAllowed) {
+            console.log("Le moteur ne peut plus être rallumé !");
+            return;
+        }
+
         this.engineState = true;
         this.buzzingSound?.play();
         this.motorSound?.play();
-        if (this.door) {
-            this.door.isVisible = true;
-        }
+
+        this.closeDoor(this.doorList.find(door => door.name === "exterior")!);
+
         if (this.motorMaterial) {
             this.motorMaterial.diffuseTexture = this.motorTextureOn;
         }
@@ -844,26 +1068,44 @@ export class Ship {
             light.diffuse = new Color3(106, 143, 63);
             light.intensity = 1;
         });
-        this.horrorSound.stop();
+
+        this.horrorSound?.stop();
         this.setupHostile(120);
+
+        this.deathSound?.stop();
+        this.runningDeathSound?.stop();
+        clearTimeout(this.deathTimeOut);
+        this.updateDataScreen();
+        this.updateSineWave();
+        this.updateBoussoleScreen();
     }
 
     shutDownEngine() {
         this.engineState = false;
+        this.engineRestartAllowed = true;
         this.buzzingSound?.stop();
         this.motorSound?.stop();
-        if (this.door) {
-            this.door.isVisible = false;
-        }
+
+        this.deathSound = this.playSound("/sons/deathsound.mp3", 0.5);
+
+        this.openDoors();
+
         if (this.motorMaterial) {
             this.motorMaterial.diffuseTexture = this.motorTextureOff;
         }
         this.lightList.forEach((light) => {
-            light.diffuse = new Color3(175,0,0);
+            light.diffuse = new Color3(175, 0, 0);
             light.intensity = 0.5;
         });
+
         this.horrorSound?.play();
+
+        this.deathInitiated();
+        this.updateDataScreen();
+        this.updateSineWave();
+        this.updateBoussoleScreen();
     }
+    
 
 
 
@@ -875,8 +1117,8 @@ export class Ship {
     //
 
 
-    playSound(url: string): void {
-        new Sound("", url, this.scene, null, { volume: 0.5, autoplay: true, loop: false });
+    playSound(url: string, volume: number, autoplay= true): Sound {
+        return new Sound("", url, this.scene, null, { volume: volume, autoplay: autoplay, loop: false });
     }
 
     playPhotoSounds(): void {
@@ -916,7 +1158,12 @@ export class Ship {
             this.isHoveringPhoto = hit?.pickedMesh === this.buttonPhoto;
             this.isHoveringMotor = hit?.pickedMesh === this.buttonMotor;
             this.isHoveringPaperSheet = hit?.pickedMesh === this.paperSheet;
+            this.isHoveringbuttonDoorMotor1 = hit?.pickedMesh=== this.buttonDoorMotor1;
+            this.isHoveringbuttonDoorMotor2 = hit?.pickedMesh=== this.buttonDoorMotor2;
+            this.isHoveringbuttonDoorNav1 = hit?.pickedMesh=== this.buttonDoorNav1;
+            this.isHoveringbuttonDoorNav2 = hit?.pickedMesh=== this.buttonDoorNav2;
         };
+        
         this.setupButtonMaterials();
 
     }
@@ -939,7 +1186,11 @@ export class Ship {
                 { mesh: this.buttonRight, isHovering: this.isHoveringRight },
                 { mesh: this.buttonPhoto, isHovering: this.isHoveringPhoto },
                 { mesh: this.buttonMotor, isHovering: this.isHoveringMotor },
-                { mesh: this.paperSheet, isHovering: this.isHoveringPaperSheet }
+                { mesh: this.paperSheet, isHovering: this.isHoveringPaperSheet },
+                { mesh: this.buttonDoorMotor1, isHovering: this.isHoveringbuttonDoorMotor1},
+                { mesh: this.buttonDoorMotor2, isHovering: this.isHoveringbuttonDoorMotor2},
+                { mesh: this.buttonDoorNav1, isHovering: this.isHoveringbuttonDoorNav1},
+                { mesh: this.buttonDoorNav1, isHovering: this.isHoveringbuttonDoorNav2}
             ];
             
             elements.forEach(({ mesh, isHovering }) => {
@@ -967,10 +1218,26 @@ export class Ship {
 
 
     private lastButton!: AbstractMesh | null;
-    private initalButtonY!: number;
 
-    updateButtonPosition(button: AbstractMesh, offset: number): void {
-        button.position.y += offset;
+    updateMeshPositionY(mesh: AbstractMesh, offset: number, fps: number): void {
+            
+        const animation = new Animation(
+            "moveY",
+            "position.y",
+            fps,
+            Animation.ANIMATIONTYPE_FLOAT,
+            Animation.ANIMATIONLOOPMODE_CONSTANT
+        );
+    
+        const keys = [
+            { frame: 0, value: mesh.position.y },
+            { frame: 30, value: mesh.position.y + offset }
+        ];
+    
+        animation.setKeys(keys);
+    
+        mesh.animations = [animation];
+        this.scene.beginAnimation(mesh, 0, 30, false);
     }
 
     getCurrentButton(): AbstractMesh | null {
@@ -980,6 +1247,11 @@ export class Ship {
         if (this.isHoveringLeft) return this.buttonLeft;
         if (this.isHoveringPhoto) return this.buttonPhoto;
         if (this.isHoveringMotor) return this.buttonMotor;
+        if (this.isHoveringbuttonDoorMotor1) return this.buttonDoorMotor1;
+        if (this.isHoveringbuttonDoorMotor2) return this.buttonDoorMotor2;
+        if (this.isHoveringbuttonDoorNav1) return this.buttonDoorNav1;
+        if (this.isHoveringbuttonDoorNav2) return this.buttonDoorNav2;
+
         return null;
     }
 }
