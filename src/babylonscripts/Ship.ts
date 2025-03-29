@@ -499,9 +499,10 @@ export class Ship {
     
             ctx.fillStyle = "black";
             ctx.fillRect(0, 0, 512, 512);
-    
+           
             // Utilisation du vert normal pour `screenTextureSelecteur`
             drawSineWave(ctx, this.amplitude, this.frequency, "lime", false);
+            
     
             screenTexture.update();
         });
@@ -509,10 +510,10 @@ export class Ship {
         // Onde liée à la position du vaisseau (en vert clair)
         if (this.screenTextureNav) {
             const ctx = this.screenTextureNav.getContext();
-            if (ctx) {
-                drawSineWave(ctx, this.amplitudePos, this.frequencyPos, "#90EE90", true); // Vert clair (light green)
-                this.screenTextureNav.update();
-            }
+            
+            drawSineWave(ctx, this.amplitudePos, this.frequencyPos, "#90EE90", true); // Vert clair (light green)
+            this.screenTextureNav.update();
+            
         }
 
         this.isStartOfGame = false; //Ppour le premier affichage
@@ -540,7 +541,7 @@ export class Ship {
     }
 
     updateBoussoleScreen(): void {
-
+        
         const drawCircle = (context: ICanvasRenderingContext, color: string): void => {
             const centerX = 256;
             const centerY = 256;
