@@ -53,7 +53,7 @@ export class MainMenu {
             this.scene,
             null,
             {
-                volume:0.15,
+                volume:0.05,
                 autoplay: true,
                 loop: true,
             }
@@ -64,11 +64,21 @@ export class MainMenu {
             this.scene,
             null,
             {
-                volume:0.5,
+                volume:0.10,
                 autoplay: true,
                 loop: true,
-            }
-        )
+            })
+        new Sound(
+            "",
+            "/sons/menumusic.mp3",
+            this.scene,
+            null,
+            {
+                volume:0.2,
+                autoplay:true,
+                loop:true,
+            })
+        
 
         playButton.onPointerUpObservable.add(() => {
             this.startGame();
