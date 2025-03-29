@@ -121,13 +121,10 @@ export class Ship {
                 this.updateSineWave();
             }, 50);
         });
-        this.setupScrollEvents();
-        this.setupNavEvents();
-        this.setupMoveEvents();
-        this.setupMotorEvents();
-        this.setupPaperSheetEvent();
     }
     
+
+
 
 
 
@@ -143,6 +140,7 @@ export class Ship {
     //                                         GESTION DE LA SCENE                                                //
     //                                                                                                            //
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
     createScene(): Scene {
         const scene = new Scene(this.engine);
@@ -286,8 +284,7 @@ export class Ship {
             
 
             this.setupButtonHoverDetection();
-            this.setupNavEvents();
-            this.setupPhotoEvent();
+            this.setupEvents();
             this.updateSineWave();   
             this.updateDataScreen(); 
             this.updateBoussoleScreen();
@@ -367,11 +364,13 @@ export class Ship {
 
 
 
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //                                                                                                            //                                  
     //                                         GESTION DES OBJECTIFS                                              //
     //                                                                                                            //
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
     photos : AbstractMesh[] = []
     beenPlayed = false;
@@ -405,11 +404,15 @@ export class Ship {
 
 
 
+
+
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //                                                                                                            //                                  
     //                                         GESTION DES HOSTILITE                                              //
     //                                                                                                            //
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
     setupHostile(shutdownTimer: number){
         if(this.nightMareIndex>0){
@@ -442,12 +445,16 @@ export class Ship {
 
 
    
+
+
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //                                                                                                            //                                  
     //                                            GESTION DES ECRANS                                              //
     //                                                                                                            //
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
+
     isDistorted = true;
 
     updateSineWave(): void {
@@ -624,88 +631,120 @@ export class Ship {
         this.screenTextureBoussole.update();
     }
     
-    
 
 
 
 
     
+
+
+
+
+
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //                                                                                                            //                                  
     //                                         GESTION DES EVENEMENTS                                             //
     //                                                                                                            //
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private wasHovering = false;
-    private isAnimating = false;
 
-    private isHoveringSomeButtonForNavigation(): boolean {
+
+
+
+
+    ////////////////////////////////////////////////////////
+    //  Gestion des events listeners                                                                                                                                                                                   
+
+
+    setupEvents(): void {
+        this.canvas.addEventListener("mousedown", this.handleMouseDown.bind(this));
+        this.canvas.addEventListener("mouseup", this.handleMouseUp.bind(this));
+        this.canvas.addEventListener("mouseleave", this.handleMouseUp.bind(this));
+        this.canvas.addEventListener("wheel", this.handleScroll.bind(this));
+
+        window.addEventListener("keydown", this.handleKeyDown.bind(this));
+        window.addEventListener("keyup", this.handleKeyUp.bind(this));
+    }
+
+    private wasHovering = false;
+
+    isHoveringSomeButtonForNavigation(): boolean {
         return this.isHoveringAmplitude || this.isHoveringFrequency || this.isHoveringUp || this.isHoveringDown || this.isHoveringLeft || this.isHoveringRight;
     }
 
-
-    setupNavEvents(): void {
-        this.canvas.addEventListener("mousedown", () => {
-            this.onMouseDown();
-        });
-
-        this.canvas.addEventListener("mouseup", () => {
-            this.onMouseUp();
-        });
-
-        this.canvas.addEventListener("mouseleave", () => {
-            this.onMouseUp();
-        });
-    }
-
-    //private lastButton!: AbstractMesh | null;
-    //private initalButtonY!: number;
-
-    private onMouseDown(): void {
-        //console.log("Initial Y:", this.initalButtonY, "Current Y:", this.lastButton?.position.y);
-
+    handleMouseDown(): void {
         if (this.isHoveringSomeButtonForNavigation()) {
-            this.wasHovering = true;
-            //this.lastButton = this.getCurrentButton();
-            //if(this.lastButton){
-            //    this.initalButtonY = this.lastButton.position.y;
-            //    this.updateButtonPosition(this.lastButton, -0.05);
-            //}
-            this.playSound("/sons/pressdown.mp3");
+            this.startIncrementing();
+        } else if (this.isHoveringPhoto) {
+            this.takePhoto();
+        } else if (this.isHoveringPaperSheet) { 
+            console.log("L'interface s'affiche"); //mets ta methode ici tom
+        } else if (this.isHoveringMotor) {
+            
+            this.toggleEngine();
         }
-        this.startIncrementing();
-    }
-    
-    private onMouseUp(): void {
-        //console.log("Initial Y:", this.initalButtonY, "Current Y:", this.lastButton?.position.y);
 
+        this.lastButton = this.getCurrentButton();
+        if (this.lastButton) {
+            this.wasHovering = true;
+            this.playSound("/sons/pressdown.mp3");
+            this.initalButtonY = this.lastButton.position.y;
+            this.updateButtonPosition(this.lastButton, -0.15);
+        }
+
+    }
+
+    handleMouseUp(): void {
         if (this.wasHovering) {
             this.wasHovering = false;
-            //if(this.lastButton){
-            //    this.lastButton.position.y = this.initalButtonY;
-            //}
             this.playSound("/sons/pressup.mp3");
+        }
+        if (this.lastButton) {
+            this.updateButtonPosition(this.lastButton, 0.15); // Remonte le bouton
         }
         this.stopIncrementing();
     }
-    
-    private updateButtonPosition(button: AbstractMesh, offset: number): void {
-        button.position.y += offset;
-    }
-    
-    private playSound(url: string): void {
-        new Sound("", url, this.scene, null, { volume: 0.5, autoplay: true, loop: false });
-    }
-    
-    private getCurrentButton(): AbstractMesh | null {
-        if (this.isHoveringUp) return this.buttonUp;
-        if (this.isHoveringDown) return this.buttonDown;
-        if (this.isHoveringRight) return this.buttonRight;
-        if (this.isHoveringLeft) return this.buttonLeft;
-        return null;
+
+    handleScroll(event: WheelEvent): void {
+        this.scrollIncrements(event);
     }
 
-    private startIncrementing(): void {
+    private pressedKeys: Set<string> = new Set();
+
+    handleKeyDown(event: KeyboardEvent): void {
+        const key = event.key.toLowerCase();
+        if (["z", "q", "s", "d"].includes(key)) {
+            this.pressedKeys.add(key);
+            if (this.metalfootstep && !this.metalfootstep.isPlaying) {
+                this.metalfootstep.play();
+            }
+        }
+    }
+
+    handleKeyUp(event: KeyboardEvent): void {
+        const key = event.key.toLowerCase();
+        if (["z", "q", "s", "d"].includes(key)) {
+            this.pressedKeys.delete(key);
+            if (this.pressedKeys.size === 0 && this.metalfootstep && this.metalfootstep.isPlaying) {
+                this.metalfootstep.stop();
+            }
+        }
+    }
+
+
+
+
+
+
+    ////////////////////////////////////////////////////////
+    //  Gestion des changements de valeurs     
+    //
+
+
+    private isAnimating = false;
+
+    startIncrementing(): void {
         if (this.isAnimating) return; 
         this.isAnimating = true;
 
@@ -727,94 +766,141 @@ export class Ship {
         requestAnimationFrame(updateLoop);
     }
 
-    private stopIncrementing(): void {
+    stopIncrementing(): void {
         this.isAnimating = false;
     }
 
-    private pressedKeys: Set<string> = new Set();
-
-    setupMoveEvents(): void {
-        window.addEventListener("keydown", (event) => {
-            const key = event.key.toLowerCase();
-            if (["z", "q", "s", "d"].includes(key)) {
-                this.pressedKeys.add(key);
-                if (this.metalfootstep && !this.metalfootstep.isPlaying) {
-                    this.metalfootstep.play();
-                }
+    scrollIncrements(event: WheelEvent): void {
+        if (this.isHoveringAmplitude) {
+            this.amplitude += event.deltaY < 0 ? 0.01 : -0.01;
+        } else if (this.isHoveringFrequency) {
+            this.frequency += event.deltaY < 0 ? 0.01 : -0.01;
         }
-        });
+
+        this.amplitude = Math.min(this.MAX_AMPLITUDE, Math.max(this.MIN_AMPLITUDE, this.amplitude));
+        this.frequency = Math.min(this.MAX_FREQUENCY, Math.max(this.MIN_FREQUENCY, this.frequency));
+
+        if (this.isHoveringAmplitude || this.isHoveringFrequency) {
+            this.updateSineWave();
+            this.updateDataScreen();
+            this.updateObjectives();
+        }
+    }
     
-        window.addEventListener("keyup", (event) => {
-            const key = event.key.toLowerCase();
-            if (["z", "q", "s", "d"].includes(key)) {
-                this.pressedKeys.delete(key);
-                if (this.pressedKeys.size === 0 && this.metalfootstep && this.metalfootstep.isPlaying) {
-                    this.metalfootstep.stop();
+
+
+
+
+
+    ////////////////////////////////////////////////////////
+    //  Gestion des actions du joueur lié à la progression de l'objectif  
+    //
+
+
+    takePhoto(): void {
+        if (this.isOverlap()) {
+            console.log("Cauchemar photographié !");
+            this.playPhotoSounds();
+            setTimeout(() => {
+                this.setupHostile(60);
+                this.photos[this.nightMareIndex].visibility = 1;
+                if (this.nightMareIndex < this.nightmares.length - 1) {
+                    this.nightMareIndex++;
+                    this.currentNightmare = this.nightmares[this.nightMareIndex];
+                    this.updateObjectives();
                 }
-            }
-        });
+            }, 4000);
+        } else {
+            console.log("Rêve photographié !");
+            this.playDreamPhotoSounds();
+            this.setupHostile(10);
+        }
     }
 
-    setupScrollEvents(): void {
-        this.canvas.addEventListener("wheel", (event) => {
-            if (this.isHoveringAmplitude) {
-                this.amplitude += (event.deltaY < 0) ? 0.01 : -0.01;
-            } else if (this.isHoveringFrequency) {
-                this.frequency += (event.deltaY < 0) ? 0.01 : -0.01;
-            }
-    
-            // Appliquer les limites
-            this.amplitude = Math.min(this.MAX_AMPLITUDE, Math.max(this.MIN_AMPLITUDE, this.amplitude));
-            this.frequency = Math.min(this.MAX_FREQUENCY, Math.max(this.MIN_FREQUENCY, this.frequency));
-    
-            if (this.isHoveringAmplitude || this.isHoveringFrequency) {
-                this.updateSineWave();
-                this.updateDataScreen();
-                this.updateObjectives();
-            }
-        });
-    }
-    
-    setupPhotoEvent(): void {
-        this.canvas.addEventListener("mousedown", () => {
-            if(this.isHoveringPhoto){
-                if(this.isOverlap()){
-                    console.log("cauchemar photographié !");
-                    new Sound("", "/sons/photo.mp3", this.scene, null, { volume: 0.5, autoplay: true, loop: false });
-                    setTimeout(() => {
-                        new Sound("", "/sons/thumb-tack.mp3", this.scene, null, { volume: 1, autoplay: true, loop: false });
-                      }, 2000);  
-                    setTimeout(() => {
-                        this.setupHostile(60);
-                        this.photos[this.nightMareIndex].visibility = 1;
-                        if(this.nightMareIndex < this.nightmares.length-1){
-                            this.nightMareIndex++;
-                            console.log("Nouveau cauchemar : "+ this.nightMareIndex);
-                            this.currentNightmare = this.nightmares[this.nightMareIndex];
-                        }
-                      }, 4000);  
-                }
-                else{
-                    console.log("rêve photographié !");
-                    new Sound("", "/sons/photo.mp3", this.scene, null, { volume: 0.5, autoplay: true, loop: false });
-                    setTimeout(() => {
-                        new Sound("", "/sons/paper-ripping.mp3", this.scene, null, { volume: 1.5, autoplay: true, loop: false });
-                      }, 3000); 
-                    this.setupHostile(10);
-                }
-
-            }
-        });
+    isOverlap() {
+        return Math.abs(this.amplitudePos - this.currentNightmare.nmAmplitude) < 0.01 && Math.abs(this.frequencyPos - this.currentNightmare.nmFrequency) < 0.01;
     }
 
-    //CODE POUR TOM
-    setupPaperSheetEvent(): void {
-        this.canvas.addEventListener("mousedown", () => {
-            if(this.isHoveringPaperSheet){
-                console.log("l'interface s'affiche")
-            }
-        });
+    toggleEngine(): void {
+        if (this.engineState) {
+            this.shutDownEngine();
+        } else {
+            this.powerEngine();
+        }
     }
+
+    powerEngine() {
+        this.engineState = true;
+        this.buzzingSound?.play();
+        this.motorSound?.play();
+        if (this.door) {
+            this.door.isVisible = true;
+        }
+        if (this.motorMaterial) {
+            this.motorMaterial.diffuseTexture = this.motorTextureOn;
+        }
+        this.lightList.forEach((light) => {
+            light.diffuse = new Color3(106, 143, 63);
+            light.intensity = 1;
+        });
+        this.horrorSound.stop();
+        this.setupHostile(120);
+    }
+
+    shutDownEngine() {
+        this.engineState = false;
+        this.buzzingSound?.stop();
+        this.motorSound?.stop();
+        if (this.door) {
+            this.door.isVisible = false;
+        }
+        if (this.motorMaterial) {
+            this.motorMaterial.diffuseTexture = this.motorTextureOff;
+        }
+        this.lightList.forEach((light) => {
+            light.diffuse = new Color3(175,0,0);
+            light.intensity = 0.5;
+        });
+        this.horrorSound?.play();
+    }
+
+
+
+
+
+
+    ////////////////////////////////////////////////////////
+    //  Gestion du son    
+    //
+
+
+    playSound(url: string): void {
+        new Sound("", url, this.scene, null, { volume: 0.5, autoplay: true, loop: false });
+    }
+
+    playPhotoSounds(): void {
+        new Sound("", "/sons/photo.mp3", this.scene, null, { volume: 0.5, autoplay: true, loop: false });
+        setTimeout(() => {
+            new Sound("", "/sons/thumb-tack.mp3", this.scene, null, { volume: 1, autoplay: true, loop: false });
+        }, 2000);
+    }
+
+    playDreamPhotoSounds(): void {
+        new Sound("", "/sons/photo.mp3", this.scene, null, { volume: 0.5, autoplay: true, loop: false });
+        setTimeout(() => {
+            new Sound("", "/sons/paper-ripping.mp3", this.scene, null, { volume: 1.5, autoplay: true, loop: false });
+        }, 3000);
+    }
+
+
+
+
+
+
+    ////////////////////////////////////////////////////////
+    //  Gestion des de la surbrillance des objets     
+    //
+
 
     setupButtonHoverDetection(): void {
         this.scene.onPointerMove = () => {
@@ -869,57 +955,30 @@ export class Ship {
         });
     }
 
-    isOverlap() {
-        return Math.abs(this.amplitudePos - this.currentNightmare.nmAmplitude) < 0.01 && Math.abs(this.frequencyPos - this.currentNightmare.nmFrequency) < 0.01;
+
+
+
+
+
+    ////////////////////////////////////////////////////////
+    //  Gestion de l'enfoncement des touches     
+    //
+
+
+    private lastButton!: AbstractMesh | null;
+    private initalButtonY!: number;
+
+    updateButtonPosition(button: AbstractMesh, offset: number): void {
+        button.position.y += offset;
     }
 
-    
-
-    setupMotorEvents(): void {
-        this.canvas.addEventListener("mousedown", () => {
-            if(this.isHoveringMotor){
-                if(this.engineState){
-                    this.shutDownEngine();
-                }
-                else{
-                    this.powerEngine();
-                }
-            }
-        });
-    }
-
-    powerEngine() {
-        this.engineState = true;
-        this.buzzingSound?.play();
-        this.motorSound?.play();
-        if (this.door) {
-            this.door.isVisible = true;
-        }
-        if (this.motorMaterial) {
-            this.motorMaterial.diffuseTexture = this.motorTextureOn;
-        }
-        this.lightList.forEach((light) => {
-            light.diffuse = new Color3(106, 143, 63);
-            light.intensity = 1;
-        });
-        this.horrorSound.stop();
-        this.setupHostile(120);
-    }
-
-    shutDownEngine() {
-        this.engineState = false;
-        this.buzzingSound?.stop();
-        this.motorSound?.stop();
-        if (this.door) {
-            this.door.isVisible = false;
-        }
-        if (this.motorMaterial) {
-            this.motorMaterial.diffuseTexture = this.motorTextureOff;
-        }
-        this.lightList.forEach((light) => {
-            light.diffuse = new Color3(175,0,0);
-            light.intensity = 0.5;
-        });
-        this.horrorSound?.play();
+    getCurrentButton(): AbstractMesh | null {
+        if (this.isHoveringUp) return this.buttonUp;
+        if (this.isHoveringDown) return this.buttonDown;
+        if (this.isHoveringRight) return this.buttonRight;
+        if (this.isHoveringLeft) return this.buttonLeft;
+        if (this.isHoveringPhoto) return this.buttonPhoto;
+        if (this.isHoveringMotor) return this.buttonMotor;
+        return null;
     }
 }
