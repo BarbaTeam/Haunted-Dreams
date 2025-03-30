@@ -524,7 +524,7 @@ export class Ship {
     openDoors(): void {
         this.doorList.forEach((door) => {
             if (door.mesh && !door.isOpen) {
-                this.openDoor(door);
+                this.openDoor(door, this.enableDoor);
             }
         });
     }
@@ -532,7 +532,7 @@ export class Ship {
     closeDoors(): void {
         this.doorList.forEach((door) => {
             if (door.mesh && door.isOpen) {
-                this.closeDoor(door);
+                this.closeDoor(door, this.enableDoor);
             }
         });
     }
@@ -540,31 +540,35 @@ export class Ship {
     toggleDoor(door: Door): void {
         if (door) {
             if (door.isOpen) {
-                this.closeDoor(door);
+                this.closeDoor(door, this.enableDoor);
             } else {
-                this.openDoor(door);
+                this.openDoor(door, this.enableDoor);
             }
         }
     }
 
-    openDoor(door: Door): void {
+    openDoor(door: Door, enable:boolean): void {
         if (!this.initialMeshesPositions.has(door.mesh)) {
             this.initialMeshesPositions.set(door.mesh, door.mesh.position.y);
         }
-        this.playSound("/sons/door.mp3",0.25);
         door.isOpen = true;
-        this.updateMeshPositionY(door.mesh, 12.5, 30);
+        if(enable){
+            this.playSound("/sons/door.mp3",0.25);
+            this.updateMeshPositionY(door.mesh, 12.5, 30);
+        }
     }
 
-    closeDoor(door: Door): void {
+    closeDoor(door: Door, enable:boolean): void {
         if (door && this.initialMeshesPositions.has(door.mesh)) {
             const initialY = this.initialMeshesPositions.get(door.mesh);
             
             if (initialY !== undefined) {
                 const offset = initialY - door.mesh.position.y;
-                this.playSound("/sons/door.mp3",0.25);
                 door.isOpen=false;
-                this.updateMeshPositionY(door.mesh, offset, 30);
+                if(enable){
+                    this.playSound("/sons/door.mp3",0.25);
+                    this.updateMeshPositionY(door.mesh, offset, 30);
+                }
             } else {
                 console.warn('Position initiale non définie pour la porte.', door);
             }
@@ -577,7 +581,6 @@ export class Ship {
         this.deathTimeOut = setTimeout(() => {
             this.engineRestartAllowed = false;
             this.runningDeathSound = this.playSound("/sons/runningdeath.mp3", 1);
-
             this.runningDeathSound.onEndedObservable.add(() => {
                 this.kill();
             });
@@ -1036,6 +1039,8 @@ export class Ship {
         return Math.abs(this.amplitudePos - this.currentNightmare.nmAmplitude) < 0.01 && Math.abs(this.frequencyPos - this.currentNightmare.nmFrequency) < 0.01;
     }
 
+    enableDoor = true;
+
     toggleEngine(): void {
         if (this.engineState) {
             this.shutDownEngine();
@@ -1058,8 +1063,8 @@ export class Ship {
         this.engineState = true;
         this.buzzingSound?.play();
         this.motorSound?.play();
-
-        this.closeDoor(this.doorList.find(door => door.name === "exterior")!);
+        this.enableDoor= true;
+        this.closeDoor(this.doorList.find(door => door.name === "exterior")!, this.enableDoor);
 
         if (this.motorMaterial) {
             this.motorMaterial.diffuseTexture = this.motorTextureOn;
@@ -1089,7 +1094,7 @@ export class Ship {
         this.deathSound = this.playSound("/sons/deathsound.mp3", 0.5);
 
         this.openDoors();
-
+        this.enableDoor = false;
         if (this.motorMaterial) {
             this.motorMaterial.diffuseTexture = this.motorTextureOff;
         }
