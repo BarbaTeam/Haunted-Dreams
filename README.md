@@ -7,7 +7,7 @@ Plongez dans une réalité alternative de 1946, où la science a ouvert les port
 
 Obéissez aux exigences du docteur, extirpez-lui les informations qu’il cherche et peut-être, juste peut-être, échapperez-vous à votre funeste destinée. Oserez-vous défier l’horreur alors encore inexplorée, au prix de votre liberté ?
 
-<video controls src="public/videos/Trailer Haunted dreams.mp4" title="Title"></video>
+[Voir la vidéo sur YouTube](https://www.youtube.com/watch?v=PME4RAuYcyg)
 
 ## Technos
 **Vue :** 
