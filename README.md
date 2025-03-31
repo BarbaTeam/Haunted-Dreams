@@ -7,9 +7,13 @@ Plongez dans une réalité alternative de 1946, où la science a ouvert les port
 
 Obéissez aux exigences du docteur, extirpez-lui les informations qu’il cherche et peut-être, juste peut-être, échapperez-vous à votre funeste destinée. Oserez-vous défier l’horreur alors encore inexplorée, au prix de votre liberté ?
 
-[Voir la vidéo sur YouTube](https://www.youtube.com/watch?v=PME4RAuYcyg)
+[Voir le trailer sur YouTube](https://www.youtube.com/watch?v=PME4RAuYcyg)
 
-## Technos
+Ce jeu est en cours de développement dans le cadre du concours [Games On Web 2025](https://www.cgi.com/france/fr-fr/event/games-on-web-2025) organisé par [CGI France](https://www.cgi.com/france/fr-fr). 
+
+
+
+### Technos
 **Vue :** 
 ```
 npm i -g @vue/cli
@@ -20,26 +24,11 @@ npm i @babylonjs/core
 npm i @babylonjs/loaders
 npm i @babylonjs/gui
 ```
-
-## Project setup
+Project setup
 ```
 npm install
 ```
-
-### Compiles and hot-reloads for development
+Compiles and hot-reloads for development
 ```
 npm run serve
 ```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
