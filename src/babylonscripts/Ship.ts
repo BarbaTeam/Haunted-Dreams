@@ -852,9 +852,9 @@ export class Ship {
 
 
     setupEvents(): void {
-        this.canvas.addEventListener("mousedown", this.handleMouseDown.bind(this));
-        this.canvas.addEventListener("mouseup", this.handleMouseUp.bind(this));
-        this.canvas.addEventListener("mouseleave", this.handleMouseUp.bind(this));
+        this.canvas.addEventListener("pointerdown", this.handleMouseDown.bind(this));
+        this.canvas.addEventListener("pointerup", this.handleMouseUp.bind(this));
+        this.canvas.addEventListener("pointerleave", this.handleMouseUp.bind(this));
         this.canvas.addEventListener("wheel", this.handleScroll.bind(this));
 
         window.addEventListener("keydown", this.handleKeyDown.bind(this));
