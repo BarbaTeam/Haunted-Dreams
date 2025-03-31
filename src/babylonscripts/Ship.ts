@@ -429,7 +429,7 @@ export class Ship {
         ];
 
         this.lightList.forEach((light) => {
-            light.intensity = 1;
+            light.intensity = 3;
             light.diffuse = new Color3(106, 143, 63);
             light.range = 2;
         });
@@ -963,13 +963,13 @@ export class Ship {
         const updateLoop = () => {
             if (!this.isIncrementing) return;
 
-            if (this.isHoveringUp) this.amplitudePos = Math.min(this.amplitudePos + 0.001, this.MAX_AMPLITUDE);
-            else if (this.isHoveringDown) this.amplitudePos = Math.max(this.amplitudePos - 0.001, this.MIN_AMPLITUDE);
+            if (this.isHoveringUp) this.amplitudePos = Math.min(this.amplitudePos + 0.0025, this.MAX_AMPLITUDE);
+            else if (this.isHoveringDown) this.amplitudePos = Math.max(this.amplitudePos - 0.0025, this.MIN_AMPLITUDE);
             else if (this.isHoveringRight) {
-                this.angle = (this.angle - Math.PI / 1000) % (2 * Math.PI);
+                this.angle = (this.angle - Math.PI / 500) % (2 * Math.PI);
             }
             else if (this.isHoveringLeft) {
-                this.angle = (this.angle + Math.PI / 1000) % (2 * Math.PI);
+                this.angle = (this.angle + Math.PI / 500) % (2 * Math.PI);
             }
             if (this.angle < 0) {
                 this.angle += 2 * Math.PI;
@@ -1071,7 +1071,7 @@ export class Ship {
         }
         this.lightList.forEach((light) => {
             light.diffuse = new Color3(106, 143, 63);
-            light.intensity = 1;
+            light.intensity = 3;
         });
 
         this.horrorSound?.stop();
@@ -1100,7 +1100,7 @@ export class Ship {
         }
         this.lightList.forEach((light) => {
             light.diffuse = new Color3(175, 0, 0);
-            light.intensity = 0.5;
+            light.intensity = 2;
         });
 
         this.horrorSound?.play();

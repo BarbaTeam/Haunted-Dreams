@@ -21,7 +21,6 @@ export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement): Univer
     camera.keysRight.push(68); // D
     camera.keysLeft.push(81); // Q
 
-    // **Gestion de la souris**
     canvas.addEventListener("click", () => {
         canvas.requestPointerLock();
     });
@@ -41,9 +40,8 @@ export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement): Univer
         camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x));
     }
 
-    // **Zoom au clic droit**
     const defaultFov = camera.fov;
-    const zoomedFov = 0.8; // Ajustable pour un zoom plus ou moins fort
+    const zoomedFov = 0.8; 
 
     canvas.addEventListener("mousedown", (event) => {
         if (event.button === 2) { // Clic droit
@@ -53,7 +51,7 @@ export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement): Univer
     });
 
     canvas.addEventListener("mouseup", (event) => {
-        if (event.button === 2) { // Relâchement clic droit
+        if (event.button === 2) { 
             camera.fov = defaultFov;
             event.preventDefault();
         }
@@ -64,10 +62,8 @@ export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement): Univer
         event.preventDefault();
     });
 
-    // **Création de l'interface UI**
     const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
-    // **Ajout du curseur (réticule)**
     const crosshair = Button.CreateImageOnlyButton("crosshair", "/images/circle.svg");
     crosshair.width = "15px";
     crosshair.height = "15px";

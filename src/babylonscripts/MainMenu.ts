@@ -90,6 +90,7 @@ export class MainMenu {
     createVideoTexture(menuPlane: Mesh, scene: Scene) {
         const videoTexture = new VideoTexture("videoTexture", ["/videos/main_menu_background.mp4"], scene, true, true);
         videoTexture.video.muted = true;
+        videoTexture.video.play();
 
         const videoMaterial = new StandardMaterial("videoMaterial", scene);
         videoMaterial.diffuseTexture = videoTexture;  
