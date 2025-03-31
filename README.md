@@ -1,6 +1,14 @@
 # haunteddreams-gameonweb-contest-24-25
 ![Affiche du jeu](public/images/HauntedDreams.png)
 
+HauntedDream est un jeu d'enquête angoissant et immersif, où vous incarnez un condamné à mort recruté par le mystérieux psychiatre Dunwich. Votre mission : explorer l’esprit brisé d’une patiente internée pour percer le secret qui la hante.
+
+Plongez dans une réalité alternative de 1946, où la science a ouvert les portes du subconscient. Grâce à une technologie révolutionnaire, vous serez projeté au cœur des cauchemars de cette âme tourmentée. Mais attention, ce voyage est aussi périlleux qu’insondable. Chaque choix compte, chaque découverte vous rapproche de la vérité… ou de la folie.
+
+Obéissez aux exigences du docteur, extirpez-lui les informations qu’il cherche et peut-être, juste peut-être, échapperez-vous à votre funeste destinée. Oserez-vous défier l’horreur alors encore inexplorée, au prix de votre liberté ?
+
+<video controls src="public/videos/Trailer Haunted dreams.mp4" title="Title"></video>
+
 ## Technos
 **Vue :** 
 ```
