@@ -1,18 +1,18 @@
 
-import { Scene, Vector3, UniversalCamera, ArcRotateCamera, BlurPostProcess } from "@babylonjs/core";
-import { AdvancedDynamicTexture, Button, Rectangle, Image } from "@babylonjs/gui";
+import { Scene, Vector3, UniversalCamera, ArcRotateCamera } from "@babylonjs/core";
+import { AdvancedDynamicTexture, Button } from "@babylonjs/gui";
 
 
 export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement): UniversalCamera {
-    const camera = new UniversalCamera("UniversalCamera", new Vector3(0, 11, 0), scene);    
+    const camera = new UniversalCamera("UniversalCamera", new Vector3(0, 11, 0), scene);
     camera.setTarget(new Vector3(0, 10, 10));
     camera.applyGravity = true;
     camera.checkCollisions = true;
     camera.attachControl(canvas, true);
     camera.ellipsoid = new Vector3(3, 5, 3);
-    camera.inertia = 0.1; 
+    camera.inertia = 0.1;
     camera.speed = 5.5;
-    camera.angularSensibility = 2000; 
+    camera.angularSensibility = 2000;
     camera.fov = 1.2;
 
     // **Clavier AZERTY**
@@ -21,7 +21,6 @@ export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement): Univer
     camera.keysRight.push(68); // D
     camera.keysLeft.push(81); // Q
 
-    // **Gestion de la souris**
     canvas.addEventListener("click", () => {
         canvas.requestPointerLock();
     });
@@ -35,16 +34,36 @@ export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement): Univer
     });
 
     function mouseMove(event: MouseEvent) {
-        const rotationSpeed = 0.002; // Ajustable pour la sensibilité
-        camera.rotation.y += event.movementX * rotationSpeed; // Axe X (horizontal) reste normal
-        camera.rotation.x += event.movementY * rotationSpeed; // Axe Y (vertical) inversé
-        camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x)); // Limite pour éviter un retournement total
+        const rotationSpeed = 0.002;
+        camera.rotation.y += event.movementX * rotationSpeed;
+        camera.rotation.x += event.movementY * rotationSpeed;
+        camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x));
     }
-    
-    // **Création de l'interface UI unique**
+
+    const defaultFov = camera.fov;
+    const zoomedFov = 0.8; 
+
+    canvas.addEventListener("mousedown", (event) => {
+        if (event.button === 2) { // Clic droit
+            camera.fov = zoomedFov;
+            event.preventDefault();
+        }
+    });
+
+    canvas.addEventListener("mouseup", (event) => {
+        if (event.button === 2) { 
+            camera.fov = defaultFov;
+            event.preventDefault();
+        }
+    });
+
+    // Désactiver le menu contextuel du clic droit
+    canvas.addEventListener("contextmenu", (event) => {
+        event.preventDefault();
+    });
+
     const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
-    // **Ajout du curseur (réticule)**
     const crosshair = Button.CreateImageOnlyButton("crosshair", "/images/circle.svg");
     crosshair.width = "15px";
     crosshair.height = "15px";
@@ -62,9 +81,11 @@ export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement): Univer
     //helmetImage.stretch = Image.STRETCH_FILL;
     //helmetOverlay.addControl(helmetImage);
 
-    return camera;
 
+    return camera;
 }
+
+
 
 
 export function createMenuCamera(scene: Scene, canvas: HTMLCanvasElement): ArcRotateCamera {
