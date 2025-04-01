@@ -551,17 +551,21 @@ export class Ship {
         if (!this.initialMeshesPositions.has(door.mesh)) {
             this.initialMeshesPositions.set(door.mesh, door.mesh.position.y);
         }
-        door.isOpen = true;
-        if(enable){
-            this.playSound("sons/door.mp3",0.25);
-            this.updateMeshPositionY(door.mesh, 12.5, 30);
-        }
+        const initialY = this.initialMeshesPositions.get(door.mesh);
+        if (initialY !== undefined) {
+            const maxY = initialY + 12.5;
+            const offset = maxY - door.mesh.position.y;
+            door.isOpen=true;
+            if(enable){
+                this.playSound("sons/door.mp3",0.25);
+                this.updateMeshPositionY(door.mesh, offset, 30);
+            }
+        }        
     }
 
     closeDoor(door: Door, enable:boolean): void {
         if (door && this.initialMeshesPositions.has(door.mesh)) {
             const initialY = this.initialMeshesPositions.get(door.mesh);
-            
             if (initialY !== undefined) {
                 const offset = initialY - door.mesh.position.y;
                 door.isOpen=false;
@@ -1225,7 +1229,6 @@ export class Ship {
     private lastButton!: AbstractMesh | null;
 
     updateMeshPositionY(mesh: AbstractMesh, offset: number, fps: number): void {
-            
         const animation = new Animation(
             "moveY",
             "position.y",
@@ -1243,6 +1246,7 @@ export class Ship {
     
         mesh.animations = [animation];
         this.scene.beginAnimation(mesh, 0, 30, false);
+        
     }
 
     getCurrentButton(): AbstractMesh | null {
