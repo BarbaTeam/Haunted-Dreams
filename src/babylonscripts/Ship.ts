@@ -107,7 +107,7 @@ export class Ship {
 
     private buttonPhoto!: AbstractMesh;
     private paperSheet!: AbstractMesh;
-
+    
     private buttonDoorNav1!: AbstractMesh
     private buttonDoorNav2!: AbstractMesh
     private buttonDoorMotor1!: AbstractMesh
@@ -117,6 +117,9 @@ export class Ship {
     private isHoveringbuttonDoorNav2= false;
     private isHoveringbuttonDoorMotor1= false;
     private isHoveringbuttonDoorMotor2= false;
+
+    private telephone!:AbstractMesh;
+    private isHoveringTelephone = false;
 
     private engineState = true;
     private buttonMotor!: AbstractMesh;
@@ -206,6 +209,19 @@ export class Ship {
         pipeline.depthOfField.fStop = 2; 
         pipeline.depthOfField.focusDistance = 1000; 
 
+        this.narratorVoices = [
+            new Sound("", "sons/intro.mp3", this.scene, null, { volume: 2, autoplay: false, loop: false }),
+            new Sound("", "sons/tuto1.mp3", this.scene, null, { volume: 2, autoplay: false, loop: false }),
+            new Sound("", "sons/tuto2.mp3", this.scene, null, { volume: 2, autoplay: false, loop: false }),
+            new Sound("", "sons/tuto3.mp3", this.scene, null, { volume: 2, autoplay: false, loop: false }),
+            new Sound("", "sons/tuto4.mp3", this.scene, null, { volume: 2, autoplay: false, loop: false }),
+            new Sound("", "sons/tuto5.mp3", this.scene, null, { volume: 2, autoplay: false, loop: false }),
+            new Sound("", "sons/tuto6.mp3", this.scene, null, { volume: 2, autoplay: false, loop: false }),
+            new Sound("", "sons/tuto7.mp3", this.scene, null, { volume: 2, autoplay: false, loop: false }),
+            new Sound("", "sons/tuto8.mp3", this.scene, null, { volume: 2, autoplay: false, loop: false }),
+            new Sound("", "sons/outro.mp3", this.scene, null, { volume: 2, autoplay: false, loop: false }),
+        ]
+
         return scene;
     }
 
@@ -218,7 +234,7 @@ export class Ship {
             spaceship.checkCollisions = true; 
             spaceship.getChildMeshes().forEach(mesh => {
                 mesh.checkCollisions = true;
-            
+                console.log(mesh.name);
                 switch (mesh.name) {
                     case "selecteur_onde.boutton_amplitude":
                         this.buttonAmplitude = mesh;
@@ -239,7 +255,7 @@ export class Ship {
                     case "nav.button_right":
                         this.buttonRight = mesh;
                         break;
-            
+                   
                     case "appareil_photo.boutton":
                         this.buttonPhoto = mesh;
                         break;
@@ -342,7 +358,9 @@ export class Ship {
                         mesh.visibility = 0;
                         this.photos.push(mesh);
                         break;
-
+                    case "telephone":
+                        this.telephone = mesh;
+                        break;
                 }
             });
             
@@ -363,7 +381,8 @@ export class Ship {
                     isOpen: false
                 }
             ]
-
+            console.log(this.telephone);
+            this.setupNarrator();
             this.setupButtonHoverDetection();
             this.setupEvents();
             this.updateSineWave();   
@@ -890,7 +909,9 @@ export class Ship {
         else if (this.isHoveringSomeButtonForMotorDoor()) {
             this.toggleDoor(this.doorList.find(door => door.name === "motor")!);
         }
-
+        else if (this.isHoveringTelephone){
+            this.answerPhone();
+        }
         this.lastButton = this.getCurrentButton();
         if (this.lastButton) {
             this.wasHovering = true;
@@ -930,8 +951,8 @@ export class Ship {
     private pressedKeys: Set<string> = new Set();
 
     handleKeyDown(event: KeyboardEvent): void {
-        const key = event.key.toLowerCase();
-        if (["z", "q", "s", "d"].includes(key)) {
+        const key = event.code; // Utilisation de event.code pour garantir la compatibilité AZERTY/QWERTY
+        if (["KeyW", "KeyA", "KeyS", "KeyD"].includes(key)) {
             this.pressedKeys.add(key);
             if (this.metalfootstep && !this.metalfootstep.isPlaying) {
                 this.metalfootstep.play();
@@ -940,15 +961,14 @@ export class Ship {
     }
 
     handleKeyUp(event: KeyboardEvent): void {
-        const key = event.key.toLowerCase();
-        if (["z", "q", "s", "d"].includes(key)) {
+        const key = event.code;
+        if (["KeyW", "KeyA", "KeyS", "KeyD"].includes(key)) {
             this.pressedKeys.delete(key);
             if (this.pressedKeys.size === 0 && this.metalfootstep && this.metalfootstep.isPlaying) {
                 this.metalfootstep.stop();
             }
         }
     }
-
 
 
 
@@ -1167,6 +1187,7 @@ export class Ship {
             this.isHoveringRight = hit?.pickedMesh === this.buttonRight;
             this.isHoveringPhoto = hit?.pickedMesh === this.buttonPhoto;
             this.isHoveringMotor = hit?.pickedMesh === this.buttonMotor;
+            this.isHoveringTelephone = hit?.pickedMesh === this.telephone;
             this.isHoveringPaperSheet = hit?.pickedMesh === this.paperSheet;
             this.isHoveringbuttonDoorMotor1 = hit?.pickedMesh=== this.buttonDoorMotor1;
             this.isHoveringbuttonDoorMotor2 = hit?.pickedMesh=== this.buttonDoorMotor2;
@@ -1197,6 +1218,7 @@ export class Ship {
                 { mesh: this.buttonPhoto, isHovering: this.isHoveringPhoto },
                 { mesh: this.buttonMotor, isHovering: this.isHoveringMotor },
                 { mesh: this.paperSheet, isHovering: this.isHoveringPaperSheet },
+                { mesh: this.telephone, isHovering: this.isHoveringTelephone },
                 { mesh: this.buttonDoorMotor1, isHovering: this.isHoveringbuttonDoorMotor1},
                 { mesh: this.buttonDoorMotor2, isHovering: this.isHoveringbuttonDoorMotor2},
                 { mesh: this.buttonDoorNav1, isHovering: this.isHoveringbuttonDoorNav1},
@@ -1216,6 +1238,244 @@ export class Ship {
             });
         });
     }
+
+
+    ////////////////////////////////////////////////////////
+    //  Gestion du narrateur     
+    //
+
+    private ringTone!: Sound;
+    private answered = false;
+    private isCalling = false;
+    private narratorVoices!: Sound[];
+    
+
+    setupNarrator(){
+        if(!this.answered){
+            setTimeout(()=>{
+                this.isCalling = true;
+                this.ringTone = new Sound("", "sons/ringtone.mp3", this.scene, null, { volume: 0.5, autoplay: true, loop: true });
+            },5000);
+        }
+        else {
+            setTimeout(()=>{
+                this.narratorVoices[0].setPlaybackRate(100);
+                this.narratorVoices[0].play();
+                this.narratorVoices[0].onEndedObservable.add(() => {
+                    this.narratorVoices[1].setPlaybackRate(100);
+                    this.narratorVoices[1].play();
+                });
+                
+            },1000);
+            this.narratorVoices[1].onEndedObservable.add(() => {
+                this.narratorVoices[2].setPlaybackRate(100);
+                this.narratorVoices[2].play();
+            });
+            this.narratorVoices[2].onEndedObservable.add(() => {
+                this.narratorVoices[3].setPlaybackRate(100);
+                this.narratorVoices[3].play();
+            });
+            this.narratorVoices[3].onEndedObservable.add(() => {
+                this.paperTutorial();
+            });
+            this.narratorVoices[4].onEndedObservable.add(() => {
+                this.waveSelectorTutorial();
+            });
+            this.narratorVoices[5].onEndedObservable.add(() => {
+                this.boussoleTutorial();
+            });
+            this.narratorVoices[6].onEndedObservable.add(() => {
+                this.photoTutorial();
+            });
+            this.narratorVoices[7].onEndedObservable.add(() => {
+                this.narratorVoices[8].play();
+            });
+        }
+    }
+
+    answerPhone(): void {
+        console.log("décroché");
+        if(!this.answered && this.isCalling){
+            this.ringTone.stop();
+            this.answered = true;
+            this.setupNarrator();
+        }
+
+    }
+
+    paperTutorial() {
+        const highlightLayer = new HighlightLayer("hl2", this.scene);
+        highlightLayer.outerGlow = false; 
+        highlightLayer.innerGlow = true; 
+    
+        const text1 = "Left click on the paper";
+        const text2 = "to see patient's info";
+    
+        const textPlane = this.createFloatingText(text1, text2, this.paperSheet as Mesh, { x: 4.1, y: 1, z: 0 });
+    
+        highlightLayer.addMesh(this.paperSheet as Mesh, Color3.Green());
+        const handleClick = ()=>{
+            if(this.isHoveringPaperSheet){
+                highlightLayer.removeMesh(this.paperSheet as Mesh);
+                textPlane.dispose();
+                this.narratorVoices[4].play();
+                removeEventListener("pointerdown", handleClick);
+            }
+        }
+        addEventListener("pointerdown", handleClick);
+    }
+
+    waveSelectorTutorial() {
+        const highlightLayer = new HighlightLayer("hl2", this.scene);
+        highlightLayer.outerGlow = false; 
+        highlightLayer.innerGlow = true; 
+    
+        const text1 = "Scroll on the buttons";
+        const text2 = "to update wave's coord";
+    
+        const textPlane = this.createFloatingText(text1, text2, this.buttonAmplitude as Mesh, { x: 17, y: 11, z: 6 });
+    
+        highlightLayer.addMesh(this.buttonAmplitude as Mesh, Color3.Green());
+        highlightLayer.addMesh(this.buttonFrequency as Mesh, Color3.Green());
+
+
+        const checkValue = () => {
+            if (this.currentNightmare.nmAmplitude.toFixed(2)===this.amplitude.toFixed(2) && this.currentNightmare.nmFrequency.toFixed(2) === this.frequency.toFixed(2)) {
+                highlightLayer.removeMesh(this.buttonAmplitude as Mesh);
+                highlightLayer.removeMesh(this.buttonFrequency as Mesh);
+                textPlane.dispose();
+                this.narratorVoices[5].play();
+
+                clearInterval(valueWatcher);
+                removeEventListener("wheel", checkValue);
+            }
+        };
+
+        addEventListener("wheel", checkValue);
+
+        const valueWatcher = setInterval(checkValue, 100);
+    }
+
+    boussoleTutorial() {
+        const highlightLayer = new HighlightLayer("hl2", this.scene);
+        highlightLayer.outerGlow = false; 
+        highlightLayer.innerGlow = true; 
+    
+        const text1 = "Use the left/right arrows";
+        const text2 = "to turn the ship towards the dot";
+    
+        const textPlane = this.createFloatingText(text1, text2, this.buttonAmplitude as Mesh, { x: 20, y: 11, z: 0 });
+    
+        highlightLayer.addMesh(this.buttonLeft as Mesh, Color3.Green());
+        highlightLayer.addMesh(this.buttonRight as Mesh, Color3.Green());
+
+
+        const checkValue = () => {
+            if (this.angle.toFixed(1) === this.angleToAim!.toFixed(1)) {
+                highlightLayer.removeMesh(this.buttonLeft as Mesh);
+                highlightLayer.removeMesh(this.buttonRight as Mesh);
+                textPlane.dispose();
+                this.navigationTutorial();
+                clearInterval(valueWatcher);
+                removeEventListener("pointerdown", checkValue);
+            }
+        };
+        addEventListener("pointerdown", checkValue);
+
+        const valueWatcher = setInterval(checkValue, 100);
+    }
+
+    navigationTutorial() {
+        const highlightLayer = new HighlightLayer("hl2", this.scene);
+        highlightLayer.outerGlow = false; 
+        highlightLayer.innerGlow = true; 
+    
+        const text1 = "Use the up/down arrows";
+        const text2 = "to update your position's wave";
+    
+        const textPlane = this.createFloatingText(text1, text2, this.buttonAmplitude as Mesh, { x: 20, y: 11, z: 0 });
+    
+        highlightLayer.addMesh(this.buttonUp as Mesh, Color3.Green());
+        highlightLayer.addMesh(this.buttonDown as Mesh, Color3.Green());
+
+
+        const checkValue = () => {
+            if (this.isOverlap()) {
+                highlightLayer.removeMesh(this.buttonUp as Mesh);
+                highlightLayer.removeMesh(this.buttonDown as Mesh);
+                textPlane.dispose();
+                this.narratorVoices[6].play();
+                clearInterval(valueWatcher);
+                removeEventListener("pointerdown", checkValue);
+            }
+        };
+
+        addEventListener("pointerdown", checkValue);
+
+        const valueWatcher = setInterval(checkValue, 100);
+    }
+    
+    photoTutorial() {
+        const highlightLayer = new HighlightLayer("hl2", this.scene);
+        highlightLayer.outerGlow = false; 
+        highlightLayer.innerGlow = true; 
+    
+        const text1 = "Left click on button";
+        const text2 = "to take a photo";
+    
+        const textPlane = this.createFloatingText(text1, text2, this.buttonPhoto as Mesh, { x: -7.5, y: 11, z: -19 });
+    
+        highlightLayer.addMesh(this.buttonPhoto as Mesh, Color3.Green());
+
+        const checkValue = () => {
+            if (this.nightMareIndex != 0) {
+                highlightLayer.removeMesh(this.buttonPhoto as Mesh);
+                textPlane.dispose();
+                this.narratorVoices[7].play();
+
+                clearInterval(valueWatcher);
+                removeEventListener("pointerdown", checkValue);
+            }
+        };
+
+        addEventListener("pointerdown", checkValue);
+
+        const valueWatcher = setInterval(checkValue, 100);
+    }
+    
+    createFloatingText(text1: string, text2: string, targetMesh: Mesh, offset = { x: 0, y: 0, z: 0 }) {
+        const plane = MeshBuilder.CreatePlane("TexturePlane", { width: 10, height: 3 }, this.scene);
+        const planeMaterial = new StandardMaterial("AvatarPlaneMat", this.scene);
+        
+        const planeTexture = new DynamicTexture("planeTexture", { width: 512, height: 256 }, this.scene);
+        planeTexture.hasAlpha = true;
+    
+        planeTexture.drawText(text1, 0, 40, "bold 40px Arial", "green", null, true, true);
+        planeTexture.drawText(text2, 18, 75, "bold 40px Arial", "green", null, true, true);
+
+        planeMaterial.backFaceCulling = true;
+        planeMaterial.diffuseTexture = planeTexture;
+        planeMaterial.emissiveColor = new Color3(1, 1, 1);  
+        planeMaterial.specularColor = new Color3(0, 0, 0);
+        plane.material = planeMaterial;
+    
+        plane.billboardMode = Mesh.BILLBOARDMODE_ALL;
+    
+        plane.position.x = targetMesh.position.x + offset.x;
+        plane.position.y = targetMesh.position.y + offset.y;
+        plane.position.z = targetMesh.position.z + offset.z;
+    
+        return plane;
+    }
+
+
+
+
+
+
+
+
+
 
 
 
