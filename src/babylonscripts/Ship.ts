@@ -573,11 +573,7 @@ export class Ship {
                     this.playSound("sons/door.mp3",0.25);
                     this.updateMeshPositionY(door.mesh, offset, 30);
                 }
-            } else {
-                console.warn('Position initiale non définie pour la porte.', door);
-            }
-        } else {
-            console.warn('Impossible de fermer la porte : la position initiale n\'est pas enregistrée.', door);
+            } 
         }
     }
         
@@ -898,14 +894,19 @@ export class Ship {
         this.lastButton = this.getCurrentButton();
         if (this.lastButton) {
             this.wasHovering = true;
-            this.playSound("sons/pressdown.mp3", 0.5);
             if (!this.initialMeshesPositions.has(this.lastButton)) {
                 this.initialMeshesPositions.set(this.lastButton, this.lastButton.position.y);
             }
-        
-            this.updateMeshPositionY(this.lastButton, -0.15, 120);
+            if (this.lastButton && this.initialMeshesPositions.has(this.lastButton)) {
+                const initialY = this.initialMeshesPositions.get(this.lastButton)!;
+                const minY = initialY -0.15;
+                const offset = minY - this.lastButton.position.y;
+                this.playSound("sons/pressdown.mp3", 0.5);
+                this.updateMeshPositionY(this.lastButton, offset, 120);
+            }
         }
 
+        
     }
 
     handleMouseUp(): void {
