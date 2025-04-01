@@ -1259,20 +1259,16 @@ export class Ship {
         }
         else {
             setTimeout(()=>{
-                this.narratorVoices[0].setPlaybackRate(100);
                 this.narratorVoices[0].play();
                 this.narratorVoices[0].onEndedObservable.add(() => {
-                    this.narratorVoices[1].setPlaybackRate(100);
                     this.narratorVoices[1].play();
                 });
                 
             },1000);
             this.narratorVoices[1].onEndedObservable.add(() => {
-                this.narratorVoices[2].setPlaybackRate(100);
                 this.narratorVoices[2].play();
             });
             this.narratorVoices[2].onEndedObservable.add(() => {
-                this.narratorVoices[3].setPlaybackRate(100);
                 this.narratorVoices[3].play();
             });
             this.narratorVoices[3].onEndedObservable.add(() => {
