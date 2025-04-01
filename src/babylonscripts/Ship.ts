@@ -210,7 +210,7 @@ export class Ship {
     }
 
     createSpaceShip(): void {
-        SceneLoader.ImportMeshAsync("", "/models/", "spaceship.glb", this.scene).then((result) => {
+        SceneLoader.ImportMeshAsync("", "models/", "spaceship.glb", this.scene).then((result) => {
             const spaceship = result.meshes[0];
 
             console.log("Le vaisseau est bien chargé");
@@ -254,8 +254,8 @@ export class Ship {
                     case "motor_controle.screen":
                         this.motor_control_screen = mesh;
                         this.motorMaterial = new StandardMaterial("motor_control_screen", this.scene);
-                        this.motorTextureOn = new Texture("/images/power_on.png", this.scene);
-                        this.motorTextureOff = new Texture("/images/power_off.png", this.scene);
+                        this.motorTextureOn = new Texture("images/power_on.png", this.scene);
+                        this.motorTextureOff = new Texture("images/power_off.png", this.scene);
             
                         this.motorTextureOn.wAng = Math.PI / 2;
                         this.motorTextureOn.uScale = -1;
@@ -372,10 +372,10 @@ export class Ship {
         });
 
         // Sons d'ambiance
-        this.buzzingSound = new Sound("", "/sons/buzzing-sound.wav", this.scene, null, { volume: 0.05, autoplay: true, loop: true });
-        this.motorSound = new Sound("", "/sons/horror-ambience-01-66708.mp3", this.scene, null, { volume: 0.25, autoplay: true, loop: true });
-        this.metalfootstep = new Sound("", "/sons/metal-footsteps.mp3", this.scene, null, { volume: 0.5, autoplay: false, loop: true });
-        this.horrorSound = new Sound("", "/sons/spooky-ambience-sound.mp3",this.scene, null, { volume : 0.5, autoplay: false, loop: true});
+        this.buzzingSound = new Sound("", "sons/buzzing-sound.wav", this.scene, null, { volume: 0.05, autoplay: true, loop: true });
+        this.motorSound = new Sound("", "sons/horror-ambience-01-66708.mp3", this.scene, null, { volume: 0.25, autoplay: true, loop: true });
+        this.metalfootstep = new Sound("", "sons/metal-footsteps.mp3", this.scene, null, { volume: 0.5, autoplay: false, loop: true });
+        this.horrorSound = new Sound("", "sons/spooky-ambience-sound.mp3",this.scene, null, { volume : 0.5, autoplay: false, loop: true});
     }
 
     createGround(): void {
@@ -460,7 +460,7 @@ export class Ship {
             this.angleToAim = this.currentNightmare.nmAngle;
             if(!this.beenPlayed){
                 this.beenPlayed = true;
-                new Sound("", "/sons/beep.mp3", this.scene, null, { volume: 0.5, autoplay: true, loop: false });
+                new Sound("", "sons/beep.mp3", this.scene, null, { volume: 0.5, autoplay: true, loop: false });
             }
             if(this.angle.toFixed(1) === this.angleToAim.toFixed(1)){
                 this.frequencyPos = this.frequency;
@@ -553,7 +553,7 @@ export class Ship {
         }
         door.isOpen = true;
         if(enable){
-            this.playSound("/sons/door.mp3",0.25);
+            this.playSound("sons/door.mp3",0.25);
             this.updateMeshPositionY(door.mesh, 12.5, 30);
         }
     }
@@ -566,7 +566,7 @@ export class Ship {
                 const offset = initialY - door.mesh.position.y;
                 door.isOpen=false;
                 if(enable){
-                    this.playSound("/sons/door.mp3",0.25);
+                    this.playSound("sons/door.mp3",0.25);
                     this.updateMeshPositionY(door.mesh, offset, 30);
                 }
             } else {
@@ -580,7 +580,7 @@ export class Ship {
     deathInitiated() {
         this.deathTimeOut = setTimeout(() => {
             this.engineRestartAllowed = false;
-            this.runningDeathSound = this.playSound("/sons/runningdeath.mp3", 1);
+            this.runningDeathSound = this.playSound("sons/runningdeath.mp3", 1);
             this.runningDeathSound.onEndedObservable.add(() => {
                 this.kill();
             });
@@ -598,7 +598,7 @@ export class Ship {
         blackScreen.style.zIndex = "9999";
         document.body.appendChild(blackScreen);
     
-        const beepSound = this.playSound("/sons/kill.mp3", 2);
+        const beepSound = this.playSound("sons/kill.mp3", 2);
     
         beepSound.onEndedObservable.add(() => {
             location.reload();
@@ -894,7 +894,7 @@ export class Ship {
         this.lastButton = this.getCurrentButton();
         if (this.lastButton) {
             this.wasHovering = true;
-            this.playSound("/sons/pressdown.mp3", 0.5);
+            this.playSound("sons/pressdown.mp3", 0.5);
             if (!this.initialMeshesPositions.has(this.lastButton)) {
                 this.initialMeshesPositions.set(this.lastButton, this.lastButton.position.y);
             }
@@ -907,7 +907,7 @@ export class Ship {
     handleMouseUp(): void {
         if (this.wasHovering) {
             this.wasHovering = false;
-            this.playSound("/sons/pressup.mp3", 0.5);
+            this.playSound("sons/pressup.mp3", 0.5);
         }
         if (this.lastButton && this.initialMeshesPositions.has(this.lastButton)) {
             const initialY = this.initialMeshesPositions.get(this.lastButton)!;
@@ -1091,7 +1091,7 @@ export class Ship {
         this.buzzingSound?.stop();
         this.motorSound?.stop();
 
-        this.deathSound = this.playSound("/sons/deathsound.mp3", 0.5);
+        this.deathSound = this.playSound("sons/deathsound.mp3", 0.5);
 
         this.openDoors();
         this.enableDoor = false;
@@ -1127,16 +1127,16 @@ export class Ship {
     }
 
     playPhotoSounds(): void {
-        new Sound("", "/sons/photo.mp3", this.scene, null, { volume: 0.5, autoplay: true, loop: false });
+        new Sound("", "sons/photo.mp3", this.scene, null, { volume: 0.5, autoplay: true, loop: false });
         setTimeout(() => {
-            new Sound("", "/sons/thumb-tack.mp3", this.scene, null, { volume: 1, autoplay: true, loop: false });
+            new Sound("", "sons/thumb-tack.mp3", this.scene, null, { volume: 1, autoplay: true, loop: false });
         }, 2000);
     }
 
     playDreamPhotoSounds(): void {
-        new Sound("", "/sons/photo.mp3", this.scene, null, { volume: 0.5, autoplay: true, loop: false });
+        new Sound("", "sons/photo.mp3", this.scene, null, { volume: 0.5, autoplay: true, loop: false });
         setTimeout(() => {
-            new Sound("", "/sons/paper-ripping.mp3", this.scene, null, { volume: 1.5, autoplay: true, loop: false });
+            new Sound("", "sons/paper-ripping.mp3", this.scene, null, { volume: 1.5, autoplay: true, loop: false });
         }, 3000);
     }
 

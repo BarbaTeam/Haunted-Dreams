@@ -49,7 +49,7 @@ export class MainMenu {
         advancedTexture.addControl(playButton); 
         new Sound(
             "",
-            "/sons/buzzing-sound.wav",
+            "sons/buzzing-sound.wav",
             this.scene,
             null,
             {
@@ -60,7 +60,7 @@ export class MainMenu {
         )
         new Sound(
             "",
-            "/sons/dark-horror-ambience-296781.mp3",
+            "sons/dark-horror-ambience-296781.mp3",
             this.scene,
             null,
             {
@@ -70,7 +70,7 @@ export class MainMenu {
             })
         new Sound(
             "",
-            "/sons/menumusic.mp3",
+            "sons/menumusic.mp3",
             this.scene,
             null,
             {
@@ -88,7 +88,7 @@ export class MainMenu {
     }
 
     createVideoTexture(menuPlane: Mesh, scene: Scene) {
-        const videoTexture = new VideoTexture("videoTexture", ["/videos/main_menu_background.mp4"], scene, true, true);
+        const videoTexture = new VideoTexture("videoTexture", ["videos/main_menu_background.mp4"], scene, true, true);
         videoTexture.video.muted = true;
         videoTexture.video.play();
 

@@ -64,7 +64,7 @@ export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement): Univer
 
     const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
-    const crosshair = Button.CreateImageOnlyButton("crosshair", "/images/circle.svg");
+    const crosshair = Button.CreateImageOnlyButton("crosshair", "images/circle.svg");
     crosshair.width = "15px";
     crosshair.height = "15px";
     crosshair.color = "transparent";
