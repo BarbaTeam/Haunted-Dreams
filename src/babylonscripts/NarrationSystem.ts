@@ -110,7 +110,7 @@ export class NarrationSystem {
     
         const textPlane = this.createFloatingText(this.ship.getPaperSheet() as Mesh, { x: 4.5, y: 1, z: 0 }, text1, text2);
     
-        highlightLayer.addMesh(this.ship.getPaperSheet() as Mesh, Green());
+        highlightLayer.addMesh(this.ship.getPaperSheet() as Mesh, Color3.Green());
         const handleClick = ()=>{
             if(this.shipControls.isHoveringPaperSheet()){
                 highlightLayer.removeMesh(this.ship.getPaperSheet() as Mesh);
@@ -132,8 +132,8 @@ export class NarrationSystem {
     
         const textPlane = this.createFloatingText(this.ship.getButtonAmplitude() as Mesh, { x: 18, y: 11, z: 6 }, text1, text2);
     
-        highlightLayer.addMesh(this.ship.getButtonAmplitude() as Mesh, Green());
-        highlightLayer.addMesh(this.ship.getButtonFrequency() as Mesh, Green());
+        highlightLayer.addMesh(this.ship.getButtonAmplitude() as Mesh, Color3.Green());
+        highlightLayer.addMesh(this.ship.getButtonFrequency() as Mesh, Color3.Green());
 
 
         const checkValue = () => {
@@ -164,8 +164,8 @@ export class NarrationSystem {
     
         const textPlane = this.createFloatingText(this.ship.getButtonAmplitude() as Mesh, { x: 23, y: 11, z: 0 }, text1, text2, text3);
     
-        highlightLayer.addMesh(this.ship.getButtonLeft() as Mesh, Green());
-        highlightLayer.addMesh(this.ship.getButtonRight() as Mesh, Green());
+        highlightLayer.addMesh(this.ship.getButtonLeft() as Mesh, Color3.Green());
+        highlightLayer.addMesh(this.ship.getButtonRight() as Mesh, Color3.Green());
 
 
         const checkValue = () => {
@@ -194,8 +194,8 @@ export class NarrationSystem {
     
         const textPlane = this.createFloatingText(this.ship.getButtonAmplitude() as Mesh, { x: 23, y: 11, z: 0 }, text1, text2, text3);
     
-        highlightLayer.addMesh(this.ship.getButtonUp() as Mesh, Green());
-        highlightLayer.addMesh(this.ship.getButtonDown() as Mesh, Green());
+        highlightLayer.addMesh(this.ship.getButtonUp() as Mesh, Color3.Green());
+        highlightLayer.addMesh(this.ship.getButtonDown() as Mesh, Color3.Green());
 
 
         const checkValue = () => {
@@ -224,7 +224,7 @@ export class NarrationSystem {
     
         const textPlane = this.createFloatingText(this.ship.getButtonPhoto() as Mesh, { x: 14, y: 3, z: -1 }, text1, text2 );
     
-        highlightLayer.addMesh(this.ship.getButtonPhoto() as Mesh, Green());
+        highlightLayer.addMesh(this.ship.getButtonPhoto() as Mesh, Color3.Green());
 
         const checkValue = () => {
             if (this.objectiveSystem.getNightmareIndex() != 0) {
@@ -268,8 +268,5 @@ export class NarrationSystem {
         return plane;
     }
 
-}
-function Green(): import("@babylonjs/core").Color3 {
-    throw new Error('Function not implemented.');
 }
 
