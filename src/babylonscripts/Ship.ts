@@ -326,13 +326,13 @@ export class Ship {
         return this.buttonUp;
     }
     public getButtonDown(): AbstractMesh{
-        return this.buttonUp;
+        return this.buttonDown;
     }
     public getButtonLeft(): AbstractMesh{
-        return this.buttonUp;
+        return this.buttonLeft;
     }
     public getButtonRight(): AbstractMesh{
-        return this.buttonUp;
+        return this.buttonRight;
     }
     public getButtonAmplitude(): AbstractMesh{
         return this.buttonAmplitude;
