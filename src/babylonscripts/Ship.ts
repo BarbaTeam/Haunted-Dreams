@@ -69,6 +69,9 @@ export class Ship {
     constructor(private canvas: HTMLCanvasElement) {
         this.engine = new Engine(this.canvas, true);
         this.scene = this.createScene();
+        this.createSpaceShip();
+        this.createGround();
+        
         this.shipSounds = new ShipSounds(this.scene);
         this.shiplight = new ShipLight(this.scene);
         this.narrationSystem = new NarrationSystem(this.scene, this);
@@ -90,25 +93,7 @@ export class Ship {
         this.hostilitySystem.setObjectiveSystem(this.objectiveSystem);
         this.hostilitySystem.setShipControls(this.shipControls);
 
-        this.createSpaceShip();
-        this.createGround();
-        this.doorList = [
-            {
-                name: "exterior",
-                mesh: this.doorExterior,
-                isOpen: false
-            },
-            {
-                name: "nav",
-                mesh: this.doorNav,
-                isOpen: false
-            },
-            {
-                name: "motor",
-                mesh: this.doorMotor,
-                isOpen: false
-            }
-        ]
+        
         const isLocked = false;
         this.scene.onPointerDown = function () {
             if (!isLocked) {
@@ -304,13 +289,28 @@ export class Ship {
                         break;
                 }
             });
-            
+            this.doorList = [
+                {
+                    name: "exterior",
+                    mesh: this.doorExterior,
+                    isOpen: false
+                },
+                {
+                    name: "nav",
+                    mesh: this.doorNav,
+                    isOpen: false
+                },
+                {
+                    name: "motor",
+                    mesh: this.doorMotor,
+                    isOpen: false
+                }
+            ]
             this.narrationSystem.setupNarrator();  
             this.navigationSystem.updateSineWave();   
             this.navigationSystem.updateDataScreen(); 
             this.navigationSystem.updateBoussoleScreen();
-
-           
+            
         });
     }
 

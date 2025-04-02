@@ -157,6 +157,11 @@ export class ShipControls{
     }
 
     openDoor(door: Door, enable:boolean): void {
+        if (!door || !door.mesh) {
+            console.error("Error: door or door.mesh is undefined", door);
+            return;
+        }
+        
         if (!this.initialMeshesPositions.has(door.mesh)) {
             this.initialMeshesPositions.set(door.mesh, door.mesh.position.y);
         }

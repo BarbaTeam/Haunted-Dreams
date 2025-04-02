@@ -14,9 +14,9 @@ export class ShipSounds {
         this.deathSound = this.playSound("sons/deathsound.mp3", 1, false);
         this.runningDeathSound = this.playSound("sons/runningdeath.mp3", 1, false);
         this.metalfootstep = this.playSound("sons/metal-footsteps.mp3", 1, false, true);
-        this.motorSound = this.playSound("sons/horror-ambience-01-66708.mp3", 1, true, true);
+        this.motorSound = this.playSound("sons/horror-ambience-01-66708.mp3", 0.15, true, true);
         this.horrorSound = this.playSound("sons/dark-horror-ambience-296781.mp3", 1, false, true);
-        this.buzzingSound = this.playSound("sons/buzzing-sound.wav", 1, true, true);
+        this.buzzingSound = this.playSound("sons/buzzing-sound.wav", 0.1, true, true);
 
     }
 
