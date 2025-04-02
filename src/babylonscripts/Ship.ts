@@ -256,7 +256,7 @@ export class Ship {
                         this.buttonRight = mesh;
                         break;
                    
-                    case "appareil_photo.boutton":
+                    case "appareil_photo.button":
                         this.buttonPhoto = mesh;
                         break;
                     case "papersheet":
@@ -1419,7 +1419,7 @@ export class Ship {
         const text1 = "Left click on button";
         const text2 = "to take a photo";
     
-        const textPlane = this.createFloatingText(text1, text2, this.buttonPhoto as Mesh, { x: -7.5, y: 11, z: -19 });
+        const textPlane = this.createFloatingText(text1, text2, this.buttonPhoto as Mesh, { x: 14, y: 3, z: -1 });
     
         highlightLayer.addMesh(this.buttonPhoto as Mesh, Color3.Green());
 
