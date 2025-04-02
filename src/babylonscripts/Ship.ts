@@ -13,6 +13,7 @@ import {
 
 import { createFPSCamera } from './Camera';
 import "@babylonjs/loaders";
+import { AdvancedDynamicTexture } from '@babylonjs/gui';
 
 type Nightmare = {
     nmAmplitude: number;
@@ -1039,9 +1040,10 @@ export class Ship {
     //  Gestion des actions du joueur lié à la progression de l'objectif  
     //
 
-
+    private isTakingPhoto = false;
     takePhoto(): void {
-        if (this.isOverlap()) {
+        if (this.isOverlap() && !this.isTakingPhoto) {
+            this.isTakingPhoto = true;
             console.log("Cauchemar photographié !");
             this.playPhotoSounds();
             setTimeout(() => {
@@ -1051,12 +1053,15 @@ export class Ship {
                     this.nightMareIndex++;
                     this.currentNightmare = this.nightmares[this.nightMareIndex];
                     this.updateObjectives();
+                    this.isTakingPhoto = false;
                 }
             }, 4000);
-        } else {
+        } else if (!this.isTakingPhoto) {
+            this.isTakingPhoto = true;
             console.log("Rêve photographié !");
             this.playDreamPhotoSounds();
             this.setupHostile(10);
+            this.isTakingPhoto=false;
         }
     }
 
@@ -1259,25 +1264,32 @@ export class Ship {
         }
         else {
             setTimeout(()=>{
+                this.narratorVoices[0].setPlaybackRate(200);
                 this.narratorVoices[0].play();
                 this.narratorVoices[0].onEndedObservable.add(() => {
+                    this.narratorVoices[1].setPlaybackRate(200);
                     this.narratorVoices[1].play();
                 });
                 
             },1000);
             this.narratorVoices[1].onEndedObservable.add(() => {
+                this.narratorVoices[2].setPlaybackRate(200);
                 this.narratorVoices[2].play();
             });
             this.narratorVoices[2].onEndedObservable.add(() => {
+                this.narratorVoices[3].setPlaybackRate(200);
                 this.narratorVoices[3].play();
             });
             this.narratorVoices[3].onEndedObservable.add(() => {
+                this.narratorVoices[4].setPlaybackRate(200);
                 this.paperTutorial();
             });
             this.narratorVoices[4].onEndedObservable.add(() => {
+                this.narratorVoices[5].setPlaybackRate(200);
                 this.waveSelectorTutorial();
             });
             this.narratorVoices[5].onEndedObservable.add(() => {
+                this.narratorVoices[6].setPlaybackRate(200);
                 this.boussoleTutorial();
             });
             this.narratorVoices[6].onEndedObservable.add(() => {
@@ -1307,7 +1319,7 @@ export class Ship {
         const text1 = "Left click on the paper";
         const text2 = "to see patient's info";
     
-        const textPlane = this.createFloatingText(text1, text2, this.paperSheet as Mesh, { x: 4.1, y: 1, z: 0 });
+        const textPlane = this.createFloatingText(this.paperSheet as Mesh, { x: 4.5, y: 1, z: 0 }, text1, text2);
     
         highlightLayer.addMesh(this.paperSheet as Mesh, Color3.Green());
         const handleClick = ()=>{
@@ -1329,7 +1341,7 @@ export class Ship {
         const text1 = "Scroll on the buttons";
         const text2 = "to update wave's coord";
     
-        const textPlane = this.createFloatingText(text1, text2, this.buttonAmplitude as Mesh, { x: 17, y: 11, z: 6 });
+        const textPlane = this.createFloatingText(this.buttonAmplitude as Mesh, { x: 18, y: 11, z: 6 }, text1, text2);
     
         highlightLayer.addMesh(this.buttonAmplitude as Mesh, Color3.Green());
         highlightLayer.addMesh(this.buttonFrequency as Mesh, Color3.Green());
@@ -1358,9 +1370,10 @@ export class Ship {
         highlightLayer.innerGlow = true; 
     
         const text1 = "Use the left/right arrows";
-        const text2 = "to turn the ship towards the dot";
+        const text2 = "to turn the ship towards";
+        const text3 = "the dot"
     
-        const textPlane = this.createFloatingText(text1, text2, this.buttonAmplitude as Mesh, { x: 20, y: 11, z: 0 });
+        const textPlane = this.createFloatingText(this.buttonAmplitude as Mesh, { x: 23, y: 11, z: 0 }, text1, text2, text3);
     
         highlightLayer.addMesh(this.buttonLeft as Mesh, Color3.Green());
         highlightLayer.addMesh(this.buttonRight as Mesh, Color3.Green());
@@ -1386,10 +1399,11 @@ export class Ship {
         highlightLayer.outerGlow = false; 
         highlightLayer.innerGlow = true; 
     
-        const text1 = "Use the up/down arrows";
-        const text2 = "to update your position's wave";
+        const text1 = "Use the up/down ";
+        const text2 = "arrows to update";
+        const text3 = "your position's wave";
     
-        const textPlane = this.createFloatingText(text1, text2, this.buttonAmplitude as Mesh, { x: 20, y: 11, z: 0 });
+        const textPlane = this.createFloatingText(this.buttonAmplitude as Mesh, { x: 23, y: 11, z: 0 }, text1, text2, text3);
     
         highlightLayer.addMesh(this.buttonUp as Mesh, Color3.Green());
         highlightLayer.addMesh(this.buttonDown as Mesh, Color3.Green());
@@ -1419,7 +1433,7 @@ export class Ship {
         const text1 = "Left click on button";
         const text2 = "to take a photo";
     
-        const textPlane = this.createFloatingText(text1, text2, this.buttonPhoto as Mesh, { x: 14, y: 3, z: -1 });
+        const textPlane = this.createFloatingText(this.buttonPhoto as Mesh, { x: 14, y: 3, z: -1 }, text1, text2 );
     
         highlightLayer.addMesh(this.buttonPhoto as Mesh, Color3.Green());
 
@@ -1439,15 +1453,16 @@ export class Ship {
         const valueWatcher = setInterval(checkValue, 100);
     }
     
-    createFloatingText(text1: string, text2: string, targetMesh: Mesh, offset = { x: 0, y: 0, z: 0 }) {
-        const plane = MeshBuilder.CreatePlane("TexturePlane", { width: 10, height: 3 }, this.scene);
+    createFloatingText(targetMesh: Mesh, offset = { x: 0, y: 0, z: 0 }, text1: string, text2: string, text3?: string,) {
+        const plane = MeshBuilder.CreatePlane("TexturePlane", { width: 15, height: 4 }, this.scene);
         const planeMaterial = new StandardMaterial("AvatarPlaneMat", this.scene);
         
         const planeTexture = new DynamicTexture("planeTexture", { width: 512, height: 256 }, this.scene);
         planeTexture.hasAlpha = true;
     
         planeTexture.drawText(text1, 0, 40, "bold 40px Arial", "green", null, true, true);
-        planeTexture.drawText(text2, 18, 75, "bold 40px Arial", "green", null, true, true);
+        planeTexture.drawText(text2, 0, 75, "bold 40px Arial", "green", null, true, true);
+        if(text3) planeTexture.drawText(text3, 0, 110, "bold 40px Arial", "green", null, true, true);
 
         planeMaterial.backFaceCulling = true;
         planeMaterial.diffuseTexture = planeTexture;
@@ -1463,10 +1478,6 @@ export class Ship {
     
         return plane;
     }
-
-
-
-
 
 
 

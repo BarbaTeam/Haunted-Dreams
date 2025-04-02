@@ -12,7 +12,7 @@ export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement): Univer
     camera.ellipsoid = new Vector3(3, 5, 3);
     camera.inertia = 0.1;
     camera.speed = 5.5;
-    camera.angularSensibility = 2000;
+    camera.angularSensibility = 4000;
     camera.fov = 1.2;
 
     // **Clavier AZERTY**
