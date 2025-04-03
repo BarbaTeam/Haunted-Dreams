@@ -1,12 +1,9 @@
 import { 
-    Scene, Engine, Vector3, MeshBuilder, SceneLoader, Color4, Sound, StandardMaterial, 
-    Color3, DynamicTexture, AbstractMesh, 
-    SpotLight,
+    Scene, Engine, Vector3, MeshBuilder, SceneLoader, Color4, StandardMaterial, 
+    Color3, DynamicTexture, AbstractMesh,
     Texture,
     DefaultRenderingPipeline,
-    DepthOfFieldEffectBlurLevel,
-    HighlightLayer,
-    Mesh,
+    DepthOfFieldEffectBlurLevel
 } from '@babylonjs/core';
 import { NarrationSystem } from './NarrationSystem';
 import { createFPSCamera } from './Camera';

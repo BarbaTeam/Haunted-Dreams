@@ -1,4 +1,4 @@
-import { AbstractMesh, Scene, Sound } from "@babylonjs/core";
+import { Scene, Sound } from "@babylonjs/core";
 import { Ship } from "./Ship";
 import { NavigationSystem } from "./NavigationSystem";
 import { ShipSounds } from "./ShipSounds";
@@ -90,11 +90,11 @@ export class ObjectiveSystem {
 
     private beenPlayed = false;
     updateObjectives(){
-        if(this.getCurrentNightmare().nmAmplitude.toFixed(2)===this.navigationSystem.getAmplitude().toFixed(2) && this.getCurrentNightmare().nmFrequency.toFixed(2) === this.navigationSystem.getAmplitude().toFixed(2)){
+        if(this.getCurrentNightmare().nmAmplitude.toFixed(2)===this.navigationSystem.getAmplitude().toFixed(2) && this.getCurrentNightmare().nmFrequency.toFixed(2) === this.navigationSystem.getFrequency().toFixed(2)){
             this.angleToAim = this.getCurrentNightmare().nmAngle;
             if(!this.beenPlayed){
                 this.beenPlayed = true;
-                new Sound("", "sons/beep.mp3", this.scene, null, { volume: 0.5, autoplay: true, loop: false });
+                new Sound("", "sons/beep.mp3", this.scene, null, { volume: 1, autoplay: true, loop: false });
             }
             if(this.navigationSystem.getAngle().toFixed(1) === this.angleToAim.toFixed(1)){
                 this.navigationSystem.setFrequencyPos(this.navigationSystem.getFrequency());

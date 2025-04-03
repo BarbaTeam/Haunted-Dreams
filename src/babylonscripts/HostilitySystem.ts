@@ -7,7 +7,7 @@ export class HostilitySystem{
     private objectiveSystem!: ObjectiveSystem;
     private shipControls!: ShipControls;
     private shipSounds: ShipSounds;
-    private deathTimeOut: any;
+    private deathTimeOut!: number;
 
     constructor(shipSounds: ShipSounds){
         this.shipSounds = shipSounds;
@@ -19,7 +19,7 @@ export class HostilitySystem{
     public setShipControls(shipControls: ShipControls): void {
         this.shipControls = shipControls;
     }
-    public getDeathTimeOut(): any{
+    public getDeathTimeOut() {
         return this.deathTimeOut;
     }
 
