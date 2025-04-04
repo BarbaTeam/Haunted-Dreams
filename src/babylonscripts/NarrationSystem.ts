@@ -1,4 +1,4 @@
-import { Color3, DynamicTexture, HighlightLayer, Mesh, MeshBuilder, Scene, Sound, StandardMaterial } from '@babylonjs/core';
+import { Color3, DynamicTexture, HighlightLayer, Mesh, MeshBuilder, Scene, Sound, StandardMaterial, Vector3 } from '@babylonjs/core';
 import { SubtitleSystem } from './SubtitleSystem'
 import { Ship } from './Ship';
 import { ObjectiveSystem } from './ObjectiveSystem';
@@ -20,7 +20,10 @@ export class NarrationSystem {
     constructor(scene : Scene, ship: Ship) {
         this.scene = scene;
         this.ship = ship;
-        this.ringTone = new Sound("", "sons/ringtone.mp3", this.scene, null, { volume: 0.5, autoplay: false, loop: true });
+        this.ringTone = new Sound("", "sons/ringtone.mp3", this.scene, null, { volume: 0.5, autoplay: false, loop: true, spatialSound: true, maxDistance: 40});
+        this.ringTone.setPosition(new Vector3(10, 12, 22));
+
+
         this.narratorVoices = [
                     new Sound("", "sons/intro.mp3", this.scene, null, { volume: 2, autoplay: false, loop: false }),
                     new Sound("", "sons/tuto1.mp3", this.scene, null, { volume: 2, autoplay: false, loop: false }),
