@@ -1,4 +1,4 @@
-import { AbstractMesh, Animation, Color3, HighlightLayer, Mesh, Scene } from "@babylonjs/core";
+import { AbstractMesh, Animation, Color3, DefaultRenderingPipeline, DepthOfFieldEffectBlurLevel, HighlightLayer, Mesh, Scene } from "@babylonjs/core";
 import { Ship } from "./Ship";
 import { ShipSounds } from "./ShipSounds";
 import { ShipLight } from "./ShipLight";
@@ -6,7 +6,7 @@ import { NavigationSystem } from "./NavigationSystem";
 import { ObjectiveSystem } from "./ObjectiveSystem";
 import { NarrationSystem } from "./NarrationSystem";
 import { HostilitySystem } from "./HostilitySystem";
-import {displayDocument, displayedItem, getAffichePage } from './Camera';
+import {createFPSCamera, displayDocument, displayedItem, getAffichePage } from './Camera';
 
 export type Door = {
     name: string;
@@ -42,6 +42,12 @@ export class ShipControls{
     private hoveringLeft = false;
     private hoveringRight = false;
 
+    private handleMouseDownBound = this.handleMouseDown.bind(this);
+    private handleMouseUpBound = this.handleMouseUp.bind(this);
+    private handleScrollBound = this.handleScroll.bind(this);
+    private handleKeyDownBound = this.handleKeyDown.bind(this);
+    private handleKeyUpBound = this.handleKeyUp.bind(this);
+
     private canvas: HTMLCanvasElement;
 
     constructor(ship: Ship, shipSounds: ShipSounds, scene: Scene, shipLight: ShipLight, narrationSystem: NarrationSystem, canvas: HTMLCanvasElement){
@@ -51,9 +57,25 @@ export class ShipControls{
         this.shipSounds = shipSounds;
         this.scene = scene;
         this.shipLight= shipLight;
-
+        this.setUpCamera();
         this.setupButtonHoverDetection();
-        this.setupEvents();
+        this.enableEvents();
+    }
+
+    public setUpCamera(){
+        const camera = createFPSCamera(this.scene, this.canvas, this);
+        camera.metadata = { isFPSCamera: true }; // Marque la caméra comme FPS pour le Raycast
+        this.scene.activeCamera = camera;
+
+        // POST-PROCESSING 
+
+        // profondeur de champ
+        const pipeline = new DefaultRenderingPipeline("pipeline", true, this.scene, [camera]);
+        pipeline.depthOfFieldEnabled = true;
+        pipeline.depthOfFieldBlurLevel = DepthOfFieldEffectBlurLevel.Low;
+        pipeline.depthOfField.focalLength = 1; 
+        pipeline.depthOfField.fStop = 2; 
+        pipeline.depthOfField.focusDistance = 1000;  
     }
     
     public setNavigationSystem(navigationSystem: NavigationSystem): void {
@@ -274,16 +296,26 @@ export class ShipControls{
         this.navigationSystem.updateSineWave();
         this.navigationSystem.updateBoussoleScreen();
     }
-    
+  
 
-    setupEvents(): void {
-        this.canvas.addEventListener("pointerdown", this.handleMouseDown.bind(this));
-        this.canvas.addEventListener("pointerup", this.handleMouseUp.bind(this));
-        this.canvas.addEventListener("pointerleave", this.handleMouseUp.bind(this));
-        this.canvas.addEventListener("wheel", this.handleScroll.bind(this));
+    public enableEvents(): void {
+        this.canvas.addEventListener("pointerdown", this.handleMouseDownBound);
+        this.canvas.addEventListener("pointerup", this.handleMouseUpBound);
+        this.canvas.addEventListener("pointerleave", this.handleMouseUpBound);
+        this.canvas.addEventListener("wheel", this.handleScrollBound);
 
-        window.addEventListener("keydown", this.handleKeyDown.bind(this));
-        window.addEventListener("keyup", this.handleKeyUp.bind(this));
+        window.addEventListener("keydown", this.handleKeyDownBound);
+        window.addEventListener("keyup", this.handleKeyUpBound);
+    }
+
+    public disableEvents(): void {
+        this.canvas.removeEventListener("pointerdown", this.handleMouseDownBound);
+        this.canvas.removeEventListener("pointerup", this.handleMouseUpBound);
+        this.canvas.removeEventListener("pointerleave", this.handleMouseUpBound);
+        this.canvas.removeEventListener("wheel", this.handleScrollBound);
+
+        window.removeEventListener("keydown", this.handleKeyDownBound);
+        window.removeEventListener("keyup", this.handleKeyUpBound);
     }
 
     private wasHovering = false;
@@ -307,7 +339,7 @@ export class ShipControls{
         } else if (this.hoveringMotor) {
             this.toggleEngine();
         } else if (this.hoveringPaperSheet) {
-            displayDocument(this.canvas, this.scene);
+            displayDocument(this.canvas, this.scene, this);
         }
         else if (this.isHoveringSomeButtonForNavDoor()) {
             this.toggleDoor(this.ship.getDoorByName("nav")!);

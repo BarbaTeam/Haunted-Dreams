@@ -3,7 +3,8 @@ import {
     Color3, DynamicTexture, AbstractMesh,
     Texture,
     DefaultRenderingPipeline,
-    DepthOfFieldEffectBlurLevel
+    DepthOfFieldEffectBlurLevel,
+    FreeCamera
 } from '@babylonjs/core';
 import { NarrationSystem } from './NarrationSystem';
 import { createFPSCamera, displayedItem } from './Camera';
@@ -135,19 +136,7 @@ export class Ship {
         scene.gravity = new Vector3(0, -0.75, 0);
         scene.collisionsEnabled = true;
         scene.enablePhysics();
-        const camera = createFPSCamera(scene, this.canvas);
-        camera.metadata = { isFPSCamera: true }; // Marque la caméra comme FPS pour le Raycast
-        // POST-PROCESSING 
-
-        // profondeur de champ
-        const pipeline = new DefaultRenderingPipeline("pipeline", true, scene, [camera]);
-        pipeline.depthOfFieldEnabled = true;
-        pipeline.depthOfFieldBlurLevel = DepthOfFieldEffectBlurLevel.Low;
-        pipeline.depthOfField.focalLength = 1; 
-        pipeline.depthOfField.fStop = 2; 
-        pipeline.depthOfField.focusDistance = 1000;  
-
-
+        
         return scene;
     }
 

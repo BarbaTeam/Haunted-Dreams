@@ -1,6 +1,7 @@
 
 import { Scene, Vector3, UniversalCamera, ArcRotateCamera } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Button, Rectangle, Image, Grid } from "@babylonjs/gui";
+import { ShipControls } from "./ShipControls";
 
 let affichePage = true;
 let advancedTexture: AdvancedDynamicTexture | null = null;
@@ -9,7 +10,7 @@ let index = 0;
 let camera: UniversalCamera | null = null;
 
 
-export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement): UniversalCamera {
+export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement, controls: ShipControls): UniversalCamera {
     camera = new UniversalCamera("UniversalCamera", new Vector3(0, 11, 0), scene);
     camera.setTarget(new Vector3(0, 10, 10));
     camera.applyGravity = true;
@@ -50,7 +51,7 @@ export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement): Univer
                 contenuePage.source = "images/doc" + index + ".png";
             }
         } else if (event.code === "Space" && !affichePage) {
-            displayDocument(canvas, scene);
+            displayDocument(canvas, scene, controls);
         }
     });
 
@@ -88,12 +89,12 @@ export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement): Univer
         event.preventDefault();
     });
 
-    displayedItem(canvas, scene);
+    displayedItem(canvas, scene, controls);
 
     return camera;
 }
 
-export function displayedItem(canvas: HTMLCanvasElement, scene: Scene) {
+export function displayedItem(canvas: HTMLCanvasElement, scene: Scene, controls: ShipControls) {
     if (!advancedTexture || !camera) return;
 
     advancedTexture.clear();
@@ -106,6 +107,7 @@ export function displayedItem(canvas: HTMLCanvasElement, scene: Scene) {
 
     if (affichePage) {
         // Rebind clavier AZERTY
+        controls.enableEvents();
         camera.keysUp = [90];    // Z
         camera.keysDown = [83];  // S
         camera.keysRight = [68]; // D
@@ -118,8 +120,10 @@ export function displayedItem(canvas: HTMLCanvasElement, scene: Scene) {
         crosshair.thickness = 0;
 
         advancedTexture.addControl(crosshair);
+        camera.attachControl(canvas, true);
         canvas.requestPointerLock();
     } else {
+        controls.disableEvents();
         camera.keysUp = [];
         camera.keysDown = [];
         camera.keysRight = [];
@@ -139,15 +143,15 @@ export function displayedItem(canvas: HTMLCanvasElement, scene: Scene) {
 
         page.addControl(contenuePage, 0, 1);
         advancedTexture.addControl(page);
+        camera.detachControl();
         document.exitPointerLock();
-
     }
 }
 
 
-export function displayDocument(canvas: HTMLCanvasElement, scene: Scene) {
+export function displayDocument(canvas: HTMLCanvasElement, scene: Scene, controls: ShipControls) {
     affichePage = !affichePage;
-    displayedItem(canvas, scene);
+    displayedItem(canvas, scene, controls);
 
     console.log("displayDocument : " + affichePage);
 }
