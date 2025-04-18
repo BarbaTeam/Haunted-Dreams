@@ -364,9 +364,6 @@ export class ShipControls{
             if (this.shipSounds.getMetalFootSteps() && !this.shipSounds.getMetalFootSteps().isPlaying) {
                 this.shipSounds.getMetalFootSteps().play();
             } 
-        } else if (key === "Space" && !getAffichePage()) {
-            console.log("Key pressed: " + event.code);
-            displayDocument(this.canvas, this.scene);
         }
     }
 

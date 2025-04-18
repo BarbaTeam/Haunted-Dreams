@@ -37,21 +37,22 @@ export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement): Univer
     });
 
     window.addEventListener("keydown", (event: KeyboardEvent) => {
-        if (!contenuePage || affichePage) return;
-        if(affichePage) return;
-        if (event.key === "right" || event.key === "ArrowRight" ) {
+        if (!contenuePage) return;
+    
+        if (event.key === "ArrowRight" && !affichePage) {
             if (index < 8) {
                 index++;
                 contenuePage.source = "images/doc" + index + ".png";
             }
-        } else if (event.key === "left" || event.key === "ArrowLeft") {
+        } else if (event.key === "ArrowLeft" && !affichePage) {
             if (index > 0) {
                 index--;
                 contenuePage.source = "images/doc" + index + ".png";
             }
+        } else if (event.code === "Space" && !affichePage) {
+            displayDocument(canvas, scene);
         }
     });
-    
 
     function mouseMove(event: MouseEvent) {
         if (!camera) return;
@@ -60,12 +61,7 @@ export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement): Univer
             camera.rotation.y += event.movementX * rotationSpeed;
             camera.rotation.x += event.movementY * rotationSpeed;
             camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x));
-        } else {
-            camera.rotation.y = 0;
-            camera.rotation.x = 0;
-            camera.rotation.z = 0;
-        }
-        
+        } 
     }
 
     const defaultFov = camera.fov;
@@ -98,29 +94,31 @@ export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement): Univer
 }
 
 export function displayedItem(canvas: HTMLCanvasElement, scene: Scene) {
-    if (!advancedTexture) return;
-    if (!camera) return;
+    if (!advancedTexture || !camera) return;
 
     advancedTexture.clear();
-    
-   
 
-    console.log("Contenus UI :", advancedTexture.getChildren());
+    if (contenuePage && contenuePage.parent) {
+        contenuePage.parent.removeControl(contenuePage);
+    }
 
-    
+    contenuePage = null;
 
     if (affichePage) {
-        // **Clavier AZERTY**
-        camera.keysUp.push(90); // Z
-        camera.keysDown.push(83); // S
-        camera.keysRight.push(68); // D
-        camera.keysLeft.push(81); // Q
+        // Rebind clavier AZERTY
+        camera.keysUp = [90];    // Z
+        camera.keysDown = [83];  // S
+        camera.keysRight = [68]; // D
+        camera.keysLeft = [81];  // Q
 
         const crosshair = Button.CreateImageOnlyButton("crosshair", "images/circle.svg");
         crosshair.width = "15px";
         crosshair.height = "15px";
         crosshair.color = "transparent";
+        crosshair.thickness = 0;
+
         advancedTexture.addControl(crosshair);
+        canvas.requestPointerLock();
     } else {
         camera.keysUp = [];
         camera.keysDown = [];
@@ -141,8 +139,11 @@ export function displayedItem(canvas: HTMLCanvasElement, scene: Scene) {
 
         page.addControl(contenuePage, 0, 1);
         advancedTexture.addControl(page);
+        document.exitPointerLock();
+
     }
 }
+
 
 export function displayDocument(canvas: HTMLCanvasElement, scene: Scene) {
     affichePage = !affichePage;
