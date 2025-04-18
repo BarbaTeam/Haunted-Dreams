@@ -3,6 +3,7 @@ import { Ship } from "./Ship";
 import { NavigationSystem } from "./NavigationSystem";
 import { ShipSounds } from "./ShipSounds";
 import { HostilitySystem } from "./HostilitySystem";
+import * as GUI from '@babylonjs/gui'
 
 
 type Nightmare = {
@@ -135,5 +136,15 @@ export class ObjectiveSystem {
         }
     }
 
-    
+    showPaper(): void {
+        console.log("showPaperTest");
+        const advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+        
+        const image = new GUI.Image('but', 'src/assets/nightmares/nightmare1-processed.png');
+        image.width = 0.2;
+        image.height = "100%";
+        image.width = "25%";
+        advancedTexture.addControl(image);    
+    }
+
 }

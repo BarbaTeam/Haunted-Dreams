@@ -6,7 +6,7 @@ import {
     DepthOfFieldEffectBlurLevel
 } from '@babylonjs/core';
 import { NarrationSystem } from './NarrationSystem';
-import { createFPSCamera } from './Camera';
+import { createFPSCamera, displayedItem } from './Camera';
 import "@babylonjs/loaders";
 import { ShipLight } from './ShipLight';
 import { ObjectiveSystem } from './ObjectiveSystem';
@@ -15,6 +15,7 @@ import { ShipControls } from './ShipControls';
 import { ShipSounds } from './ShipSounds';
 import { Door } from './ShipControls';
 import { HostilitySystem } from './HostilitySystem';
+import * as GUI from '@babylonjs/gui';
 
 
 
@@ -143,7 +144,8 @@ export class Ship {
         pipeline.depthOfFieldBlurLevel = DepthOfFieldEffectBlurLevel.Low;
         pipeline.depthOfField.focalLength = 1; 
         pipeline.depthOfField.fStop = 2; 
-        pipeline.depthOfField.focusDistance = 1000; 
+        pipeline.depthOfField.focusDistance = 1000;  
+
 
         return scene;
     }
@@ -165,7 +167,6 @@ export class Ship {
                     case "selecteur_onde.boutton_frequence":
                         this.buttonFrequency = mesh;
                         break;
-
                     case "nav.button_up":
                         this.buttonUp = mesh;
                         break;
@@ -178,7 +179,6 @@ export class Ship {
                     case "nav.button_right":
                         this.buttonRight = mesh;
                         break;
-                   
                     case "appareil_photo.button":
                         this.buttonPhoto = mesh;
                         break;
@@ -315,7 +315,7 @@ export class Ship {
         const ground = MeshBuilder.CreateGround("ground", { width: 100, height: 100 }, this.scene);
         ground.position.y = 1; 
         ground.isVisible = false; 
-        ground.checkCollisions = true;
+        ground.checkCollisions = true; 
     }
 
 

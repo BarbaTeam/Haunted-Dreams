@@ -1,10 +1,16 @@
 
 import { Scene, Vector3, UniversalCamera, ArcRotateCamera } from "@babylonjs/core";
-import { AdvancedDynamicTexture, Button } from "@babylonjs/gui";
+import { AdvancedDynamicTexture, Button, Rectangle, Image, Grid } from "@babylonjs/gui";
+
+let affichePage = true;
+let advancedTexture: AdvancedDynamicTexture | null = null;
+let contenuePage: Image | null = null;
+let index = 0;
+let camera: UniversalCamera | null = null;
 
 
 export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement): UniversalCamera {
-    const camera = new UniversalCamera("UniversalCamera", new Vector3(0, 11, 0), scene);
+    camera = new UniversalCamera("UniversalCamera", new Vector3(0, 11, 0), scene);
     camera.setTarget(new Vector3(0, 10, 10));
     camera.applyGravity = true;
     camera.checkCollisions = true;
@@ -14,16 +20,13 @@ export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement): Univer
     camera.speed = 5.5;
     camera.angularSensibility = 4000;
     camera.fov = 1.2;
-
-    // **Clavier AZERTY**
-    camera.keysUp.push(90); // Z
-    camera.keysDown.push(83); // S
-    camera.keysRight.push(68); // D
-    camera.keysLeft.push(81); // Q
+    advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("UI", true, scene);
+    
 
     canvas.addEventListener("click", () => {
         canvas.requestPointerLock();
     });
+
 
     document.addEventListener("pointerlockchange", () => {
         if (document.pointerLockElement === canvas) {
@@ -33,17 +36,43 @@ export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement): Univer
         }
     });
 
+    window.addEventListener("keydown", (event: KeyboardEvent) => {
+        if (!contenuePage || affichePage) return;
+        if(affichePage) return;
+        if (event.key === "right" || event.key === "ArrowRight" ) {
+            if (index < 8) {
+                index++;
+                contenuePage.source = "images/doc" + index + ".png";
+            }
+        } else if (event.key === "left" || event.key === "ArrowLeft") {
+            if (index > 0) {
+                index--;
+                contenuePage.source = "images/doc" + index + ".png";
+            }
+        }
+    });
+    
+
     function mouseMove(event: MouseEvent) {
-        const rotationSpeed = 0.002;
-        camera.rotation.y += event.movementX * rotationSpeed;
-        camera.rotation.x += event.movementY * rotationSpeed;
-        camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x));
+        if (!camera) return;
+        if(affichePage) {
+            const rotationSpeed = 0.002;
+            camera.rotation.y += event.movementX * rotationSpeed;
+            camera.rotation.x += event.movementY * rotationSpeed;
+            camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x));
+        } else {
+            camera.rotation.y = 0;
+            camera.rotation.x = 0;
+            camera.rotation.z = 0;
+        }
+        
     }
 
     const defaultFov = camera.fov;
     const zoomedFov = 0.8; 
 
     canvas.addEventListener("mousedown", (event) => {
+        if (!camera) return;
         if (event.button === 2) { // Clic droit
             camera.fov = zoomedFov;
             event.preventDefault();
@@ -51,6 +80,7 @@ export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement): Univer
     });
 
     canvas.addEventListener("mouseup", (event) => {
+        if (!camera) return;
         if (event.button === 2) { 
             camera.fov = defaultFov;
             event.preventDefault();
@@ -62,30 +92,68 @@ export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement): Univer
         event.preventDefault();
     });
 
-    const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("UI");
-
-    const crosshair = Button.CreateImageOnlyButton("crosshair", "images/circle.svg");
-    crosshair.width = "15px";
-    crosshair.height = "15px";
-    crosshair.color = "transparent";
-    advancedTexture.addControl(crosshair);
-
-    // **Ajout de l'image du casque**
-    //const helmetOverlay = new Rectangle("helmetOverlay");
-    //helmetOverlay.width = "100%";
-    //helmetOverlay.height = "100%";
-    //helmetOverlay.thickness = 0;
-    //advancedTexture.addControl(helmetOverlay);
-
-    //const helmetImage = new Image("helmetImage", "/images/casque.png");
-    //helmetImage.stretch = Image.STRETCH_FILL;
-    //helmetOverlay.addControl(helmetImage);
-
+    displayedItem(canvas, scene);
 
     return camera;
 }
 
+export function displayedItem(canvas: HTMLCanvasElement, scene: Scene) {
+    if (!advancedTexture) return;
+    if (!camera) return;
 
+    advancedTexture.clear();
+    
+   
+
+    console.log("Contenus UI :", advancedTexture.getChildren());
+
+    
+
+    if (affichePage) {
+        // **Clavier AZERTY**
+        camera.keysUp.push(90); // Z
+        camera.keysDown.push(83); // S
+        camera.keysRight.push(68); // D
+        camera.keysLeft.push(81); // Q
+
+        const crosshair = Button.CreateImageOnlyButton("crosshair", "images/circle.svg");
+        crosshair.width = "15px";
+        crosshair.height = "15px";
+        crosshair.color = "transparent";
+        advancedTexture.addControl(crosshair);
+    } else {
+        camera.keysUp = [];
+        camera.keysDown = [];
+        camera.keysRight = [];
+        camera.keysLeft = [];
+
+        document.exitPointerLock();
+
+        const page = new Grid();
+        page.addColumnDefinition(0.3);
+        page.addColumnDefinition(0.3);
+        page.addColumnDefinition(0.3);
+
+        contenuePage = new Image("pageTest", "images/doc0.png");
+        contenuePage.width = "100%";
+        contenuePage.height = "100%";
+        contenuePage.stretch = Image.STRETCH_UNIFORM;
+
+        page.addControl(contenuePage, 0, 1);
+        advancedTexture.addControl(page);
+    }
+}
+
+export function displayDocument(canvas: HTMLCanvasElement, scene: Scene) {
+    affichePage = !affichePage;
+    displayedItem(canvas, scene);
+
+    console.log("displayDocument : " + affichePage);
+}
+
+export function getAffichePage() {
+    return affichePage;
+}
 
 
 export function createMenuCamera(scene: Scene, canvas: HTMLCanvasElement): ArcRotateCamera {

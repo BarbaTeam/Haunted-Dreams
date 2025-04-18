@@ -6,6 +6,7 @@ import { NavigationSystem } from "./NavigationSystem";
 import { ObjectiveSystem } from "./ObjectiveSystem";
 import { NarrationSystem } from "./NarrationSystem";
 import { HostilitySystem } from "./HostilitySystem";
+import {displayDocument, displayedItem, getAffichePage } from './Camera';
 
 export type Door = {
     name: string;
@@ -303,10 +304,10 @@ export class ShipControls{
             this.navigationSystem.startIncrementing();
         } else if (this.hoveringPhoto) {
             this.objectiveSystem.takePhoto();
-        } else if (this.hoveringPaperSheet) { 
-            console.log("L'interface s'affiche"); //mets ta methode ici tom
         } else if (this.hoveringMotor) {
             this.toggleEngine();
+        } else if (this.hoveringPaperSheet) {
+            displayDocument(this.canvas, this.scene);
         }
         else if (this.isHoveringSomeButtonForNavDoor()) {
             this.toggleDoor(this.ship.getDoorByName("nav")!);
@@ -356,18 +357,22 @@ export class ShipControls{
     private pressedKeys: Set<string> = new Set();
 
     handleKeyDown(event: KeyboardEvent): void {
+        
         const key = event.code; // Utilisation de event.code pour garantir la compatibilité AZERTY/QWERTY
-        if (["KeyW", "KeyA", "KeyS", "KeyD"].includes(key)) {
+        if (["KeyW", "KeyA", "KeyS", "KeyD"].includes(key) && getAffichePage()) {
             this.pressedKeys.add(key);
             if (this.shipSounds.getMetalFootSteps() && !this.shipSounds.getMetalFootSteps().isPlaying) {
                 this.shipSounds.getMetalFootSteps().play();
-            }
+            } 
+        } else if (key === "Space" && !getAffichePage()) {
+            console.log("Key pressed: " + event.code);
+            displayDocument(this.canvas, this.scene);
         }
     }
 
     handleKeyUp(event: KeyboardEvent): void {
         const key = event.code;
-        if (["KeyW", "KeyA", "KeyS", "KeyD"].includes(key)) {
+        if (["KeyW", "KeyA", "KeyS", "KeyD"].includes(key) && getAffichePage()) {
             this.pressedKeys.delete(key);
             if (this.pressedKeys.size === 0 && this.shipSounds.getMetalFootSteps()  && this.shipSounds.getMetalFootSteps().isPlaying) {
                 this.shipSounds.getMetalFootSteps().stop();

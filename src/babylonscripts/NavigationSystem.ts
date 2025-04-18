@@ -268,7 +268,7 @@ export class NavigationSystem {
 
         const updateLoop = () => {
             if (!this.isIncrementing) return;
-
+            
             if (this.shipControls.isHoveringUp()) this.amplitudePos = Math.min(this.amplitudePos + 0.0025, this.MAX_AMPLITUDE);
             else if (this.shipControls.isHoveringDown()) this.amplitudePos = Math.max(this.amplitudePos - 0.0025, this.MIN_AMPLITUDE);
             else if (this.shipControls.isHoveringRight()) {
