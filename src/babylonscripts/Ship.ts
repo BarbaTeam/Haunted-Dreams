@@ -35,6 +35,7 @@ export class Ship {
     private buttonRight!: AbstractMesh;
     private buttonPhoto!: AbstractMesh;
     private paperSheet!: AbstractMesh;
+    private diaries!: AbstractMesh;
     private buttonDoorNav1!: AbstractMesh
     private buttonDoorNav2!: AbstractMesh
     private buttonDoorMotor1!: AbstractMesh
@@ -185,6 +186,10 @@ export class Ship {
                     case "papersheet":
                         this.paperSheet = mesh;
                         break;
+                    case "diaries":
+                        this.diaries = mesh;
+                        break;
+            
             
                     case "motor_controle.boutton":
                         this.buttonMotor = mesh;
@@ -354,6 +359,9 @@ export class Ship {
     }
     public getPaperSheet(): AbstractMesh {
         return this.paperSheet;
+    }
+    public getDiaries(): AbstractMesh {
+        return this.diaries;
     }
     public getPhotos(): AbstractMesh[] {
         return this.photos;
