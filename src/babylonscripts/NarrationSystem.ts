@@ -61,6 +61,7 @@ export class NarrationSystem {
         else {
             setTimeout(()=>{
                 this.narratorVoices[0].play();
+                this.narratorVoices[0].setPlaybackRate(1000);
                 this.subtitles.showSubtitles([
                     { text: "Bonjour !", duration: 1000 },
                     { text: "Bienvenue à bord...", duration: 2000 },
@@ -86,6 +87,8 @@ export class NarrationSystem {
                 ]);           
                 this.narratorVoices[0].onEndedObservable.add(() => {
                     this.narratorVoices[1].play();
+                    this.narratorVoices[1].setPlaybackRate(1000);
+
                     this.subtitles.showSubtitles([
                         { text: "Tout d’abord...", duration: 1000},
                         { text: "Le poste de commande.", duration: 2000},
@@ -101,6 +104,8 @@ export class NarrationSystem {
             },1000); 
             this.narratorVoices[1].onEndedObservable.add(() => {
                 this.narratorVoices[2].play();
+                this.narratorVoices[2].setPlaybackRate(1000);
+
                 this.subtitles.showSubtitles([
                     { text: "Dans la même pièce, face à la porte", duration: 3000}, 
                     { text: "Le poste de navigation. ", duration: 3000}, 
@@ -112,6 +117,8 @@ export class NarrationSystem {
             });
             this.narratorVoices[2].onEndedObservable.add(() => {
                 this.narratorVoices[3].play();
+                this.narratorVoices[3].setPlaybackRate(1000);
+
                 this.subtitles.showSubtitles([
                     { text: "À présent, consultez le dossier posé sur le bureau.", duration: 3000},
                     { text: "Il contient toutes les informations dont nous disposons…", duration: 4500},
@@ -166,7 +173,7 @@ export class NarrationSystem {
         const text1 = "Left click on the paper";
         const text2 = "to see patient's info";
     
-        const textPlane = this.createFloatingText(this.ship.getPaperSheet() as Mesh, { x: 4.5, y: 1, z: 0 }, text1, text2);
+        const textPlane = this.createFloatingText(this.ship.getPaperSheet() as Mesh, { x: 11, y: 3, z: 0 }, text1, text2);
     
         highlightLayer.addMesh(this.ship.getPaperSheet() as Mesh, Color3.Green());
         const handleClick = ()=>{
