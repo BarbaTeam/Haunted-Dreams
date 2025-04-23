@@ -81,6 +81,7 @@ export class Ship {
         this.shipControls.setNavigationSystem(this.navigationSystem);
         this.shipControls.setObjectiveSystem(this.objectiveSystem);
         this.shipControls.setHostilitySystem(this.hostilitySystem);
+        this.shipControls.setUpCamera();
         this.objectiveSystem.setNavigationSystem(this.navigationSystem);
         this.objectiveSystem.setHostilitySystem(this.hostilitySystem);
         this.navigationSystem.setObjectiveSystem(this.objectiveSystem);

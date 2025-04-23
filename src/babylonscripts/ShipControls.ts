@@ -1,4 +1,4 @@
-import { AbstractMesh, Animation, Color3, DefaultRenderingPipeline, DepthOfFieldEffectBlurLevel, HighlightLayer, Mesh, Scene } from "@babylonjs/core";
+import { AbstractMesh, Animation, Camera, Color3, DefaultRenderingPipeline, DepthOfFieldEffectBlurLevel, HighlightLayer, Mesh, Scene, TGATools } from "@babylonjs/core";
 import { Ship } from "./Ship";
 import { ShipSounds } from "./ShipSounds";
 import { ShipLight } from "./ShipLight";
@@ -58,13 +58,12 @@ export class ShipControls{
         this.shipSounds = shipSounds;
         this.scene = scene;
         this.shipLight= shipLight;
-        this.setUpCamera();
         this.setupButtonHoverDetection();
         this.enableEvents();
     }
 
     public setUpCamera(){
-        const camera = createFPSCamera(this.scene, this.canvas, this);
+        const camera = createFPSCamera(this.scene, this.canvas, this, this, this.shipSounds, this.ship, this.hostilitySystem);
         camera.metadata = { isFPSCamera: true }; // Marque la caméra comme FPS pour le Raycast
         this.scene.activeCamera = camera;
 
@@ -401,7 +400,7 @@ export class ShipControls{
         const key = event.code; // Utilisation de event.code pour garantir la compatibilité AZERTY/QWERTY
         if (["KeyW", "KeyA", "KeyS", "KeyD"].includes(key) && getAffichePage()) {
             this.pressedKeys.add(key);
-            if (this.shipSounds.getMetalFootSteps() && !this.shipSounds.getMetalFootSteps().isPlaying) {
+            if (this.shipSounds.getMetalFootSteps() && !this.shipSounds.getMetalFootSteps().isPlaying && !this.shipSounds.leftSpaceShip()) {
                 this.shipSounds.getMetalFootSteps().play();
             } 
         }

@@ -8,6 +8,7 @@ export class ShipSounds {
     private buzzingSound: Sound;
     private motorSound: Sound;
     private horrorSound: Sound;
+    private hasLeftSpaceShip = false;
 
     constructor(scene: Scene){
         this.scene = scene;
@@ -55,5 +56,20 @@ export class ShipSounds {
     }
     getMetalFootSteps(): Sound {
         return this.metalfootstep;
+    }
+
+    clearSounds(): void {
+        this.deathSound.stop();
+        this.runningDeathSound.stop();
+        this.metalfootstep.stop();
+        this.motorSound.stop();
+        this.horrorSound.stop();
+        this.buzzingSound.stop();
+    }
+    leaveSpaceShip(): void {
+        this.hasLeftSpaceShip = true;
+    }
+    leftSpaceShip(): boolean {
+        return this.hasLeftSpaceShip;
     }
 }

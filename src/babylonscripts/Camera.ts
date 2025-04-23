@@ -1,7 +1,10 @@
 
-import { Scene, Vector3, UniversalCamera, ArcRotateCamera, Effect, PostProcess, Color4, BlackAndWhitePostProcess, ImageProcessingConfiguration, DefaultRenderingPipeline } from "@babylonjs/core";
+import { Scene, Vector3, UniversalCamera, ArcRotateCamera, Effect, PostProcess, Color4, BlackAndWhitePostProcess, ImageProcessingConfiguration, DefaultRenderingPipeline, Sound } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Button, Rectangle, Image, Grid } from "@babylonjs/gui";
 import { ShipControls } from "./ShipControls";
+import { ShipSounds } from "./ShipSounds";
+import { HostilitySystem } from "./HostilitySystem";
+import { Ship } from "./Ship";
 
 let affichePage = true;
 let advancedTexture: AdvancedDynamicTexture | null = null;
@@ -10,7 +13,7 @@ let index = 0;
 let camera: UniversalCamera | null = null;
 
 
-export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement, controls: ShipControls): UniversalCamera {
+export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement, controls: ShipControls, shipControls: ShipControls, shipSounds : ShipSounds, ship: Ship, hostilitySystem: HostilitySystem): UniversalCamera {
     camera = new UniversalCamera("UniversalCamera", new Vector3(0, 11, 0), scene);
     camera.setTarget(new Vector3(0, 10, 10));
     camera.applyGravity = true;
@@ -107,6 +110,21 @@ export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement, control
     });
 
     displayedItem(canvas, scene, controls);
+
+    let hasLeftSpaceShip = false;
+    scene.onBeforeRenderObservable.add(() => {
+        const camPos = camera!.position;
+    
+        if (camPos.z < -20 && !hasLeftSpaceShip) { 
+            hasLeftSpaceShip = true; 
+            shipControls.closeDoor(ship.getDoorByName("exterior")!, true);
+            shipSounds.clearSounds();
+            shipSounds.leaveSpaceShip();
+            setTimeout(() => {
+                hostilitySystem.kill();
+            }, 1000);
+        }
+    });
 
     return camera;
 }
