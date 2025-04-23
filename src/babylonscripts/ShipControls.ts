@@ -344,9 +344,9 @@ export class ShipControls{
         } else if (this.hoveringMotor) {
             this.toggleEngine();
         } else if (this.hoveringPaperSheet) {
-            displayDocument(this.canvas, this.scene, this);
+            displayDocument(this.canvas, this, this.objectiveSystem, "doc");
         } else if (this.hoveringDiaries) {
-            displayDocument(this.canvas, this.scene, this);
+            displayDocument(this.canvas, this, this.objectiveSystem, "diaries");
         }   
         else if (this.isHoveringSomeButtonForNavDoor()) {
             this.toggleDoor(this.ship.getDoorByName("nav")!);

@@ -5,6 +5,7 @@ import { ShipControls } from "./ShipControls";
 import { ShipSounds } from "./ShipSounds";
 import { HostilitySystem } from "./HostilitySystem";
 import { Ship } from "./Ship";
+import { ObjectiveSystem } from "./ObjectiveSystem";
 
 let affichePage = true;
 let advancedTexture: AdvancedDynamicTexture | null = null;
@@ -61,17 +62,17 @@ export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement, control
         if (!contenuePage) return;
     
         if (event.key === "ArrowRight" && !affichePage) {
-            if (index < 8) {
+            if (index < 8 && contenuePage.source!.includes("doc")) {
                 index++;
                 contenuePage.source = "images/doc" + index + ".png";
             }
         } else if (event.key === "ArrowLeft" && !affichePage) {
-            if (index > 0) {
+            if (index > 0 && contenuePage.source!.includes("doc")) {
                 index--;
                 contenuePage.source = "images/doc" + index + ".png";
             }
         } else if (event.code === "Space" && !affichePage) {
-            displayDocument(canvas, scene, controls);
+            displayDocument(canvas, controls);
         }
     });
 
@@ -109,7 +110,7 @@ export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement, control
         event.preventDefault();
     });
 
-    displayedItem(canvas, scene, controls);
+    displayedItem(canvas, controls);
 
     let hasLeftSpaceShip = false;
     scene.onBeforeRenderObservable.add(() => {
@@ -130,7 +131,7 @@ export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement, control
 }
 
 
-export function displayedItem(canvas: HTMLCanvasElement, scene: Scene, controls: ShipControls) {
+export function displayedItem(canvas: HTMLCanvasElement, controls: ShipControls, objectiveSystem?: ObjectiveSystem, type?: string) {
     if (!advancedTexture || !camera) return;
 
     advancedTexture.clear();
@@ -171,8 +172,18 @@ export function displayedItem(canvas: HTMLCanvasElement, scene: Scene, controls:
         page.addColumnDefinition(0.3);
         page.addColumnDefinition(0.3);
         page.addColumnDefinition(0.3);
-
-        contenuePage = new Image("pageTest", "images/doc0.png");
+        switch (type) {
+            case "doc":
+                contenuePage = new Image("", "images/doc0.png");
+                break;
+            case "diaries":
+                contenuePage = new Image("", "");
+                if(objectiveSystem)
+                    contenuePage.source = "images/diaries" + objectiveSystem.getNightmareIndex() + ".png";
+                break;
+            default:
+                contenuePage = new Image("", "");
+        }
         contenuePage.width = "100%";
         contenuePage.height = "100%";
         contenuePage.stretch = Image.STRETCH_UNIFORM;
@@ -185,9 +196,9 @@ export function displayedItem(canvas: HTMLCanvasElement, scene: Scene, controls:
 }
 
 
-export function displayDocument(canvas: HTMLCanvasElement, scene: Scene, controls: ShipControls) {
+export function displayDocument(canvas: HTMLCanvasElement, controls: ShipControls, objectiveSystem?: ObjectiveSystem, type?: string) {
     affichePage = !affichePage;
-    displayedItem(canvas, scene, controls);
+    displayedItem(canvas, controls, objectiveSystem, type);
 
     console.log("displayDocument : " + affichePage);
 }
