@@ -1,13 +1,9 @@
 import { 
     Scene, Engine, Vector3, MeshBuilder, SceneLoader, Color4, StandardMaterial, 
     Color3, DynamicTexture, AbstractMesh,
-    Texture,
-    DefaultRenderingPipeline,
-    DepthOfFieldEffectBlurLevel,
-    FreeCamera
+    Texture
 } from '@babylonjs/core';
 import { NarrationSystem } from './NarrationSystem';
-import { createFPSCamera, displayedItem } from './Camera';
 import "@babylonjs/loaders";
 import { ShipLight } from './ShipLight';
 import { ObjectiveSystem } from './ObjectiveSystem';
@@ -16,7 +12,6 @@ import { ShipControls } from './ShipControls';
 import { ShipSounds } from './ShipSounds';
 import { Door } from './ShipControls';
 import { HostilitySystem } from './HostilitySystem';
-import * as GUI from '@babylonjs/gui';
 
 
 

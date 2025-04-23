@@ -40,7 +40,7 @@ export class ShipLight {
         ];
 
         this.lightList.forEach((light) => {
-            light.intensity = 3;
+            light.intensity = 5;
             light.diffuse = new Color3(106, 143, 63);
             light.range = 2;
         });

@@ -1,5 +1,5 @@
 
-import { Scene, Vector3, UniversalCamera, ArcRotateCamera } from "@babylonjs/core";
+import { Scene, Vector3, UniversalCamera, ArcRotateCamera, Effect, PostProcess, Color4, BlackAndWhitePostProcess, ImageProcessingConfiguration, DefaultRenderingPipeline } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Button, Rectangle, Image, Grid } from "@babylonjs/gui";
 import { ShipControls } from "./ShipControls";
 
@@ -22,6 +22,17 @@ export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement, control
     camera.angularSensibility = 4000;
     camera.fov = 1.2;
     advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("UI", true, scene);
+    
+    // PostProcess: Desaturation, Vignette, Grain
+    
+    const bw = new BlackAndWhitePostProcess("bw", 1.0, camera);
+    bw.degree = 0.3;
+    
+    const grain = new PostProcess("grain", "grain", ["intensity", "grainy"], null, 1.0, camera);
+    grain.onApply = (effect: Effect) => {
+        effect.setFloat("intensity", 30);
+        effect.setFloat("grainy", 1.0);
+    };
     
 
     canvas.addEventListener("click", () => {
@@ -93,6 +104,7 @@ export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement, control
 
     return camera;
 }
+
 
 export function displayedItem(canvas: HTMLCanvasElement, scene: Scene, controls: ShipControls) {
     if (!advancedTexture || !camera) return;

@@ -36,6 +36,7 @@ export class ShipControls{
     private hoveringTelephone = false;
     private hoveringPhoto = false;
     private hoveringPaperSheet = false;
+    private hoveringDiaries = false;
     private hoveringMotor = false
     private hoveringUp = false;
     private hoveringDown = false;
@@ -131,6 +132,10 @@ export class ShipControls{
     
     public isHoveringPaperSheet(): boolean {
         return this.hoveringPaperSheet;
+    }
+
+    public isHoveringDiaries(): boolean {
+        return this.hoveringDiaries;
     }
     
     public isHoveringMotor(): boolean {
@@ -259,7 +264,7 @@ export class ShipControls{
         this.ship.diffuseTextureOn();
         this.shipLight.getLights().forEach((light) => {
             light.diffuse = new Color3(106, 143, 63);
-            light.intensity = 3;
+            light.intensity = 5;
         });
 
         this.shipSounds.getHorrorSound().stop();
@@ -331,7 +336,8 @@ export class ShipControls{
         return this.hoveringbuttonDoorMotor1 || this.hoveringbuttonDoorMotor2;
     }
 
-    handleMouseDown(): void {
+    handleMouseDown(event: PointerEvent): void {
+        if(event.button !== 0) return;
         if (this.isHoveringSomeButtonForNavigation()) {
             this.navigationSystem.startIncrementing();
         } else if (this.hoveringPhoto) {
@@ -340,7 +346,9 @@ export class ShipControls{
             this.toggleEngine();
         } else if (this.hoveringPaperSheet) {
             displayDocument(this.canvas, this.scene, this);
-        }
+        } else if (this.hoveringDiaries) {
+            displayDocument(this.canvas, this.scene, this);
+        }   
         else if (this.isHoveringSomeButtonForNavDoor()) {
             this.toggleDoor(this.ship.getDoorByName("nav")!);
         }
@@ -424,6 +432,7 @@ export class ShipControls{
             this.hoveringMotor = hit?.pickedMesh === this.ship.getButtonMotor();
             this.hoveringTelephone = hit?.pickedMesh === this.ship.getTelephone();
             this.hoveringPaperSheet = hit?.pickedMesh === this.ship.getPaperSheet();
+            this.hoveringDiaries = hit?.pickedMesh === this.ship.getDiaries();
             this.hoveringbuttonDoorMotor1 = hit?.pickedMesh=== this.ship.getButtonDoorMotor()[0];
             this.hoveringbuttonDoorMotor2 = hit?.pickedMesh=== this.ship.getButtonDoorMotor()[1];
             this.hoveringbuttonDoorNav1 = hit?.pickedMesh=== this.ship.getButtonDoorNav()[0];
@@ -453,6 +462,7 @@ export class ShipControls{
                 { mesh: this.ship.getButtonPhoto(), hovering: this.hoveringPhoto },
                 { mesh: this.ship.getButtonMotor(), hovering: this.hoveringMotor },
                 { mesh: this.ship.getPaperSheet(), hovering: this.hoveringPaperSheet },
+                { mesh: this.ship.getDiaries(), hovering: this.hoveringDiaries },
                 { mesh: this.ship.getTelephone(), hovering: this.hoveringTelephone },
                 { mesh: this.ship.getButtonDoorMotor()[0], hovering: this.hoveringbuttonDoorMotor1},
                 { mesh: this.ship.getButtonDoorMotor()[1], hovering: this.hoveringbuttonDoorMotor2},
