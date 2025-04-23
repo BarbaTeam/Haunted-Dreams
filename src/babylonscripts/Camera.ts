@@ -36,12 +36,17 @@ export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement, control
     
 
     canvas.addEventListener("click", () => {
-        canvas.requestPointerLock();
+        if (affichePage) {
+            canvas.requestPointerLock();
+        } 
+        else {
+            document.exitPointerLock();
+        }
     });
 
 
     document.addEventListener("pointerlockchange", () => {
-        if (document.pointerLockElement === canvas) {
+        if (affichePage){
             document.addEventListener("mousemove", mouseMove);
         } else {
             document.removeEventListener("mousemove", mouseMove);
