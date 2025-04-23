@@ -53,6 +53,7 @@ export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement, control
         }
     });
 
+    
     window.addEventListener("keydown", (event: KeyboardEvent) => {
         if (!contenuePage) return;
     
