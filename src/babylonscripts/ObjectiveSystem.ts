@@ -27,28 +27,28 @@ export class ObjectiveSystem {
             nmAngle : 5.10
         },
         {
-            nmAmplitude : 0.45,
-            nmFrequency : 2.42,
+            nmAmplitude : 0.60,
+            nmFrequency : 7.00,
             nmAngle : 3.30
         },
         {
-            nmAmplitude : 0.12,
-            nmFrequency : 3.98,
+            nmAmplitude : 1.20,
+            nmFrequency : 1.20,
             nmAngle : 1.20
         },
         {
-            nmAmplitude : 0.97,
-            nmFrequency : 5.23,
+            nmAmplitude : 1.00,
+            nmFrequency : 6.00,
             nmAngle : 5.70
         },
         {
-            nmAmplitude : 1.44,
-            nmFrequency : 6.57,
+            nmAmplitude : 0.70,
+            nmFrequency : 8.00,
             nmAngle : 2.70
         },
         {
-            nmAmplitude : 1.17,
-            nmFrequency : 8.11,
+            nmAmplitude : 0.20,
+            nmFrequency : 8.90,
             nmAngle : 6.00
         }
     ]

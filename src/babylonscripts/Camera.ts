@@ -12,6 +12,7 @@ let advancedTexture: AdvancedDynamicTexture | null = null;
 let contenuePage: Image | null = null;
 let index = 0;
 let camera: UniversalCamera | null = null;
+let pageZoom = false
 
 
 export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement, controls: ShipControls, shipControls: ShipControls, shipSounds : ShipSounds, ship: Ship, hostilitySystem: HostilitySystem): UniversalCamera {
@@ -64,12 +65,12 @@ export function createFPSCamera(scene: Scene, canvas: HTMLCanvasElement, control
         if (event.key === "ArrowRight" && !affichePage) {
             if (index < 8 && contenuePage.source!.includes("doc")) {
                 index++;
-                contenuePage.source = "images/doc" + index + ".png";
+                contenuePage.source = "images/doc" + index + ".jpg";
             }
         } else if (event.key === "ArrowLeft" && !affichePage) {
             if (index > 0 && contenuePage.source!.includes("doc")) {
                 index--;
-                contenuePage.source = "images/doc" + index + ".png";
+                contenuePage.source = "images/doc" + index + ".jpg";
             }
         } else if (event.code === "Space" && !affichePage) {
             displayDocument(canvas, controls);
@@ -174,7 +175,7 @@ export function displayedItem(canvas: HTMLCanvasElement, controls: ShipControls,
         page.addColumnDefinition(0.3);
         switch (type) {
             case "doc":
-                contenuePage = new Image("", "images/doc0.png");
+                contenuePage = new Image("", "images/doc0.jpg");
                 break;
             case "diaries":
                 contenuePage = new Image("", "");
@@ -192,6 +193,31 @@ export function displayedItem(canvas: HTMLCanvasElement, controls: ShipControls,
         advancedTexture.addControl(page);
         camera.detachControl();
         document.exitPointerLock();
+
+        contenuePage.onPointerClickObservable.add((event) => {
+            pageZoom = !pageZoom;
+            if (pageZoom) {
+                const zoomFactor = 2;
+
+                const parentWidth = canvas.clientWidth;
+                const parentHeight = canvas.clientHeight;
+
+                const offsetX = event.x - parentWidth / 2;
+                const offsetY = event.y - parentHeight / 2;
+
+                page.left = -offsetX + "px";
+                page.top = -offsetY + "px";
+
+                page.width = (zoomFactor * 100) + "%";
+                page.height = (zoomFactor * 100) + "%";
+            }
+            else {
+                page.top = 0;
+                page.left = 0;
+                page.width = "100%";
+                page.height = "100%";
+            }
+        });
     }
 }
 
