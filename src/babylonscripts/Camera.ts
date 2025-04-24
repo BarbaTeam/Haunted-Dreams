@@ -145,10 +145,10 @@ export function displayedItem(canvas: HTMLCanvasElement, controls: ShipControls,
     if (affichePage) {
         // Rebind clavier AZERTY
         controls.enableEvents();
-        camera.keysUp = [90];    // Z
+        camera.keysUp = [90,87];    // Z, W
         camera.keysDown = [83];  // S
         camera.keysRight = [68]; // D
-        camera.keysLeft = [81];  // Q
+        camera.keysLeft = [81,65];  // Q
 
         const crosshair = Button.CreateImageOnlyButton("crosshair", "images/circle.svg");
         crosshair.width = "15px";
