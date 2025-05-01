@@ -61,7 +61,7 @@ export class Ship {
     private shipSounds: ShipSounds;
     private hostilitySystem: HostilitySystem;
 
-    constructor(private canvas: HTMLCanvasElement) {
+    constructor(private canvas: HTMLCanvasElement, private language: string, private subtitlesEnabled: boolean) {
         this.engine = new Engine(this.canvas, true);
         this.scene = this.createScene();
         this.createSpaceShip();
@@ -316,7 +316,14 @@ export class Ship {
         ground.checkCollisions = true; 
     }
 
+    public get languageValue(): string {
+        return this.language;
+    }
 
+    public get subtitlesEnabledValue(): boolean {
+        return this.subtitlesEnabled;
+    }
+    
     public getButtonUp(): AbstractMesh{
         return this.buttonUp;
     }

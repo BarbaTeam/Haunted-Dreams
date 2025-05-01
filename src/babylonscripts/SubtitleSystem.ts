@@ -1,4 +1,5 @@
 import { AdvancedDynamicTexture, Control, TextBlock } from "@babylonjs/gui";
+import { Ship } from "./Ship";
 
 export class SubtitleSystem {
     private guiTexture: AdvancedDynamicTexture;
@@ -6,7 +7,7 @@ export class SubtitleSystem {
     private queue: { text: string; duration: number }[] = [];
     private isDisplaying = false;
 
-    constructor() {
+    constructor(private subtitlesEnabled: boolean) {
         this.guiTexture = AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
         this.subtitleText = new TextBlock();
@@ -23,6 +24,7 @@ export class SubtitleSystem {
     }
 
     public showSubtitles(subtitles: { text: string; duration: number }[]): void {
+        if(!this.subtitlesEnabled) return;
         this.queue.push(...subtitles);
         if (!this.isDisplaying) {
             this.displayNextSubtitle();

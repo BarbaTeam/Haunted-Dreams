@@ -24,6 +24,7 @@ let affichePage = true;
 let advancedTexture: AdvancedDynamicTexture | null = null;
 let contenuePage: Image | null = null;
 let index = 0;
+let maxDiariesIndex = 0;
 let diariesIndex = 0;
 let camera: UniversalCamera | null = null;
 let pageZoom = false;
@@ -98,22 +99,23 @@ export function createFPSCamera(
     window.addEventListener("keydown", (event: KeyboardEvent) => {
         if (!contenuePage) return;
 
+        updateDiariesIndex(objectiveSystem.getNightmareIndex());
         if (event.key === "ArrowRight" && !affichePage) {
             if (index < 8 && contenuePage.source!.includes("doc")) {
                 contenuePage.source = `images/doc${++index}.jpg`;
             }
-            if (diariesIndex < objectiveSystem.getNightmareIndex() && contenuePage.source!.includes("diaries")) {
-                contenuePage.source = `images/diaries${++diariesIndex}.png`;
+            if (diariesIndex < maxDiariesIndex && contenuePage.source!.includes("diaries")) {
+                contenuePage.source = `images/diaries${++diariesIndex}_${ship.languageValue}.png`;
             }
         } else if (event.key === "ArrowLeft" && !affichePage) {
             if (index > 0 && contenuePage.source!.includes("doc")) {
                 contenuePage.source = `images/doc${--index}.jpg`;
             }
             if (diariesIndex > 0 && contenuePage.source!.includes("diaries")) {
-                contenuePage.source = `images/diaries${--diariesIndex}.png`;
+                contenuePage.source = `images/diaries${--diariesIndex}_${ship.languageValue}.png`;
             }
         } else if (event.code === "Space" && !affichePage) {
-            displayDocument(canvas, controls);
+            displayDocument(canvas, controls, ship.languageValue);
         }
     });
 
@@ -134,8 +136,40 @@ export function createFPSCamera(
         }
     });
 
-    displayedItem(canvas, controls);
+    displayedItem(canvas, controls, ship.languageValue);
     return camera;
+}
+
+function updateDiariesIndex(nightmareIndex: number): void {
+    switch (nightmareIndex) {
+        case 0:
+            maxDiariesIndex = 0;
+            break;
+        case 1:
+            maxDiariesIndex = 5;
+            break;
+        case 2:
+            maxDiariesIndex = 10;
+            break;
+        case 3:
+            maxDiariesIndex = 8;
+            break;
+        case 4:
+            maxDiariesIndex = 8;
+            break;
+        case 5:
+            maxDiariesIndex = 8;
+            break;
+        case 6:
+            maxDiariesIndex = 8;
+            break;
+        case 7:
+            maxDiariesIndex = 8;
+            break;
+        default:
+            maxDiariesIndex = 0;
+            break;
+    }
 }
 
 function mouseMove(event: MouseEvent) {
@@ -150,6 +184,7 @@ function mouseMove(event: MouseEvent) {
 export function displayedItem(
     canvas: HTMLCanvasElement,
     controls: ShipControls,
+    language: string,
     objectiveSystem?: ObjectiveSystem,
     type?: string
 ): void {
@@ -196,13 +231,13 @@ export function displayedItem(
 
         switch (type) {
             case "doc":
-                contenuePage = new Image("", "images/doc0.jpg");
+                contenuePage = new Image("", `images/doc0.jpg`);
                 break;
             case "diaries":
                 contenuePage = new Image("", "");
                 if (objectiveSystem) {
                     diariesIndex = objectiveSystem.getNightmareIndex();
-                    contenuePage.source = `images/diaries${diariesIndex}.png`;
+                    contenuePage.source = `images/diaries${diariesIndex}_${language}.png`;
                 }
                 break;
             default:
@@ -242,11 +277,12 @@ export function displayedItem(
 export function displayDocument(
     canvas: HTMLCanvasElement,
     controls: ShipControls,
+    language: string,
     objectiveSystem?: ObjectiveSystem,
     type?: string
 ): void {
     affichePage = !affichePage;
-    displayedItem(canvas, controls, objectiveSystem, type);
+    displayedItem(canvas, controls, language, objectiveSystem ,type);
 }
 
 export function getAffichePage(): boolean {
@@ -261,3 +297,4 @@ export function createMenuCamera(scene: Scene, canvas: HTMLCanvasElement): ArcRo
     camera.inputs.clear(); // Disable user control for menu
     return camera;
 }
+
