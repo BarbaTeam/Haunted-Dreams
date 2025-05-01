@@ -118,7 +118,7 @@ export class ShipControls{
         return this.hoveringbuttonDoorMotor1;
     }
     
-    public sHoveringButtonDoorMotor2(): boolean {
+    public isHoveringButtonDoorMotor2(): boolean {
         return this.hoveringbuttonDoorMotor2;
     }
     

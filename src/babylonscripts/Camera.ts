@@ -24,7 +24,7 @@ let affichePage = true;
 let advancedTexture: AdvancedDynamicTexture | null = null;
 let contenuePage: Image | null = null;
 let docIndex = 0;
-const maxDocIndex = 2;
+let maxDocIndex = 0;
 let maxDiariesIndex = 0;
 let maxExplorersIndex = 0;
 let diariesIndex = 0;
@@ -152,38 +152,47 @@ export function createFPSCamera(
 function updateIndex(nightmareIndex: number): void {
     switch (nightmareIndex) {
         case 0:
+            maxDocIndex = 0;
             maxDiariesIndex = 0;
             maxExplorersIndex = 0;
             break;
         case 1:
+            maxDocIndex = 2;
             maxDiariesIndex = 5;
             maxExplorersIndex = 5;
             break;
         case 2:
+            maxDocIndex = 4;
             maxDiariesIndex = 10;
             maxExplorersIndex = 10;
             break;
         case 3:
+            maxDocIndex = 6;
             maxDiariesIndex = 8;
             maxExplorersIndex = 8;
             break;
         case 4:
+            maxDocIndex = 8;
             maxDiariesIndex = 8;
             maxExplorersIndex = 8;
             break;
         case 5:
+            maxDocIndex = 10;
             maxDiariesIndex = 8;
             maxExplorersIndex = 8;
             break;
         case 6:
+            maxDocIndex = 12;
             maxDiariesIndex = 8;
             maxExplorersIndex = 8;
             break;
         case 7:
+            maxDocIndex = 14;
             maxDiariesIndex = 8;
             maxExplorersIndex = 8;
             break;
         default:
+            maxDocIndex = 16;
             maxDiariesIndex = 0;
             maxExplorersIndex = 0;
             break;
@@ -275,7 +284,7 @@ export function displayedItem(
 
         contenuePage.onPointerClickObservable.add((event) => {
             pageZoom = !pageZoom;
-            const zoomFactor = 2;
+            const zoomFactor = 2.25;
 
             if (pageZoom) {
                 const offsetX = event.x - canvas.clientWidth / 2;
