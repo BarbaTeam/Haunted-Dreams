@@ -62,18 +62,19 @@ export class Ship {
     private shipSounds: ShipSounds;
     private hostilitySystem: HostilitySystem;
 
-    constructor(private canvas: HTMLCanvasElement, private language: string, private subtitlesEnabled: boolean) {
+    constructor(private canvas: HTMLCanvasElement, private language: string, private subtitlesEnabled: boolean, private keyBindings: { [action: string]: string }
+    ) {
         this.engine = new Engine(this.canvas, true);
         this.scene = this.createScene();
         this.createSpaceShip();
         this.createGround();
-        
+        console.log(keyBindings);
         this.shipSounds = new ShipSounds(this.scene);
         this.shiplight = new ShipLight(this.scene);
         this.narrationSystem = new NarrationSystem(this.scene, this);
         this.navigationSystem = new NavigationSystem(this.scene, this);
         this.objectiveSystem = new ObjectiveSystem(this.scene, this, this.shipSounds);
-        this.shipControls = new ShipControls(this, this.shipSounds,this.scene, this.shiplight, this.narrationSystem, canvas);
+        this.shipControls = new ShipControls(this, this.shipSounds,this.scene, this.shiplight, this.narrationSystem, keyBindings, canvas);
         this.hostilitySystem = new HostilitySystem(this.shipSounds);
 
         this.narrationSystem.setNavigationSystem(this.navigationSystem);
@@ -106,6 +107,7 @@ export class Ship {
                 this.navigationSystem.updateSineWave();
             }, 50);
         });
+        window.addEventListener("resize", () => this.engine.resize());
     }
     
 

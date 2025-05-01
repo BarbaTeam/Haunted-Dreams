@@ -40,7 +40,8 @@ export function createFPSCamera(
     shipSounds: ShipSounds,
     ship: Ship,
     hostilitySystem: HostilitySystem,
-    objectiveSystem: ObjectiveSystem
+    objectiveSystem: ObjectiveSystem,
+    keyBindings: { [action: string]: string }
 ): UniversalCamera {
     camera = new UniversalCamera("UniversalCamera", new Vector3(0, 11, 0), scene);
     camera.setTarget(new Vector3(0, 10, 10));
@@ -124,7 +125,7 @@ export function createFPSCamera(
                 contenuePage.source = `images/explorers${--explorersIndex}_${ship.languageValue}.png`;
             }
         } else if (event.code === "Space" && !affichePage) {
-            displayDocument(canvas, controls, ship.languageValue);
+            displayDocument(canvas, controls, ship.languageValue, keyBindings);
         }
     });
 
@@ -145,7 +146,7 @@ export function createFPSCamera(
         }
     });
 
-    displayedItem(canvas, controls, ship.languageValue);
+    displayedItem(canvas, controls, ship.languageValue, keyBindings);
     return camera;
 }
 
@@ -212,6 +213,7 @@ export function displayedItem(
     canvas: HTMLCanvasElement,
     controls: ShipControls,
     language: string,
+    keyBindings: { [action: string]: string },
     objectiveSystem?: ObjectiveSystem,
     type?: string
 ): void {
@@ -228,11 +230,12 @@ export function displayedItem(
     if (affichePage) {
         // Gameplay mode
         controls.enableEvents();
-        camera.keysUp = [90, 87]; // Z, W
-        camera.keysDown = [83];   // S
-        camera.keysRight = [68];  // D
-        camera.keysLeft = [81, 65]; // Q, A
+        camera.keysUp = [keyBindings["Forward"].toUpperCase().charCodeAt(0)];
+        camera.keysDown = [keyBindings["Backward"].toUpperCase().charCodeAt(0)];
+        camera.keysLeft = [keyBindings["Left"].toUpperCase().charCodeAt(0)];
+        camera.keysRight = [keyBindings["Right"].toUpperCase().charCodeAt(0)];
 
+        console.log("Camera keys: ", camera.keysUp, camera.keysDown, camera.keysRight, camera.keysLeft);
         const crosshair = Button.CreateImageOnlyButton("crosshair", "images/circle.svg");
         crosshair.width = "15px";
         crosshair.height = "15px";
@@ -308,11 +311,12 @@ export function displayDocument(
     canvas: HTMLCanvasElement,
     controls: ShipControls,
     language: string,
+    keyBindings: { [action: string]: string },
     objectiveSystem?: ObjectiveSystem,
     type?: string
 ): void {
     affichePage = !affichePage;
-    displayedItem(canvas, controls, language, objectiveSystem ,type);
+    displayedItem(canvas, controls, language, keyBindings, objectiveSystem ,type);
 }
 
 export function getAffichePage(): boolean {

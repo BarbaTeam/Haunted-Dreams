@@ -52,7 +52,7 @@ export class ShipControls{
 
     private canvas: HTMLCanvasElement;
 
-    constructor(ship: Ship, shipSounds: ShipSounds, scene: Scene, shipLight: ShipLight, narrationSystem: NarrationSystem, canvas: HTMLCanvasElement){
+    constructor(ship: Ship, shipSounds: ShipSounds, scene: Scene, shipLight: ShipLight, narrationSystem: NarrationSystem, private keyBindings: { [action: string]: string }, canvas: HTMLCanvasElement){
         this.canvas = canvas;
         this.narrationSystem = narrationSystem;
         this.ship = ship;
@@ -64,7 +64,7 @@ export class ShipControls{
     }
 
     public setUpCamera(){
-        const camera = createFPSCamera(this.scene, this.canvas, this, this, this.shipSounds, this.ship, this.hostilitySystem, this.objectiveSystem);
+        const camera = createFPSCamera(this.scene, this.canvas, this, this, this.shipSounds, this.ship, this.hostilitySystem, this.objectiveSystem, this.keyBindings);
         camera.metadata = { isFPSCamera: true }; // Marque la caméra comme FPS pour le Raycast
         this.scene.activeCamera = camera;
 
@@ -349,11 +349,11 @@ export class ShipControls{
         } else if (this.hoveringMotor) {
             this.toggleEngine();
         } else if (this.hoveringPaperSheet) {
-            displayDocument(this.canvas, this, this.ship.languageValue, this.objectiveSystem, "doc");
+            displayDocument(this.canvas, this, this.ship.languageValue,this.keyBindings, this.objectiveSystem, "doc");
         } else if (this.hoveringDiaries) {
-            displayDocument(this.canvas, this,this.ship.languageValue, this.objectiveSystem, "diaries");
+            displayDocument(this.canvas, this,this.ship.languageValue,this.keyBindings, this.objectiveSystem, "diaries");
         } else if(this.hoveringExplorerSheet) {
-            displayDocument(this.canvas, this,this.ship.languageValue, this.objectiveSystem, "explorer");
+            displayDocument(this.canvas, this,this.ship.languageValue,this.keyBindings, this.objectiveSystem, "explorer");
         }
         else if (this.isHoveringSomeButtonForNavDoor()) {
             this.toggleDoor(this.ship.getDoorByName("nav")!);
