@@ -22,13 +22,13 @@ export class ObjectiveSystem {
 
     private nightmares: Nightmare[] = [
         {
-            nmAmplitude : 1.00,
-            nmFrequency : 1.02,
+            nmAmplitude : 0.20,
+            nmFrequency : 3.20,
             nmAngle : 5.10
         },
         {
-            nmAmplitude : 0.60,
-            nmFrequency : 7.00,
+            nmAmplitude : 0.50,
+            nmFrequency : 6.20,
             nmAngle : 3.30
         },
         {
