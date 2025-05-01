@@ -63,7 +63,7 @@ export class ShipControls{
     }
 
     public setUpCamera(){
-        const camera = createFPSCamera(this.scene, this.canvas, this, this, this.shipSounds, this.ship, this.hostilitySystem);
+        const camera = createFPSCamera(this.scene, this.canvas, this, this, this.shipSounds, this.ship, this.hostilitySystem, this.objectiveSystem);
         camera.metadata = { isFPSCamera: true }; // Marque la caméra comme FPS pour le Raycast
         this.scene.activeCamera = camera;
 

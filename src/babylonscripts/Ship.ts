@@ -271,6 +271,14 @@ export class Ship {
                         mesh.visibility = 0;
                         this.photos.push(mesh);
                         break;
+                    case "photo7":
+                        mesh.visibility = 0;
+                        this.photos.push(mesh);
+                        break;
+                    case "photo8":
+                        mesh.visibility = 0;
+                        this.photos.push(mesh);
+                        break;
                     case "telephone":
                         this.telephone = mesh;
                         break;
