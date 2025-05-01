@@ -23,7 +23,7 @@ export class MainMenu {
             this.engine.resize();
         });
     }
-
+ 
     createMenuScene(engine: Engine, canvas: HTMLCanvasElement): Scene {
         const scene = new Scene(engine);
 

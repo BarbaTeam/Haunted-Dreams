@@ -48,7 +48,7 @@ export class NarrationSystem {
     public setShipControls(shipControls: ShipControls): void {
         this.shipControls = shipControls;
     }
-
+    
     setupNarrator(){
 
         if(!this.answered){
