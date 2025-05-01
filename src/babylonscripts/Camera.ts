@@ -23,7 +23,8 @@ import { ObjectiveSystem } from "./ObjectiveSystem";
 let affichePage = true;
 let advancedTexture: AdvancedDynamicTexture | null = null;
 let contenuePage: Image | null = null;
-let index = 0;
+let docIndex = 0;
+const maxDocIndex = 8;
 let maxDiariesIndex = 0;
 let maxExplorersIndex = 0;
 let diariesIndex = 0;
@@ -103,8 +104,8 @@ export function createFPSCamera(
 
         updateIndex(objectiveSystem.getNightmareIndex());
         if (event.key === "ArrowRight" && !affichePage) {
-            if (index < 8 && contenuePage.source!.includes("doc")) {
-                contenuePage.source = `images/doc${++index}.jpg`;
+            if (docIndex < maxDocIndex && contenuePage.source!.includes("doc")) {
+                contenuePage.source = `images/doc${++docIndex}_${ship.languageValue}.jpg`;
             }
             if (diariesIndex < maxDiariesIndex && contenuePage.source!.includes("diaries")) {
                 contenuePage.source = `images/diaries${++diariesIndex}_${ship.languageValue}.png`;
@@ -113,8 +114,8 @@ export function createFPSCamera(
                 contenuePage.source = `images/explorers${++explorersIndex}_${ship.languageValue}.png`;
             }
         } else if (event.key === "ArrowLeft" && !affichePage) {
-            if (index > 0 && contenuePage.source!.includes("doc")) {
-                contenuePage.source = `images/doc${--index}.jpg`;
+            if (docIndex > 0 && contenuePage.source!.includes("doc")) {
+                contenuePage.source = `images/doc${--docIndex}_${ship.languageValue}.jpg`;            
             }
             if (diariesIndex > 0 && contenuePage.source!.includes("diaries")) {
                 contenuePage.source = `images/diaries${--diariesIndex}_${ship.languageValue}.png`;
@@ -248,7 +249,7 @@ export function displayedItem(
 
         switch (type) {
             case "doc":
-                contenuePage = new Image("", `images/doc0.jpg`);
+                contenuePage = new Image("", `images/doc${docIndex}_${language}.jpg`);
                 break;
             case "diaries":
                 contenuePage = new Image("", "");

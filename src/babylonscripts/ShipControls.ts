@@ -470,7 +470,7 @@ export class ShipControls{
                 { mesh: this.ship.getButtonMotor(), hovering: this.hoveringMotor },
                 { mesh: this.ship.getPaperSheet(), hovering: this.hoveringPaperSheet },
                 { mesh: this.ship.getDiaries(), hovering: this.hoveringDiaries },
-                {mesh : this.ship.getExplorerSheet(), hovering: this.hoveringPaperSheet},
+                {mesh : this.ship.getExplorerSheet(), hovering: this.hoveringExplorerSheet},
                 { mesh: this.ship.getTelephone(), hovering: this.hoveringTelephone },
                 { mesh: this.ship.getButtonDoorMotor()[0], hovering: this.hoveringbuttonDoorMotor1},
                 { mesh: this.ship.getButtonDoorMotor()[1], hovering: this.hoveringbuttonDoorMotor2},
