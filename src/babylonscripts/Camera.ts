@@ -25,7 +25,9 @@ let advancedTexture: AdvancedDynamicTexture | null = null;
 let contenuePage: Image | null = null;
 let index = 0;
 let maxDiariesIndex = 0;
+let maxExplorersIndex = 0;
 let diariesIndex = 0;
+let explorersIndex = 0;
 let camera: UniversalCamera | null = null;
 let pageZoom = false;
 
@@ -99,7 +101,7 @@ export function createFPSCamera(
     window.addEventListener("keydown", (event: KeyboardEvent) => {
         if (!contenuePage) return;
 
-        updateDiariesIndex(objectiveSystem.getNightmareIndex());
+        updateIndex(objectiveSystem.getNightmareIndex());
         if (event.key === "ArrowRight" && !affichePage) {
             if (index < 8 && contenuePage.source!.includes("doc")) {
                 contenuePage.source = `images/doc${++index}.jpg`;
@@ -107,12 +109,18 @@ export function createFPSCamera(
             if (diariesIndex < maxDiariesIndex && contenuePage.source!.includes("diaries")) {
                 contenuePage.source = `images/diaries${++diariesIndex}_${ship.languageValue}.png`;
             }
+            if (diariesIndex < maxExplorersIndex && contenuePage.source!.includes("explorers")) {
+                contenuePage.source = `images/explorers${++explorersIndex}_${ship.languageValue}.png`;
+            }
         } else if (event.key === "ArrowLeft" && !affichePage) {
             if (index > 0 && contenuePage.source!.includes("doc")) {
                 contenuePage.source = `images/doc${--index}.jpg`;
             }
             if (diariesIndex > 0 && contenuePage.source!.includes("diaries")) {
                 contenuePage.source = `images/diaries${--diariesIndex}_${ship.languageValue}.png`;
+            }
+            if (diariesIndex > 0 && contenuePage.source!.includes("explorers")) {
+                contenuePage.source = `images/explorers${--explorersIndex}_${ship.languageValue}.png`;
             }
         } else if (event.code === "Space" && !affichePage) {
             displayDocument(canvas, controls, ship.languageValue);
@@ -140,34 +148,43 @@ export function createFPSCamera(
     return camera;
 }
 
-function updateDiariesIndex(nightmareIndex: number): void {
+function updateIndex(nightmareIndex: number): void {
     switch (nightmareIndex) {
         case 0:
             maxDiariesIndex = 0;
+            maxExplorersIndex = 0;
             break;
         case 1:
             maxDiariesIndex = 5;
+            maxExplorersIndex = 5;
             break;
         case 2:
             maxDiariesIndex = 10;
+            maxExplorersIndex = 10;
             break;
         case 3:
             maxDiariesIndex = 8;
+            maxExplorersIndex = 8;
             break;
         case 4:
             maxDiariesIndex = 8;
+            maxExplorersIndex = 8;
             break;
         case 5:
             maxDiariesIndex = 8;
+            maxExplorersIndex = 8;
             break;
         case 6:
             maxDiariesIndex = 8;
+            maxExplorersIndex = 8;
             break;
         case 7:
             maxDiariesIndex = 8;
+            maxExplorersIndex = 8;
             break;
         default:
             maxDiariesIndex = 0;
+            maxExplorersIndex = 0;
             break;
     }
 }
@@ -239,6 +256,9 @@ export function displayedItem(
                     diariesIndex = objectiveSystem.getNightmareIndex();
                     contenuePage.source = `images/diaries${diariesIndex}_${language}.png`;
                 }
+                break;
+            case "explorer":
+                contenuePage = new Image("", `images/explorers0_${language}.png`);
                 break;
             default:
                 contenuePage = new Image("", "");

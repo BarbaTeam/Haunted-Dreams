@@ -36,6 +36,7 @@ export class ShipControls{
     private hoveringTelephone = false;
     private hoveringPhoto = false;
     private hoveringPaperSheet = false;
+    private hoveringExplorerSheet = false;
     private hoveringDiaries = false;
     private hoveringMotor = false
     private hoveringUp = false;
@@ -131,6 +132,10 @@ export class ShipControls{
     
     public isHoveringPaperSheet(): boolean {
         return this.hoveringPaperSheet;
+    }
+
+    public isHoveringExplorerSheet(): boolean {
+        return this.hoveringExplorerSheet;
     }
 
     public isHoveringDiaries(): boolean {
@@ -347,7 +352,9 @@ export class ShipControls{
             displayDocument(this.canvas, this, this.ship.languageValue, this.objectiveSystem, "doc");
         } else if (this.hoveringDiaries) {
             displayDocument(this.canvas, this,this.ship.languageValue, this.objectiveSystem, "diaries");
-        }   
+        } else if(this.hoveringExplorerSheet) {
+            displayDocument(this.canvas, this,this.ship.languageValue, this.objectiveSystem, "explorer");
+        }
         else if (this.isHoveringSomeButtonForNavDoor()) {
             this.toggleDoor(this.ship.getDoorByName("nav")!);
         }
@@ -431,6 +438,7 @@ export class ShipControls{
             this.hoveringMotor = hit?.pickedMesh === this.ship.getButtonMotor();
             this.hoveringTelephone = hit?.pickedMesh === this.ship.getTelephone();
             this.hoveringPaperSheet = hit?.pickedMesh === this.ship.getPaperSheet();
+            this.hoveringExplorerSheet = hit?.pickedMesh === this.ship.getExplorerSheet();
             this.hoveringDiaries = hit?.pickedMesh === this.ship.getDiaries();
             this.hoveringbuttonDoorMotor1 = hit?.pickedMesh=== this.ship.getButtonDoorMotor()[0];
             this.hoveringbuttonDoorMotor2 = hit?.pickedMesh=== this.ship.getButtonDoorMotor()[1];
@@ -462,6 +470,7 @@ export class ShipControls{
                 { mesh: this.ship.getButtonMotor(), hovering: this.hoveringMotor },
                 { mesh: this.ship.getPaperSheet(), hovering: this.hoveringPaperSheet },
                 { mesh: this.ship.getDiaries(), hovering: this.hoveringDiaries },
+                {mesh : this.ship.getExplorerSheet(), hovering: this.hoveringPaperSheet},
                 { mesh: this.ship.getTelephone(), hovering: this.hoveringTelephone },
                 { mesh: this.ship.getButtonDoorMotor()[0], hovering: this.hoveringbuttonDoorMotor1},
                 { mesh: this.ship.getButtonDoorMotor()[1], hovering: this.hoveringbuttonDoorMotor2},
