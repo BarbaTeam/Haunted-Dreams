@@ -20,7 +20,7 @@ import { HostilitySystem } from "./HostilitySystem";
 import { Ship } from "./Ship";
 import { ObjectiveSystem } from "./ObjectiveSystem";
 
-let affichePage = true;
+let affichePage = false;
 let advancedTexture: AdvancedDynamicTexture | null = null;
 let contenuePage: Image | null = null;
 let docIndex = 0;
@@ -68,11 +68,11 @@ export function createFPSCamera(
 
     // Pointer lock control
     canvas.addEventListener("click", () => {
-        affichePage ? canvas.requestPointerLock() : document.exitPointerLock();
+        !affichePage ? canvas.requestPointerLock() : document.exitPointerLock();
     });
 
     document.addEventListener("pointerlockchange", () => {
-        if (affichePage) {
+        if (!affichePage) {
             document.addEventListener("mousemove", mouseMove);
         } else {
             document.removeEventListener("mousemove", mouseMove);
@@ -104,7 +104,7 @@ export function createFPSCamera(
         if (!contenuePage) return;
 
         updateIndex(objectiveSystem.getNightmareIndex());
-        if (event.key === "ArrowRight" && !affichePage) {
+        if (event.key === "ArrowRight" && affichePage) {
             if (docIndex < maxDocIndex && contenuePage.source!.includes("doc")) {
                 contenuePage.source = `images/doc${++docIndex}_${ship.languageValue}.jpg`;
             }
@@ -114,7 +114,7 @@ export function createFPSCamera(
             if (diariesIndex < maxExplorersIndex && contenuePage.source!.includes("explorers")) {
                 contenuePage.source = `images/explorers${++explorersIndex}_${ship.languageValue}.png`;
             }
-        } else if (event.key === "ArrowLeft" && !affichePage) {
+        } else if (event.key === "ArrowLeft" && affichePage) {
             if (docIndex > 0 && contenuePage.source!.includes("doc")) {
                 contenuePage.source = `images/doc${--docIndex}_${ship.languageValue}.jpg`;            
             }
@@ -124,7 +124,7 @@ export function createFPSCamera(
             if (diariesIndex > 0 && contenuePage.source!.includes("explorers")) {
                 contenuePage.source = `images/explorers${--explorersIndex}_${ship.languageValue}.png`;
             }
-        } else if (event.code === "Space" && !affichePage) {
+        } else if (event.code === "Space" && affichePage) {
             displayDocument(canvas, controls, ship.languageValue, keyBindings);
         }
     });
@@ -201,7 +201,7 @@ function updateIndex(nightmareIndex: number): void {
 }
 
 function mouseMove(event: MouseEvent) {
-    if (!camera || !affichePage) return;
+    if (!camera || affichePage) return;
 
     const rotationSpeed = 0.002;
     camera.rotation.y += event.movementX * rotationSpeed;
@@ -227,7 +227,7 @@ export function displayedItem(
 
     contenuePage = null;
 
-    if (affichePage) {
+    if (!affichePage) {
         // Gameplay mode
         controls.enableEvents();
         camera.keysUp = [keyBindings["Forward"].toUpperCase().charCodeAt(0)];
@@ -237,6 +237,8 @@ export function displayedItem(
 
         console.log("Camera keys: ", camera.keysUp, camera.keysDown, camera.keysRight, camera.keysLeft);
         const crosshair = Button.CreateImageOnlyButton("crosshair", "images/circle.svg");
+        crosshair.isHitTestVisible = false;
+        crosshair.isPointerBlocker = false; 
         crosshair.width = "15px";
         crosshair.height = "15px";
         crosshair.thickness = 0;

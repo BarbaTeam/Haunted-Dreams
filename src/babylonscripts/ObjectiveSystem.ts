@@ -27,8 +27,8 @@ export class ObjectiveSystem {
             nmAngle : 5.10
         },
         {
-            nmAmplitude : 0.50,
-            nmFrequency : 6.20,
+            nmAmplitude : 0.80,
+            nmFrequency : 7.40,
             nmAngle : 3.30
         },
         {
@@ -37,8 +37,8 @@ export class ObjectiveSystem {
             nmAngle : 1.20
         },
         {
-            nmAmplitude : 1.00,
-            nmFrequency : 6.00,
+            nmAmplitude : 0.20,
+            nmFrequency : 1.20,
             nmAngle : 5.70
         },
         {
