@@ -12,6 +12,8 @@ export class MainMenu {
     canvas: HTMLCanvasElement;
 
     private subtitlesEnabled = true;
+    private intro = true;
+
     private keyBindings: { [action: string]: string } = {
         "Forward": "z",
         "Backward": "s",
@@ -28,24 +30,30 @@ export class MainMenu {
         settings: string;
         language: string;
         subtitles: string;
+        intro: string;
         back: string;
-        keys: string;
+        keys: string,
+        keysConfig: string;
     }> = {
         fr: {
             play: "Jouer",
             settings: "Paramètres",
             language: "Langue: Français",
-            subtitles: "Sous-titres: Activés",
+            subtitles: "Sous-titres",
+            intro : "Introduction",
             back: "Retour",
-            keys: "Touches"
+            keys: "Touches",
+            keysConfig: "Configuration des touches"
         },
         en: {
             play: "Play",
             settings: "Settings",
             language: "Language: English",
-            subtitles: "Subtitles: Enabled",
+            subtitles: "Subtitles",
+            intro : "Introduction",
             back: "Back",
-            keys: "Keys"
+            keys: "Keys",
+            keysConfig: "Keys configuration"
         }
     };
     
@@ -98,7 +106,7 @@ export class MainMenu {
         playButton.onPointerUpObservable.add(() => this.startGame());
         advancedTexture.addControl(playButton);
 
-        const settingsButton = this.createButton("settingsButton", this.texts[this.language].settings, "350px", "200px", "50px", 20);
+        const settingsButton = this.createButton("settingsButton", this.texts[this.language].settings, "350px", "200px", "50px", 30);
         settingsButton.onPointerUpObservable.add(() => this.showSettingsMenu(advancedTexture));
         advancedTexture.addControl(settingsButton);
 
@@ -109,17 +117,47 @@ export class MainMenu {
         this.mainMenuButtons.forEach(btn => advancedTexture.removeControl(btn));
         const inputFields: Button[] = [];
 
-        const languageButton = this.createButton("languageButton", this.texts[this.language].language, "-40px");
+        const optionTitle = this.createButton("optionTitle", "Options", "-380px", "300px", "50px", 25);
+        optionTitle.isEnabled = false;
+        advancedTexture.addControl(optionTitle);
+        inputFields.push(optionTitle);
+
+        const languageButton = this.createButton("languageButton", this.texts[this.language].language, "-330px");
         languageButton.onPointerUpObservable.add(() => this.toggleLanguage(languageButton));
         advancedTexture.addControl(languageButton);
         inputFields.push(languageButton);
 
-        const subtitlesButton = this.createButton("subtitlesButton", this.texts[this.language].subtitles, "10px");
+        const subtitlesButton = this.createButton("subtitlesButton", `${this.texts[this.language].subtitles}: ${this.language === "fr" ? this.subtitlesEnabled ? "Activés" : "Désactivés" : this.subtitlesEnabled ? "Enabled" : "Disabled"}`, "-280px");
         subtitlesButton.onPointerUpObservable.add(() => this.toggleSubtitles(subtitlesButton));
         advancedTexture.addControl(subtitlesButton);
         inputFields.push(subtitlesButton);
 
-        const mappingTitle = this.createButton("mappingTitle", this.texts[this.language].keys, "80px", "200px", "50px", 20);
+        const skipIntroButton = this.createButton("skipIntroButton", `${this.texts[this.language].intro}: ${this.language === "fr" ? this.intro ? "Activés" : "Désactivés" : this.intro ? "Enabled" : "Disabled"}`, "-230px");
+        skipIntroButton.onPointerUpObservable.add(() => this.toggleIntro(skipIntroButton));
+        advancedTexture.addControl(skipIntroButton);
+        inputFields.push(skipIntroButton);
+
+        const keysTitle = this.createButton("keysTitle", `${this.texts[this.language].keys} (locked)`, "-150px", "300px", "50px", 25);
+        keysTitle.isEnabled = false;
+        advancedTexture.addControl(keysTitle);
+        inputFields.push(keysTitle);
+
+        const zoomButton = this.createButton("zoom", `Zoom (Button 2)`, "-100px", "300px", "50px");
+        zoomButton.isEnabled = false;
+        advancedTexture.addControl(zoomButton);
+        inputFields.push(zoomButton);
+
+        const interactionButton = this.createButton("interaction", `Interaction (Button 1)`, "-50px", "300px", "50px");
+        interactionButton.isEnabled = false;
+        advancedTexture.addControl(interactionButton);
+        inputFields.push(interactionButton);
+
+        const quitDocumentViewButton = this.createButton("quitDocumentView", `Quit Document View (Space)`, "0px", "300px", "50px");
+        quitDocumentViewButton.isEnabled = false;
+        advancedTexture.addControl(quitDocumentViewButton);
+        inputFields.push(quitDocumentViewButton);
+
+        const mappingTitle = this.createButton("mappingTitle", this.texts[this.language].keysConfig, "80px", "300px", "50px", 25);
         mappingTitle.isEnabled = false;
         advancedTexture.addControl(mappingTitle);
         inputFields.push(mappingTitle);
@@ -139,7 +177,7 @@ export class MainMenu {
             inputFields.push(inputButton);
         });
 
-        const backButton = this.createButton("backButton", this.texts[this.language].back, "350px", "150px", "40px");
+        const backButton = this.createButton("backButton", this.texts[this.language].back, "350px", "200px", "40px", 25);
         backButton.onPointerUpObservable.add(() => {
             inputFields.forEach(field => advancedTexture.removeControl(field));
             advancedTexture.removeControl(backButton);
@@ -177,7 +215,12 @@ export class MainMenu {
 
     private toggleSubtitles(subtitlesButton: Button): void {
         this.subtitlesEnabled = !this.subtitlesEnabled;
-        subtitlesButton.textBlock!.text = `Sous-titres: ${this.subtitlesEnabled ? "Activés" : "Désactivés"}`;
+        subtitlesButton.textBlock!.text = `${this.texts[this.language].subtitles}: ${this.language === "fr" ? this.subtitlesEnabled ? "Activés" : "Désactivés" : this.subtitlesEnabled ? "Enabled" : "Disabled"}`;
+    }
+
+    private toggleIntro(skipIntroButton: Button): void {
+        this.intro = !this.intro;
+        skipIntroButton.textBlock!.text = `${this.texts[this.language].intro}: ${this.language === "fr" ? this.intro ? "Activés" : "Désactivés" : this.intro ? "Enabled" : "Disabled"}`;
     }
 
     private startGame(): void {
@@ -187,6 +230,6 @@ export class MainMenu {
         console.log(`Touch Bindings:`, this.keyBindings);
 
         this.scene.dispose();
-        new Ship(this.canvas, this.language, this.subtitlesEnabled, this.keyBindings);
+        new Ship(this.canvas, this.language, this.subtitlesEnabled, this.keyBindings, this.intro);
     }
 }

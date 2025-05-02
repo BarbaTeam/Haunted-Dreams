@@ -405,7 +405,7 @@ export class ShipControls{
     handleKeyDown(event: KeyboardEvent): void {
         
         const key = event.code; // Utilisation de event.code pour garantir la compatibilité AZERTY/QWERTY
-        if (["KeyW", "KeyA", "KeyS", "KeyD"].includes(key) && getAffichePage()) {
+        if (["KeyW", "KeyA", "KeyS", "KeyD"].includes(key) && !getAffichePage()) {
             this.pressedKeys.add(key);
             if (this.shipSounds.getMetalFootSteps() && !this.shipSounds.getMetalFootSteps().isPlaying && !this.shipSounds.leftSpaceShip()) {
                 this.shipSounds.getMetalFootSteps().play();
@@ -415,7 +415,7 @@ export class ShipControls{
 
     handleKeyUp(event: KeyboardEvent): void {
         const key = event.code;
-        if (["KeyW", "KeyA", "KeyS", "KeyD"].includes(key) && getAffichePage()) {
+        if (["KeyW", "KeyA", "KeyS", "KeyD"].includes(key) && !getAffichePage()) {
             this.pressedKeys.delete(key);
             if (this.pressedKeys.size === 0 && this.shipSounds.getMetalFootSteps()  && this.shipSounds.getMetalFootSteps().isPlaying) {
                 this.shipSounds.getMetalFootSteps().stop();

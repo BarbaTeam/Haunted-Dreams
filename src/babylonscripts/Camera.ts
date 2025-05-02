@@ -111,7 +111,7 @@ export function createFPSCamera(
             if (diariesIndex < maxDiariesIndex && contenuePage.source!.includes("diaries")) {
                 contenuePage.source = `images/diaries${++diariesIndex}_${ship.languageValue}.png`;
             }
-            if (diariesIndex < maxExplorersIndex && contenuePage.source!.includes("explorers")) {
+            if (explorersIndex < maxExplorersIndex && contenuePage.source!.includes("explorers")) {
                 contenuePage.source = `images/explorers${++explorersIndex}_${ship.languageValue}.png`;
             }
         } else if (event.key === "ArrowLeft" && affichePage) {
@@ -121,7 +121,7 @@ export function createFPSCamera(
             if (diariesIndex > 0 && contenuePage.source!.includes("diaries")) {
                 contenuePage.source = `images/diaries${--diariesIndex}_${ship.languageValue}.png`;
             }
-            if (diariesIndex > 0 && contenuePage.source!.includes("explorers")) {
+            if (explorersIndex > 0 && contenuePage.source!.includes("explorers")) {
                 contenuePage.source = `images/explorers${--explorersIndex}_${ship.languageValue}.png`;
             }
         } else if (event.code === "Space" && affichePage) {
@@ -152,50 +152,50 @@ export function createFPSCamera(
 
 function updateIndex(nightmareIndex: number): void {
     switch (nightmareIndex) {
-        case 0:
+        case 0: // pour trouver les parents
             maxDocIndex = 0;
             maxDiariesIndex = 0;
-            maxExplorersIndex = 0;
+            maxExplorersIndex = 1;
             break;
-        case 1:
+        case 1: // pour trouver les escaliers
+            maxDocIndex = 1;
+            maxDiariesIndex = 6;
+            maxExplorersIndex = 4;
+            break;
+        case 2: // pour trouver la chose rampante
             maxDocIndex = 2;
-            maxDiariesIndex = 5;
-            maxExplorersIndex = 5;
+            maxDiariesIndex = 11;
+            maxExplorersIndex = 7;
             break;
-        case 2:
-            maxDocIndex = 4;
-            maxDiariesIndex = 10;
-            maxExplorersIndex = 10;
-            break;
-        case 3:
-            maxDocIndex = 6;
-            maxDiariesIndex = 8;
-            maxExplorersIndex = 8;
+        case 3: // pour trouver sally 
+            maxDocIndex = 3;
+            maxDiariesIndex = 21;
+            maxExplorersIndex = 7;
             break;
         case 4:
-            maxDocIndex = 8;
-            maxDiariesIndex = 8;
-            maxExplorersIndex = 8;
+            maxDocIndex = 3;
+            maxDiariesIndex = 21;
+            maxExplorersIndex = 7;
             break;
         case 5:
-            maxDocIndex = 10;
-            maxDiariesIndex = 8;
-            maxExplorersIndex = 8;
+            maxDocIndex = 3;
+            maxDiariesIndex = 21;
+            maxExplorersIndex = 7;
             break;
         case 6:
-            maxDocIndex = 12;
-            maxDiariesIndex = 8;
-            maxExplorersIndex = 8;
+            maxDocIndex = 3;
+            maxDiariesIndex = 21;
+            maxExplorersIndex = 7;
             break;
         case 7:
-            maxDocIndex = 14;
-            maxDiariesIndex = 8;
-            maxExplorersIndex = 8;
+            maxDocIndex = 3;
+            maxDiariesIndex = 21;
+            maxExplorersIndex = 7;
             break;
         default:
-            maxDocIndex = 16;
-            maxDiariesIndex = 0;
-            maxExplorersIndex = 0;
+            maxDocIndex = 3;
+            maxDiariesIndex = 21;
+            maxExplorersIndex = 7;
             break;
     }
 }
@@ -273,7 +273,7 @@ export function displayedItem(
                 }
                 break;
             case "explorer":
-                contenuePage = new Image("", `images/explorers0_${language}.png`);
+                contenuePage = new Image("", `images/explorers${explorersIndex}_${language}.png`);
                 break;
             default:
                 contenuePage = new Image("", "");

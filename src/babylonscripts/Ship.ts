@@ -62,7 +62,7 @@ export class Ship {
     private shipSounds: ShipSounds;
     private hostilitySystem: HostilitySystem;
 
-    constructor(private canvas: HTMLCanvasElement, private language: string, private subtitlesEnabled: boolean, private keyBindings: { [action: string]: string }
+    constructor(private canvas: HTMLCanvasElement, private language: string, private subtitlesEnabled: boolean, private keyBindings: { [action: string]: string}, private intro: boolean
     ) {
         this.engine = new Engine(this.canvas, true);
         this.scene = this.createScene();
@@ -91,7 +91,6 @@ export class Ship {
         this.hostilitySystem.setObjectiveSystem(this.objectiveSystem);
         this.hostilitySystem.setShipControls(this.shipControls);
 
-        
         const isLocked = false;
         this.scene.onPointerDown = function () {
             if (!isLocked) {
@@ -310,7 +309,6 @@ export class Ship {
             this.navigationSystem.updateSineWave();   
             this.navigationSystem.updateDataScreen(); 
             this.navigationSystem.updateBoussoleScreen();
-            
         });
     }
 
@@ -323,6 +321,10 @@ export class Ship {
 
     public get languageValue(): string {
         return this.language;
+    }
+
+    public get introValue(): boolean {
+        return this.intro;
     }
 
     public get subtitlesEnabledValue(): boolean {

@@ -21,10 +21,13 @@ export class NarrationSystem {
         this.scene = scene;
         this.ship = ship;
         this.subtitles = new SubtitleSystem(this.ship.subtitlesEnabledValue)
-        this.ringTone = new Sound("", "sons/ringtone.mp3", this.scene, null, { volume: 0.5, autoplay: false, loop: true, spatialSound: true, maxDistance: 40});
-        this.ringTone.setPosition(new Vector3(10, 12, 22));
-
-
+        if(ship.introValue){
+            this.ringTone = new Sound("", "sons/ringtone.mp3", this.scene, null, { volume: 0.5, autoplay: false, loop: true, spatialSound: true, maxDistance: 40});
+            this.ringTone.setPosition(new Vector3(10, 12, 22));
+        }
+        else {
+            this.ringTone = new Sound("", "", this.scene, null, { volume: 0.5, autoplay: false, loop: false});
+        }
         this.narratorVoices = [
                     new Sound("", "sons/intro.mp3", this.scene, null, { volume: 2, autoplay: false, loop: false }),
                     new Sound("", "sons/tuto1.mp3", this.scene, null, { volume: 2, autoplay: false, loop: false }),
@@ -62,7 +65,6 @@ export class NarrationSystem {
         else {
             setTimeout(()=>{
                 this.narratorVoices[0].play();
-                this.narratorVoices[0].setPlaybackRate(1000) ;
                 if(this.ship.languageValue === "fr"){
                     this.subtitles.showSubtitles([
                         { text: "Bonjour !", duration: 1000 },
@@ -113,7 +115,6 @@ export class NarrationSystem {
                 }
                 this.narratorVoices[0].onEndedObservable.add(() => {
                     this.narratorVoices[1].play();
-                    this.narratorVoices[1].setPlaybackRate(1000) ;
                     if(this.ship.languageValue === "fr"){
                         this.subtitles.showSubtitles([
                             { text: "Tout d’abord...", duration: 1000},
@@ -142,7 +143,6 @@ export class NarrationSystem {
             },1000); 
             this.narratorVoices[1].onEndedObservable.add(() => {
                 this.narratorVoices[2].play();
-                this.narratorVoices[2].setPlaybackRate(1000) ;
 
                 if(this.ship.languageValue === "fr"){
                     this.subtitles.showSubtitles([
@@ -166,7 +166,6 @@ export class NarrationSystem {
             });
             this.narratorVoices[2].onEndedObservable.add(() => {
                 this.narratorVoices[3].play();
-                this.narratorVoices[3].setPlaybackRate(1000) ;
 
                 if(this.ship.languageValue === "fr"){
 
@@ -462,6 +461,5 @@ export class NarrationSystem {
     
         return plane;
     }
-
-}
+}   
 
