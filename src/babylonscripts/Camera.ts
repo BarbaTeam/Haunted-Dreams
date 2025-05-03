@@ -28,7 +28,7 @@ let affichePage = false;
 let advancedTexture: AdvancedDynamicTexture | null = null;
 let contenuePage: Image | null = null;
 let caption : TextBlock;
-
+let indication : string;
 let docIndex = 0;
 let maxDocIndex = 0;
 let maxDiariesIndex = 0;
@@ -60,6 +60,8 @@ export function createFPSCamera(
     camera.speed = 5.5;
     camera.angularSensibility = 4000;
     camera.fov = 1.2;
+
+    indication = `${ship.languageValue === "fr" ? "Appuyez <Espace> pour quitter" : "Press <Space> to quit"}`
 
     advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("UI", true, scene);
 
@@ -126,31 +128,31 @@ export function createFPSCamera(
         if (!contenuePage || !contenuePage.isLoaded) return;
         updateIndex(objectiveSystem.getNightmareIndex());
 
-        if (event.key === "ArrowRight" && affichePage) {
+        if (event.key.toLowerCase() === keyBindings["Right"].toLowerCase() && affichePage) {
             if (contenuePage.source!.includes("doc") && docIndex < maxDocIndex) {
                 contenuePage.source = `images/doc${++docIndex}_${ship.languageValue}.jpg`;
-                caption.text = `${docIndex+1}/${maxDocIndex+1}`
+                caption.text = `${indication} \n${docIndex+1}/${maxDocIndex+1}`
             }
             if (contenuePage.source!.includes("diaries") && diariesIndex < maxDiariesIndex) {
                 contenuePage.source = `images/diaries${++diariesIndex}_${ship.languageValue}.png`;
-                caption.text = `${diariesIndex+1}/${maxDiariesIndex+1}`
+                caption.text = `${indication} \n${diariesIndex+1}/${maxDiariesIndex+1}`
             }
             if (contenuePage.source!.includes("explorers") && explorersIndex < maxExplorersIndex) {
                 contenuePage.source = `images/explorers${++explorersIndex}_${ship.languageValue}.png`;
-                caption.text = `${explorersIndex+1}/${maxExplorersIndex+1}`
+                caption.text = `${indication} \n${explorersIndex+1}/${maxExplorersIndex+1}`
             }
-        } else if (event.key === "ArrowLeft" && affichePage) {
+        } else if (event.key.toLowerCase() === keyBindings["Left"].toLowerCase() && affichePage) {
             if (contenuePage.source!.includes("doc") && docIndex > 0) {
                 contenuePage.source = `images/doc${--docIndex}_${ship.languageValue}.jpg`;
-                caption.text = `${docIndex+1}/${maxDocIndex+1}`
+                caption.text = `${indication} \n${docIndex+1}/${maxDocIndex+1}`
             }
             if (contenuePage.source!.includes("diaries") && diariesIndex > 0) {
                 contenuePage.source = `images/diaries${--diariesIndex}_${ship.languageValue}.png`;
-                caption.text = `${diariesIndex+1}/${maxDiariesIndex+1}`
+                caption.text = `${indication} \n${diariesIndex+1}/${maxDiariesIndex+1}`
             }
             if (contenuePage.source!.includes("explorers") && explorersIndex > 0) {
                 contenuePage.source = `images/explorers${--explorersIndex}_${ship.languageValue}.png`;
-                caption.text = `${explorersIndex+1}/${maxExplorersIndex+1}`
+                caption.text = `${indication} \n${explorersIndex+1}/${maxExplorersIndex+1}`
             }
         } else if (event.code === "Space" && affichePage) {
             displayDocument(canvas, controls, ship.languageValue, keyBindings, objectiveSystem);
@@ -181,13 +183,15 @@ export function createFPSCamera(
 
 function updateIndex(nightmareIndex: number): void {
     switch (nightmareIndex) {
-        case 0: maxDocIndex = 0; maxDiariesIndex = 0; maxExplorersIndex = 1; break;
-        case 1: maxDocIndex = 1; maxDiariesIndex = 6; maxExplorersIndex = 4; break;
-        case 2: maxDocIndex = 2; maxDiariesIndex = 11; maxExplorersIndex = 7; break;
-        case 3: case 4: case 5: case 6: case 7:
-            maxDocIndex = 3; maxDiariesIndex = 21; maxExplorersIndex = 7; break;
+        case 0: maxDocIndex = 0; maxDiariesIndex = 0; maxExplorersIndex = 1; break; //la famille
+        case 1: maxDocIndex = 1; maxDiariesIndex = 6; maxExplorersIndex = 4; break; //les escaliers
+        case 2: maxDocIndex = 2; maxDiariesIndex = 11; maxExplorersIndex = 7; break; //la chose rampante
+        case 3: maxDocIndex = 3; maxDiariesIndex = 21; maxExplorersIndex = 7; break; //sally
+        case 4: maxDocIndex = 3; maxDiariesIndex = 27; maxExplorersIndex = 10; break; 
+        case 5: case 6: case 7:
+            maxDocIndex = 3; maxDiariesIndex = 27; maxExplorersIndex = 13; break; 
         default:
-            maxDocIndex = 3; maxDiariesIndex = 21; maxExplorersIndex = 7;
+            maxDocIndex = 3; maxDiariesIndex = 27; maxExplorersIndex = 13;
     }
 }
 
@@ -253,6 +257,7 @@ export function displayedItem(
         caption.textWrapping = true;
         caption.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         caption.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+
         if(objectiveSystem)
             updateIndex(objectiveSystem.getNightmareIndex());
 
@@ -260,20 +265,20 @@ export function displayedItem(
         switch (type) {
             case "doc":
                 contenuePage = new Image("", `images/doc${docIndex}_${language}.jpg`);
-                caption.text = `${docIndex+1}/${maxDocIndex+1}`
+                caption.text = `${indication} \n${docIndex+1}/${maxDocIndex+1}`
                 break;
             case "diaries":
                 contenuePage = new Image("", "");
                 if (objectiveSystem) {
                     contenuePage.source = `images/diaries${diariesIndex}_${language}.png`;
-                    caption.text = `${diariesIndex+1}/${maxDiariesIndex+1}`
+                    caption.text = `${indication} \n${diariesIndex+1}/${maxDiariesIndex+1}`
                 }
                 break;
             case "explorer":
                 contenuePage = new Image("", `images/explorers${explorersIndex}_${language}.png`);
                 console.log(explorersIndex);
                 console.log(maxExplorersIndex);
-                caption.text = `${explorersIndex+1}/${maxExplorersIndex+1}`
+                caption.text = `${indication} \n${explorersIndex+1}/${maxExplorersIndex+1}`
                 break;
             default:
                 contenuePage = new Image("", "");
