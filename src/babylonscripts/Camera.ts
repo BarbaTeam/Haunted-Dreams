@@ -1,3 +1,4 @@
+// Imports nécessaires
 import {
     Scene,
     Vector3,
@@ -11,7 +12,10 @@ import {
     AdvancedDynamicTexture,
     Button,
     Image,
-    Grid
+    Grid,
+    StackPanel,
+    TextBlock,
+    Control
 } from "@babylonjs/gui";
 
 import { ShipControls } from "./ShipControls";
@@ -23,6 +27,8 @@ import { ObjectiveSystem } from "./ObjectiveSystem";
 let affichePage = false;
 let advancedTexture: AdvancedDynamicTexture | null = null;
 let contenuePage: Image | null = null;
+let caption : TextBlock;
+
 let docIndex = 0;
 let maxDocIndex = 0;
 let maxDiariesIndex = 0;
@@ -31,6 +37,7 @@ let diariesIndex = 0;
 let explorersIndex = 0;
 let camera: UniversalCamera | null = null;
 let pageZoom = false;
+let isZooming = false;
 
 export function createFPSCamera(
     scene: Scene,
@@ -66,7 +73,42 @@ export function createFPSCamera(
         effect.setFloat("grainy", 1.0);
     };
 
-    // Pointer lock control
+    // Zoom animation
+    const defaultFov = camera.fov;
+    const zoomedFov = 0.8;
+
+    function animateFov(from: number, to: number, duration: number): void {
+        if (!camera) return;
+        const start = performance.now();
+        const step = (now: number) => {
+            const progress = Math.min((now - start) / duration, 1);
+            camera!.fov = from + (to - from) * progress;
+            if (progress < 1) {
+                requestAnimationFrame(step);
+            }
+        };
+        requestAnimationFrame(step);
+    }
+
+    canvas.addEventListener("mousedown", (event) => {
+        if (event.button === 2 && !isZooming) {
+            isZooming = true;
+            animateFov(camera!.fov, zoomedFov, 150);
+            event.preventDefault();
+        }
+    });
+
+    canvas.addEventListener("mouseup", (event) => {
+        if (event.button === 2) {
+            animateFov(camera!.fov, defaultFov, 150);
+            setTimeout(() => { isZooming = false; }, 150);
+            event.preventDefault();
+        }
+    });
+
+    canvas.addEventListener("contextmenu", (event) => event.preventDefault());
+
+    // Pointer lock
     canvas.addEventListener("click", () => {
         !affichePage ? canvas.requestPointerLock() : document.exitPointerLock();
     });
@@ -79,60 +121,47 @@ export function createFPSCamera(
         }
     });
 
-    // Zoom with right click
-    const defaultFov = camera.fov;
-    const zoomedFov = 0.8;
-
-    canvas.addEventListener("mousedown", (event) => {
-        if (event.button === 2) {
-            camera!.fov = zoomedFov;
-            event.preventDefault();
-        }
-    });
-
-    canvas.addEventListener("mouseup", (event) => {
-        if (event.button === 2) {
-            camera!.fov = defaultFov;
-            event.preventDefault();
-        }
-    });
-
-    canvas.addEventListener("contextmenu", (event) => event.preventDefault());
-
-    // Handle document navigation
+    // Clavier
     window.addEventListener("keydown", (event: KeyboardEvent) => {
-        if (!contenuePage) return;
-
+        if (!contenuePage || !contenuePage.isLoaded) return;
         updateIndex(objectiveSystem.getNightmareIndex());
+
         if (event.key === "ArrowRight" && affichePage) {
-            if (docIndex < maxDocIndex && contenuePage.source!.includes("doc")) {
+            if (contenuePage.source!.includes("doc") && docIndex < maxDocIndex) {
                 contenuePage.source = `images/doc${++docIndex}_${ship.languageValue}.jpg`;
+                caption.text = `${docIndex+1}/${maxDocIndex+1}`
             }
-            if (diariesIndex < maxDiariesIndex && contenuePage.source!.includes("diaries")) {
+            if (contenuePage.source!.includes("diaries") && diariesIndex < maxDiariesIndex) {
                 contenuePage.source = `images/diaries${++diariesIndex}_${ship.languageValue}.png`;
+                caption.text = `${diariesIndex+1}/${maxDiariesIndex+1}`
             }
-            if (explorersIndex < maxExplorersIndex && contenuePage.source!.includes("explorers")) {
+            if (contenuePage.source!.includes("explorers") && explorersIndex < maxExplorersIndex) {
                 contenuePage.source = `images/explorers${++explorersIndex}_${ship.languageValue}.png`;
+                caption.text = `${explorersIndex+1}/${maxExplorersIndex+1}`
             }
         } else if (event.key === "ArrowLeft" && affichePage) {
-            if (docIndex > 0 && contenuePage.source!.includes("doc")) {
-                contenuePage.source = `images/doc${--docIndex}_${ship.languageValue}.jpg`;            
+            if (contenuePage.source!.includes("doc") && docIndex > 0) {
+                contenuePage.source = `images/doc${--docIndex}_${ship.languageValue}.jpg`;
+                caption.text = `${docIndex+1}/${maxDocIndex+1}`
             }
-            if (diariesIndex > 0 && contenuePage.source!.includes("diaries")) {
+            if (contenuePage.source!.includes("diaries") && diariesIndex > 0) {
                 contenuePage.source = `images/diaries${--diariesIndex}_${ship.languageValue}.png`;
+                caption.text = `${diariesIndex+1}/${maxDiariesIndex+1}`
             }
-            if (explorersIndex > 0 && contenuePage.source!.includes("explorers")) {
+            if (contenuePage.source!.includes("explorers") && explorersIndex > 0) {
                 contenuePage.source = `images/explorers${--explorersIndex}_${ship.languageValue}.png`;
+                caption.text = `${explorersIndex+1}/${maxExplorersIndex+1}`
             }
         } else if (event.code === "Space" && affichePage) {
-            displayDocument(canvas, controls, ship.languageValue, keyBindings);
+            displayDocument(canvas, controls, ship.languageValue, keyBindings, objectiveSystem);
         }
     });
 
-    // Ship exit trigger
+    // Sortie du vaisseau
     let hasLeftSpaceShip = false;
     scene.onBeforeRenderObservable.add(() => {
-        const camPos = camera!.position;
+        if (!camera) return;
+        const camPos = camera.position;
 
         if (camPos.z < -20 && !hasLeftSpaceShip) {
             hasLeftSpaceShip = true;
@@ -152,57 +181,18 @@ export function createFPSCamera(
 
 function updateIndex(nightmareIndex: number): void {
     switch (nightmareIndex) {
-        case 0: // pour trouver les parents
-            maxDocIndex = 0;
-            maxDiariesIndex = 0;
-            maxExplorersIndex = 1;
-            break;
-        case 1: // pour trouver les escaliers
-            maxDocIndex = 1;
-            maxDiariesIndex = 6;
-            maxExplorersIndex = 4;
-            break;
-        case 2: // pour trouver la chose rampante
-            maxDocIndex = 2;
-            maxDiariesIndex = 11;
-            maxExplorersIndex = 7;
-            break;
-        case 3: // pour trouver sally 
-            maxDocIndex = 3;
-            maxDiariesIndex = 21;
-            maxExplorersIndex = 7;
-            break;
-        case 4:
-            maxDocIndex = 3;
-            maxDiariesIndex = 21;
-            maxExplorersIndex = 7;
-            break;
-        case 5:
-            maxDocIndex = 3;
-            maxDiariesIndex = 21;
-            maxExplorersIndex = 7;
-            break;
-        case 6:
-            maxDocIndex = 3;
-            maxDiariesIndex = 21;
-            maxExplorersIndex = 7;
-            break;
-        case 7:
-            maxDocIndex = 3;
-            maxDiariesIndex = 21;
-            maxExplorersIndex = 7;
-            break;
+        case 0: maxDocIndex = 0; maxDiariesIndex = 0; maxExplorersIndex = 1; break;
+        case 1: maxDocIndex = 1; maxDiariesIndex = 6; maxExplorersIndex = 4; break;
+        case 2: maxDocIndex = 2; maxDiariesIndex = 11; maxExplorersIndex = 7; break;
+        case 3: case 4: case 5: case 6: case 7:
+            maxDocIndex = 3; maxDiariesIndex = 21; maxExplorersIndex = 7; break;
         default:
-            maxDocIndex = 3;
-            maxDiariesIndex = 21;
-            maxExplorersIndex = 7;
-            break;
+            maxDocIndex = 3; maxDiariesIndex = 21; maxExplorersIndex = 7;
     }
 }
 
-function mouseMove(event: MouseEvent) {
+function mouseMove(event: MouseEvent): void {
     if (!camera || affichePage) return;
-
     const rotationSpeed = 0.002;
     camera.rotation.y += event.movementX * rotationSpeed;
     camera.rotation.x += event.movementY * rotationSpeed;
@@ -220,39 +210,33 @@ export function displayedItem(
     if (!advancedTexture || !camera) return;
 
     advancedTexture.clear();
-
-    if (contenuePage?.parent) {
-        contenuePage.parent.removeControl(contenuePage);
-    }
+    contenuePage?.parent?.removeControl(contenuePage);
+    caption?.parent?.removeControl(caption);
 
     contenuePage = null;
 
     if (!affichePage) {
-        // Gameplay mode
         controls.enableEvents();
         camera.keysUp = [keyBindings["Forward"].toUpperCase().charCodeAt(0)];
         camera.keysDown = [keyBindings["Backward"].toUpperCase().charCodeAt(0)];
         camera.keysLeft = [keyBindings["Left"].toUpperCase().charCodeAt(0)];
         camera.keysRight = [keyBindings["Right"].toUpperCase().charCodeAt(0)];
 
-        console.log("Camera keys: ", camera.keysUp, camera.keysDown, camera.keysRight, camera.keysLeft);
         const crosshair = Button.CreateImageOnlyButton("crosshair", "images/circle.svg");
         crosshair.isHitTestVisible = false;
-        crosshair.isPointerBlocker = false; 
+        crosshair.isPointerBlocker = false;
         crosshair.width = "15px";
         crosshair.height = "15px";
         crosshair.thickness = 0;
         advancedTexture.addControl(crosshair);
-
         camera.attachControl(canvas, true);
         canvas.requestPointerLock();
     } else {
-        // Document display mode
         controls.disableEvents();
         camera.keysUp = [];
         camera.keysDown = [];
-        camera.keysRight = [];
         camera.keysLeft = [];
+        camera.keysRight = [];
 
         document.exitPointerLock();
 
@@ -260,20 +244,36 @@ export function displayedItem(
         page.addColumnDefinition(0.3);
         page.addColumnDefinition(0.3);
         page.addColumnDefinition(0.3);
+        
+        caption = new TextBlock();
+        caption.text = ``;
+        caption.color = "white";
+        caption.fontSize = "18px";
+        caption.height = "90%";
+        caption.textWrapping = true;
+        caption.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        caption.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+        if(objectiveSystem)
+            updateIndex(objectiveSystem.getNightmareIndex());
 
+        // Crée l'image selon le type
         switch (type) {
             case "doc":
                 contenuePage = new Image("", `images/doc${docIndex}_${language}.jpg`);
+                caption.text = `${docIndex+1}/${maxDocIndex+1}`
                 break;
             case "diaries":
                 contenuePage = new Image("", "");
                 if (objectiveSystem) {
-                    diariesIndex = objectiveSystem.getNightmareIndex();
                     contenuePage.source = `images/diaries${diariesIndex}_${language}.png`;
+                    caption.text = `${diariesIndex+1}/${maxDiariesIndex+1}`
                 }
                 break;
             case "explorer":
                 contenuePage = new Image("", `images/explorers${explorersIndex}_${language}.png`);
+                console.log(explorersIndex);
+                console.log(maxExplorersIndex);
+                caption.text = `${explorersIndex+1}/${maxExplorersIndex+1}`
                 break;
             default:
                 contenuePage = new Image("", "");
@@ -283,27 +283,44 @@ export function displayedItem(
         contenuePage.height = "100%";
         contenuePage.stretch = Image.STRETCH_UNIFORM;
 
-        page.addControl(contenuePage, 0, 1);
+        const container = new StackPanel();
+        container.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+        container.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        container.width = "100%";
+        container.height = "100%";
+
+        contenuePage.stretch = Image.STRETCH_UNIFORM;
+        contenuePage.height = "90%";
+        contenuePage.width = "100%";
+        container.addControl(contenuePage);
+        container.addControl(caption);
+
+        page.addControl(container, 0, 1);
         advancedTexture.addControl(page);
+
+        page.alpha = 0;
+        camera.getScene().onBeforeRenderObservable.add(function fadeIn() {
+            page.alpha = Math.min(1, page.alpha + 0.05);
+            if (page.alpha >= 1) {
+                camera!.getScene().onBeforeRenderObservable.removeCallback(fadeIn);
+            }
+        });
+
         camera.detachControl();
 
         contenuePage.onPointerClickObservable.add((event) => {
             pageZoom = !pageZoom;
             const zoomFactor = 2.25;
-
             if (pageZoom) {
                 const offsetX = event.x - canvas.clientWidth / 2;
                 const offsetY = event.y - canvas.clientHeight / 2;
-
                 page.left = `${-offsetX}px`;
                 page.top = `${-offsetY}px`;
                 page.width = `${zoomFactor * 100}%`;
                 page.height = `${zoomFactor * 100}%`;
             } else {
-                page.top = "0";
-                page.left = "0";
-                page.width = "100%";
-                page.height = "100%";
+                page.top = "0"; page.left = "0";
+                page.width = "100%"; page.height = "100%";
             }
         });
     }
@@ -315,10 +332,14 @@ export function displayDocument(
     language: string,
     keyBindings: { [action: string]: string },
     objectiveSystem?: ObjectiveSystem,
-    type?: string
+    type?: string,
+    shipSounds?: ShipSounds
 ): void {
     affichePage = !affichePage;
-    displayedItem(canvas, controls, language, keyBindings, objectiveSystem ,type);
+    if (shipSounds) {
+        affichePage ? shipSounds.playOpenDocument() : shipSounds.playCloseDocument();
+    }
+    displayedItem(canvas, controls, language, keyBindings, objectiveSystem, type);
 }
 
 export function getAffichePage(): boolean {
@@ -330,7 +351,6 @@ export function createMenuCamera(scene: Scene, canvas: HTMLCanvasElement): ArcRo
     camera.setPosition(new Vector3(0, 0, -15));
     camera.setTarget(Vector3.Zero());
     camera.attachControl(canvas, true);
-    camera.inputs.clear(); // Disable user control for menu
+    camera.inputs.clear();
     return camera;
 }
-
