@@ -243,75 +243,65 @@ export function displayedItem(
         camera.keysRight = [];
 
         document.exitPointerLock();
-
-        const page = new Grid();
-        page.addColumnDefinition(0.3);
-        page.addColumnDefinition(0.3);
-        page.addColumnDefinition(0.3);
-        
-        caption = new TextBlock();
-        caption.text = ``;
-        caption.color = "white";
-        caption.fontSize = "18px";
-        caption.height = "90%";
-        caption.textWrapping = true;
-        caption.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-        caption.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-
         if(objectiveSystem)
             updateIndex(objectiveSystem.getNightmareIndex());
 
-        // Crée l'image selon le type
-        switch (type) {
-            case "doc":
-                contenuePage = new Image("", `images/doc${docIndex}_${language}.jpg`);
-                caption.text = `${indication} \n${docIndex+1}/${maxDocIndex+1}`
-                break;
-            case "diaries":
-                contenuePage = new Image("", "");
-                if (objectiveSystem) {
-                    contenuePage.source = `images/diaries${diariesIndex}_${language}.png`;
-                    caption.text = `${indication} \n${diariesIndex+1}/${maxDiariesIndex+1}`
-                }
-                break;
-            case "explorer":
-                contenuePage = new Image("", `images/explorers${explorersIndex}_${language}.png`);
-                console.log(explorersIndex);
-                console.log(maxExplorersIndex);
-                caption.text = `${indication} \n${explorersIndex+1}/${maxExplorersIndex+1}`
-                break;
-            default:
-                contenuePage = new Image("", "");
-        }
+       // Préparation du layout avec 2 lignes (image + caption) et 3 colonnes
+        const page = new Grid();
+        page.addRowDefinition(0.9); // Ligne pour l'image
+        page.addRowDefinition(0.1); // Ligne pour la légende
+        page.addColumnDefinition(0.33);
+        page.addColumnDefinition(0.34); // Colonne centrale
+        page.addColumnDefinition(0.33);
 
+        // Création de l'image et de la légende
+        contenuePage = new Image("contenueImage", "");
         contenuePage.width = "100%";
         contenuePage.height = "100%";
         contenuePage.stretch = Image.STRETCH_UNIFORM;
 
-        const container = new StackPanel();
-        container.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
-        container.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
-        container.width = "100%";
-        container.height = "100%";
+        caption = new TextBlock("captionText", "");
+        caption.color = "white";
+        caption.fontSize = "18px";
+        caption.textWrapping = true;
+        caption.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+        caption.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
 
-        contenuePage.stretch = Image.STRETCH_UNIFORM;
-        contenuePage.height = "90%";
-        contenuePage.width = "100%";
-        container.addControl(contenuePage);
-        container.addControl(caption);
+        // Remplissage selon le type
+        switch (type) {
+            case "doc":
+                contenuePage.source = `images/doc${docIndex}_${language}.jpg`;
+                caption.text = `${indication} \n${docIndex + 1}/${maxDocIndex + 1}`;
+                break;
+            case "diaries":
+                if (objectiveSystem) {
+                    contenuePage.source = `images/diaries${diariesIndex}_${language}.png`;
+                    caption.text = `${indication} \n${diariesIndex + 1}/${maxDiariesIndex + 1}`;
+                }
+                break;
+            case "explorer":
+                contenuePage.source = `images/explorers${explorersIndex}_${language}.png`;
+                caption.text = `${indication} \n${explorersIndex + 1}/${maxExplorersIndex + 1}`;
+                break;
+            default:
+                contenuePage.source = "";
+        }
 
-        page.addControl(container, 0, 1);
+        // Placement au centre de la grille
+        page.addControl(contenuePage, 0, 1); // ligne 0, colonne 1 (milieu)
+        page.addControl(caption, 1, 1);      // ligne 1, colonne 1 (milieu)
+
+        // Ajout au GUI
         advancedTexture.addControl(page);
-
         page.alpha = 0;
+
+        // Fade in
         camera.getScene().onBeforeRenderObservable.add(function fadeIn() {
             page.alpha = Math.min(1, page.alpha + 0.05);
             if (page.alpha >= 1) {
                 camera!.getScene().onBeforeRenderObservable.removeCallback(fadeIn);
             }
         });
-
-        camera.detachControl();
 
         contenuePage.onPointerClickObservable.add((event) => {
             pageZoom = !pageZoom;
@@ -328,6 +318,7 @@ export function displayedItem(
                 page.width = "100%"; page.height = "100%";
             }
         });
+
     }
 }
 
