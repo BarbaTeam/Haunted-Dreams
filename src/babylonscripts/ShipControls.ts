@@ -255,7 +255,6 @@ export class ShipControls{
 
     powerEngine() {
         if (!this.engineRestartAllowed) {
-            console.log("Le moteur ne peut plus être rallumé !");
             return;
         }
 

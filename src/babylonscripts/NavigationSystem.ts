@@ -174,8 +174,6 @@ export class NavigationSystem {
                 context.beginPath();
                 
                 context.arc(x, y, 20, 0, 2 * Math.PI);
-                //console.log("angle point: " +this.angle_points[i].toFixed(1))
-                //console.log("angle to aim: "+ this.angleToAim?.toFixed(1))
                 if(this.objectiveSystem.getAngleToAim() && this.angle_points[i].toFixed(1) === this.objectiveSystem.getAngleToAim()!.toFixed(1)){
                     context.fillStyle = "lime"; 
                 }
@@ -184,8 +182,6 @@ export class NavigationSystem {
                 }
                 context.fill();
             }
-            console.log(this.angle_points);
-            console.log("currentangle = "+ this.angle + "angle to aim = "+ this.objectiveSystem.getAngleToAim());
         
         };
 

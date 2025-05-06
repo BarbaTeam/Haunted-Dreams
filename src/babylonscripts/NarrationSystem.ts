@@ -229,7 +229,6 @@ export class NarrationSystem {
     }
 
     answerPhone(): void {
-        console.log("décroché");
         if(!this.answered && this.isCalling){
             this.ringTone.stop();
             this.answered = true;

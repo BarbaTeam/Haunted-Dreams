@@ -68,7 +68,6 @@ export class Ship {
         this.scene = this.createScene();
         this.createSpaceShip();
         this.createGround();
-        console.log(keyBindings);
         this.shipSounds = new ShipSounds(this.scene);
         this.shiplight = new ShipLight(this.scene);
         this.narrationSystem = new NarrationSystem(this.scene, this);
@@ -140,14 +139,10 @@ export class Ship {
 
     createSpaceShip(): void {
         SceneLoader.ImportMeshAsync("", "models/", "spaceship.glb", this.scene).then((result) => {
-            const spaceship = result.meshes[0];
-
-            console.log("Le vaisseau est bien chargé");
-            
+            const spaceship = result.meshes[0];            
             spaceship.checkCollisions = true; 
             spaceship.getChildMeshes().forEach(mesh => {
                 mesh.checkCollisions = true;
-                console.log(mesh.name);
                 switch (mesh.name) {
                     case "selecteur_onde.boutton_amplitude":
                         this.buttonAmplitude = mesh;
@@ -292,8 +287,6 @@ export class Ship {
             this.photos.sort((p1, p2) => {
                 return p1.name > p2.name ? 1 : p1.name < p2.name ? -1 : 0;
             });
-
-            console.log(this.photos);
             
             this.doorList = [
                 {

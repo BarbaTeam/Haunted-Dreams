@@ -224,11 +224,6 @@ export class MainMenu {
     }
 
     private startGame(): void {
-        console.log("Le jeu commence !");
-        console.log(`Langue sélectionnée: ${this.language}`);
-        console.log(`Sous-titres activés: ${this.subtitlesEnabled}`);
-        console.log(`Touch Bindings:`, this.keyBindings);
-
         this.scene.dispose();
         new Ship(this.canvas, this.language, this.subtitlesEnabled, this.keyBindings, this.intro);
     }

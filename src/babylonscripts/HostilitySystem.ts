@@ -35,7 +35,6 @@ export class HostilitySystem {
         const randomDelay = shutdownTimer * 1000 - Math.random() * 0.3 * shutdownTimer * 1000;
 
         setTimeout(() => {
-            console.log("Shutdown event triggered");
             this.shipControls.shutDownEngine();
         }, randomDelay);
     }

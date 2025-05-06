@@ -126,7 +126,6 @@ export class ObjectiveSystem {
     takePhoto(): void {
         if (this.navigationSystem.isOverlap() && !this.isTakingPhoto) {
             this.isTakingPhoto = true;
-            console.log("Cauchemar photographié !");
             this.shipSounds.playPhotoSounds();
             setTimeout(() => {
                 this.hostilitySystem.setupHostile(60);
@@ -139,7 +138,6 @@ export class ObjectiveSystem {
             }, 4000);
         } else if (!this.isTakingPhoto) {
             this.isTakingPhoto = true;
-            console.log("Rêve photographié !");
             this.shipSounds.playDreamPhotoSounds();
             this.hostilitySystem.setupHostile(10);
             this.isTakingPhoto=false;
@@ -147,7 +145,6 @@ export class ObjectiveSystem {
     }
 
     showPaper(): void {
-        console.log("showPaperTest");
         const advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
         
         const image = new GUI.Image('but', 'src/assets/nightmares/nightmare1-processed.png');
