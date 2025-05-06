@@ -288,6 +288,13 @@ export class Ship {
                         break;
                 }
             });
+
+            this.photos.sort((p1, p2) => {
+                return p1.name > p2.name ? 1 : p1.name < p2.name ? -1 : 0;
+            });
+
+            console.log(this.photos);
+            
             this.doorList = [
                 {
                     name: "exterior",
