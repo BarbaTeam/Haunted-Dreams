@@ -34,7 +34,7 @@ let maxDocIndex = 0;
 let maxDiariesIndex = 0;
 let maxExplorersIndex = 0;
 let diariesIndex = 0;
-let explorersIndex = 0;
+let explorersIndex = 1;
 let camera: UniversalCamera | null = null;
 let pageZoom = false;
 let isZooming = false;
@@ -130,7 +130,7 @@ export function createFPSCamera(
 
         if (event.key.toLowerCase() === keyBindings["Right"].toLowerCase() && affichePage) {
             if (contenuePage.source!.includes("doc") && docIndex < maxDocIndex) {
-                contenuePage.source = `images/doc${++docIndex}_${ship.languageValue}.jpg`;
+                contenuePage.source = `images/doc/doc${++docIndex}_${ship.languageValue}.jpg`;
                 caption.text = `${indication} \n${docIndex+1}/${maxDocIndex+1}`
             }
             if (contenuePage.source!.includes("diaries") && diariesIndex < maxDiariesIndex) {
@@ -138,12 +138,12 @@ export function createFPSCamera(
                 caption.text = `${indication} \n${diariesIndex+1}/${maxDiariesIndex+1}`
             }
             if (contenuePage.source!.includes("explorers") && explorersIndex < maxExplorersIndex) {
-                contenuePage.source = `images/explorers${++explorersIndex}_${ship.languageValue}.png`;
+                contenuePage.source = `images/explorers/diaries${++explorersIndex}_${ship.languageValue}.png`;
                 caption.text = `${indication} \n${explorersIndex+1}/${maxExplorersIndex+1}`
             }
         } else if (event.key.toLowerCase() === keyBindings["Left"].toLowerCase() && affichePage) {
             if (contenuePage.source!.includes("doc") && docIndex > 0) {
-                contenuePage.source = `images/doc${--docIndex}_${ship.languageValue}.jpg`;
+                contenuePage.source = `images/doc/doc${--docIndex}_${ship.languageValue}.jpg`;
                 caption.text = `${indication} \n${docIndex+1}/${maxDocIndex+1}`
             }
             if (contenuePage.source!.includes("diaries") && diariesIndex > 0) {
@@ -151,7 +151,7 @@ export function createFPSCamera(
                 caption.text = `${indication} \n${diariesIndex+1}/${maxDiariesIndex+1}`
             }
             if (contenuePage.source!.includes("explorers") && explorersIndex > 0) {
-                contenuePage.source = `images/explorers${--explorersIndex}_${ship.languageValue}.png`;
+                contenuePage.source = `images/explorers/diaries${--explorersIndex}_${ship.languageValue}.png`;
                 caption.text = `${indication} \n${explorersIndex+1}/${maxExplorersIndex+1}`
             }
         } else if (event.code === "Space" && affichePage) {
@@ -184,14 +184,14 @@ export function createFPSCamera(
 function updateIndex(nightmareIndex: number): void {
     switch (nightmareIndex) {
         case 0: maxDocIndex = 0; maxDiariesIndex = 0; maxExplorersIndex = 1; break; //la famille
-        case 1: maxDocIndex = 1; maxDiariesIndex = 6; maxExplorersIndex = 4; break; //les escaliers
-        case 2: maxDocIndex = 2; maxDiariesIndex = 11; maxExplorersIndex = 7; break; //la chose rampante
-        case 3: maxDocIndex = 3; maxDiariesIndex = 21; maxExplorersIndex = 7; break; //sally
-        case 4: maxDocIndex = 3; maxDiariesIndex = 27; maxExplorersIndex = 10; break; 
+        case 1: maxDocIndex = 4; maxDiariesIndex = 6; maxExplorersIndex = 9; break; //les escaliers
+        case 2: maxDocIndex = 7; maxDiariesIndex = 11; maxExplorersIndex = 15; break; //la chose rampante
+        case 3: maxDocIndex = 14; maxDiariesIndex = 21; maxExplorersIndex = 15; break; //sally
+        case 4: maxDocIndex = 15; maxDiariesIndex = 27; maxExplorersIndex = 21; break; 
         case 5: case 6: case 7:
-            maxDocIndex = 3; maxDiariesIndex = 27; maxExplorersIndex = 13; break; 
+            maxDocIndex = 15; maxDiariesIndex = 27; maxExplorersIndex = 61; break; 
         default:
-            maxDocIndex = 3; maxDiariesIndex = 27; maxExplorersIndex = 13;
+            maxDocIndex = 15; maxDiariesIndex = 27; maxExplorersIndex = 61;
     }
 }
 
@@ -270,7 +270,7 @@ export function displayedItem(
         // Remplissage selon le type
         switch (type) {
             case "doc":
-                contenuePage.source = `images/doc${docIndex}_${language}.jpg`;
+                contenuePage.source = `images/doc/doc${docIndex}_${language}.jpg`;
                 caption.text = `${indication} \n${docIndex + 1}/${maxDocIndex + 1}`;
                 break;
             case "diaries":
@@ -280,7 +280,7 @@ export function displayedItem(
                 }
                 break;
             case "explorer":
-                contenuePage.source = `images/explorers${explorersIndex}_${language}.png`;
+                contenuePage.source = `images/explorers/diaries${explorersIndex}_${language}.png`;
                 caption.text = `${indication} \n${explorersIndex + 1}/${maxExplorersIndex + 1}`;
                 break;
             default:
