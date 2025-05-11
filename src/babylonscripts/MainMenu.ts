@@ -23,7 +23,7 @@ export class MainMenu {
 
     private mainMenuButtons: Button[] = [];
 
-    private language: Language = "en";
+    private language: Language = "fr";
 
     private texts: Record<Language, {
         play: string;
@@ -122,8 +122,8 @@ export class MainMenu {
         advancedTexture.addControl(optionTitle);
         inputFields.push(optionTitle);
 
-        const languageButton = this.createButton("languageButton", this.texts[this.language].language, "-330px");
-        languageButton.onPointerUpObservable.add(() => this.toggleLanguage(languageButton));
+        const languageButton = this.createButton("languageButton", this.texts[this.language].language + " [Indisponible]", "-330px");
+        //languageButton.onPointerUpObservable.add(() => this.toggleLanguage(languageButton));
         advancedTexture.addControl(languageButton);
         inputFields.push(languageButton);
 
