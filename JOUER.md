@@ -1,15 +1,33 @@
-Introduction au Jeu
+# 🧠 Haunted Dream — Guide de Démarrage
 
-Bienvenue à bord d’un vaisseau très particulier, capable de voyager à travers les rêves. Vous êtes plongé dans l’esprit d’un patient en proie à des cauchemars, et vous n’avez aucun contact avec l’extérieur. Ce qui se passe au-dehors vous est inconnu — vous ne pouvez compter que sur ce que vous percevez ici, dans cet univers onirique, instable et mystérieux.
+## 🎮 Contexte du jeu
 
-Votre mission : guérir le patient. Pour cela, vous devrez explorer ses cauchemars et en identifier l’origine. C’est la seule façon de sortir de son esprit.
+Vous êtes à bord d’un vaisseau unique, conçu pour voyager à travers les rêves.  
+Ce que vous voyez, entendez ou ressentez provient exclusivement de l’esprit du patient : l’extérieur vous est totalement inaccessible.
 
-Pour vous aider, plusieurs ressources sont à votre disposition :
+---
 
-    -Le journal intime d’Elisa, la patiente ;
-    -Les notes de l’équipe d’exploration précédente ;
-    -Des documents médicaux fournis par le docteur.
+## 🧩 Objectif
 
-Ces éléments contiennent des indices cruciaux. Ils vous permettront de déterminer la fréquence d’un cauchemar. Une fois cette fréquence identifiée, vous devrez la régler avec précision sur votre boussole afin de vous y rendre.
+Votre objectif est de :
+- Explorer les cauchemars du patient ;
+- Identifier leur fréquence ;
+- Naviguer à l’aide de votre boussole jusqu’à ces fréquences ;
+- Capturer les cauchemars en photo pour progresser dans l’histoire.
 
-Lorsque vous atteindrez la bonne fréquence, vous aurez la possibilité de photographier le cauchemar pour poursuivre votre progression. Mais soyez vigilant : une erreur de navigation peut avoir de lourdes conséquences sur votre voyage… et sur l’état du patient.
+⚠️ **Attention** : une mauvaise navigation peut avoir des conséquences négatives sur votre progression ou sur l’état mental du patient.
+
+---
+
+## 🗂️ Ressources à votre disposition
+
+Pour vous orienter, vous aurez accès à plusieurs documents :
+- Le **journal intime d’Elisa**, la patiente ;
+- Les **notes d’exploration de l’équipe précédente** ;
+- Des **documents médicaux fournis par le docteur**.
+
+Ces éléments vous permettront de récolter les informations nécessaires pour déterminer les fréquences à atteindre.
+
+---
+
+*Bonne exploration, et faites preuve de discernement dans l’univers des rêves...*
