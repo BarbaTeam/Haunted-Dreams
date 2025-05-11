@@ -11,7 +11,7 @@ Obéissez aux exigences du docteur, extirpez-lui les informations qu’il cherch
 
 Ce jeu est développé dans le cadre du concours [Games On Web 2025](https://www.cgi.com/france/fr-fr/event/games-on-web-2025) organisé par [CGI France](https://www.cgi.com/france/fr-fr). 
 
-Consulter notre [repo Github](h).
+Consulter notre [repo Github](https://github.com/BarbaTeam/Haunted-Dreams).
 ## Documentation
 
 - [🎮 Comment jouer](JOUER.md)
