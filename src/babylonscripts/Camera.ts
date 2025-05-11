@@ -134,7 +134,7 @@ export function createFPSCamera(
                 caption.text = `${indication} \n${docIndex+1}/${maxDocIndex+1}`
             }
             if (contenuePage.source!.includes("diaries") && diariesIndex < maxDiariesIndex) {
-                contenuePage.source = `images/diaries${++diariesIndex}_${ship.languageValue}.png`;
+                contenuePage.source = `images/diaries/diaries${++diariesIndex}_${ship.languageValue}.png`;
                 caption.text = `${indication} \n${diariesIndex+1}/${maxDiariesIndex+1}`
             }
             if (contenuePage.source!.includes("explorers") && explorersIndex < maxExplorersIndex) {
@@ -150,7 +150,7 @@ export function createFPSCamera(
                 contenuePage.source = `images/diaries${--diariesIndex}_${ship.languageValue}.png`;
                 caption.text = `${indication} \n${diariesIndex+1}/${maxDiariesIndex+1}`
             }
-            if (contenuePage.source!.includes("explorers") && explorersIndex > 0) {
+            if (contenuePage.source!.includes("explorers") && explorersIndex > 1) {
                 contenuePage.source = `images/explorers/diaries${--explorersIndex}_${ship.languageValue}.png`;
                 caption.text = `${indication} \n${explorersIndex+1}/${maxExplorersIndex+1}`
             }
@@ -183,15 +183,17 @@ export function createFPSCamera(
 
 function updateIndex(nightmareIndex: number): void {
     switch (nightmareIndex) {
-        case 0: maxDocIndex = 0; maxDiariesIndex = 0; maxExplorersIndex = 1; break; //la famille
-        case 1: maxDocIndex = 4; maxDiariesIndex = 6; maxExplorersIndex = 9; break; //les escaliers
-        case 2: maxDocIndex = 7; maxDiariesIndex = 11; maxExplorersIndex = 15; break; //la chose rampante
-        case 3: maxDocIndex = 14; maxDiariesIndex = 21; maxExplorersIndex = 15; break; //sally
-        case 4: maxDocIndex = 15; maxDiariesIndex = 27; maxExplorersIndex = 21; break; 
-        case 5: case 6: case 7:
-            maxDocIndex = 15; maxDiariesIndex = 27; maxExplorersIndex = 61; break; 
+        case 0: maxDocIndex = 0; maxDiariesIndex = 1; maxExplorersIndex = 5; break; //la famille
+        case 1: maxDocIndex = 3; maxDiariesIndex = 7; maxExplorersIndex = 11; break; //les escaliers
+        case 2: maxDocIndex = 5; maxDiariesIndex = 12; maxExplorersIndex = 23; break; //la chose rampante
+        case 3: maxDocIndex = 6; maxDiariesIndex = 22; maxExplorersIndex = 33; break; //sally
+        case 4: maxDocIndex = 11; maxDiariesIndex = 33; maxExplorersIndex = 37; break; //la bosse
+        case 5: maxDocIndex = 13; maxDiariesIndex = 37; maxExplorersIndex = 61; break; //les scientifiques
+        case 6: maxDocIndex = 14; maxDiariesIndex = 45; maxExplorersIndex = 21; break; //le couloir
+        case 7:
+            maxDocIndex = 14; maxDiariesIndex = 45; maxExplorersIndex = 61; break; 
         default:
-            maxDocIndex = 15; maxDiariesIndex = 27; maxExplorersIndex = 61;
+            maxDocIndex = 14; maxDiariesIndex = 45; maxExplorersIndex = 61;
     }
 }
 
@@ -246,15 +248,13 @@ export function displayedItem(
         if(objectiveSystem)
             updateIndex(objectiveSystem.getNightmareIndex());
 
-       // Préparation du layout avec 2 lignes (image + caption) et 3 colonnes
         const page = new Grid();
-        page.addRowDefinition(0.9); // Ligne pour l'image
-        page.addRowDefinition(0.1); // Ligne pour la légende
+        page.addRowDefinition(0.9);
+        page.addRowDefinition(0.1);
         page.addColumnDefinition(0.33);
-        page.addColumnDefinition(0.34); // Colonne centrale
+        page.addColumnDefinition(0.34);
         page.addColumnDefinition(0.33);
 
-        // Création de l'image et de la légende
         contenuePage = new Image("contenueImage", "");
         contenuePage.width = "100%";
         contenuePage.height = "100%";
@@ -267,7 +267,6 @@ export function displayedItem(
         caption.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
         caption.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
 
-        // Remplissage selon le type
         switch (type) {
             case "doc":
                 contenuePage.source = `images/doc/doc${docIndex}_${language}.jpg`;
@@ -275,7 +274,7 @@ export function displayedItem(
                 break;
             case "diaries":
                 if (objectiveSystem) {
-                    contenuePage.source = `images/diaries${diariesIndex}_${language}.png`;
+                    contenuePage.source = `images/diaries/diaries${diariesIndex}_${language}.png`;
                     caption.text = `${indication} \n${diariesIndex + 1}/${maxDiariesIndex + 1}`;
                 }
                 break;
@@ -287,15 +286,12 @@ export function displayedItem(
                 contenuePage.source = "";
         }
 
-        // Placement au centre de la grille
-        page.addControl(contenuePage, 0, 1); // ligne 0, colonne 1 (milieu)
-        page.addControl(caption, 1, 1);      // ligne 1, colonne 1 (milieu)
+        page.addControl(contenuePage, 0, 1); 
+        page.addControl(caption, 1, 1);
 
-        // Ajout au GUI
         advancedTexture.addControl(page);
         page.alpha = 0;
 
-        // Fade in
         camera.getScene().onBeforeRenderObservable.add(function fadeIn() {
             page.alpha = Math.min(1, page.alpha + 0.05);
             if (page.alpha >= 1) {
