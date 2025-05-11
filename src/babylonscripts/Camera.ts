@@ -134,11 +134,11 @@ export function createFPSCamera(
                 caption.text = `${indication} \n${docIndex+1}/${maxDocIndex+1}`
             }
             if (contenuePage.source!.includes("diaries") && diariesIndex < maxDiariesIndex) {
-                contenuePage.source = `images/diaries/diaries${++diariesIndex}_${ship.languageValue}.png`;
+                contenuePage.source = `images/diaries/diaries${++diariesIndex}_${ship.languageValue}.jpg`;
                 caption.text = `${indication} \n${diariesIndex+1}/${maxDiariesIndex+1}`
             }
             if (contenuePage.source!.includes("explorers") && explorersIndex < maxExplorersIndex) {
-                contenuePage.source = `images/explorers/diaries${++explorersIndex}_${ship.languageValue}.png`;
+                contenuePage.source = `images/explorers/diaries${++explorersIndex}_${ship.languageValue}.jpg`;
                 caption.text = `${indication} \n${explorersIndex+1}/${maxExplorersIndex+1}`
             }
         } else if (event.key.toLowerCase() === keyBindings["Left"].toLowerCase() && affichePage) {
@@ -147,11 +147,11 @@ export function createFPSCamera(
                 caption.text = `${indication} \n${docIndex+1}/${maxDocIndex+1}`
             }
             if (contenuePage.source!.includes("diaries") && diariesIndex > 0) {
-                contenuePage.source = `images/diaries${--diariesIndex}_${ship.languageValue}.png`;
+                contenuePage.source = `images/diaries${--diariesIndex}_${ship.languageValue}.jpg`;
                 caption.text = `${indication} \n${diariesIndex+1}/${maxDiariesIndex+1}`
             }
             if (contenuePage.source!.includes("explorers") && explorersIndex > 1) {
-                contenuePage.source = `images/explorers/diaries${--explorersIndex}_${ship.languageValue}.png`;
+                contenuePage.source = `images/explorers/diaries${--explorersIndex}_${ship.languageValue}.jpg`;
                 caption.text = `${indication} \n${explorersIndex+1}/${maxExplorersIndex+1}`
             }
         } else if (event.code === "Space" && affichePage) {
@@ -274,12 +274,12 @@ export function displayedItem(
                 break;
             case "diaries":
                 if (objectiveSystem) {
-                    contenuePage.source = `images/diaries/diaries${diariesIndex}_${language}.png`;
+                    contenuePage.source = `images/diaries/diaries${diariesIndex}_${language}.jpg`;
                     caption.text = `${indication} \n${diariesIndex + 1}/${maxDiariesIndex + 1}`;
                 }
                 break;
             case "explorer":
-                contenuePage.source = `images/explorers/diaries${explorersIndex}_${language}.png`;
+                contenuePage.source = `images/explorers/diaries${explorersIndex}_${language}.jpg`;
                 caption.text = `${indication} \n${explorersIndex + 1}/${maxExplorersIndex + 1}`;
                 break;
             default:
