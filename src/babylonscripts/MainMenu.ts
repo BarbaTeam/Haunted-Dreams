@@ -122,7 +122,7 @@ export class MainMenu {
         advancedTexture.addControl(optionTitle);
         inputFields.push(optionTitle);
 
-        const languageButton = this.createButton("languageButton", this.texts[this.language].language + " [Indisponible]", "-330px");
+        const languageButton = this.createButton("languageButton", this.texts[this.language].language + " [Anglais indisponible]", "-330px");
         //languageButton.onPointerUpObservable.add(() => this.toggleLanguage(languageButton));
         advancedTexture.addControl(languageButton);
         inputFields.push(languageButton);
