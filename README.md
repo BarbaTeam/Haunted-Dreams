@@ -14,7 +14,7 @@ Ce jeu est développé dans le cadre du concours [Games On Web 2025](https://www
 Consulter notre [repo Github](h).
 ## Documentation
 
-- [🔧 Installation](INSTAL.md)
 - [🎮 Comment jouer](JOUER.md)
 - [📚 Explication du lore](LORE.md)
 - [💡 Solution des énigmes](SOLU.md)
+- [🔧 Installation](INSTAL.md)
