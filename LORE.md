@@ -1,1 +1,6 @@
-Explication du lore
+![alt text](public/images/LORE/1.png)
+![alt text](public/images/LORE/2.png)
+![alt text](public/images/LORE/3.png)
+![alt text](public/images/LORE/4.png)
+![alt text](public/images/LORE/5.png)
+![alt text](public/images/LORE/6.png)
