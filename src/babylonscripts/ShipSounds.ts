@@ -72,4 +72,10 @@ export class ShipSounds {
     leftSpaceShip(): boolean {
         return this.hasLeftSpaceShip;
     }
+    playOpenDocument(): void{
+        return;
+    }
+    playCloseDocument(): void{
+        return;
+    }
 }

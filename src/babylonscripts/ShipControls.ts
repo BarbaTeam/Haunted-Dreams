@@ -36,6 +36,7 @@ export class ShipControls{
     private hoveringTelephone = false;
     private hoveringPhoto = false;
     private hoveringPaperSheet = false;
+    private hoveringExplorerSheet = false;
     private hoveringDiaries = false;
     private hoveringMotor = false
     private hoveringUp = false;
@@ -51,7 +52,7 @@ export class ShipControls{
 
     private canvas: HTMLCanvasElement;
 
-    constructor(ship: Ship, shipSounds: ShipSounds, scene: Scene, shipLight: ShipLight, narrationSystem: NarrationSystem, canvas: HTMLCanvasElement){
+    constructor(ship: Ship, shipSounds: ShipSounds, scene: Scene, shipLight: ShipLight, narrationSystem: NarrationSystem, private keyBindings: { [action: string]: string }, canvas: HTMLCanvasElement){
         this.canvas = canvas;
         this.narrationSystem = narrationSystem;
         this.ship = ship;
@@ -63,7 +64,7 @@ export class ShipControls{
     }
 
     public setUpCamera(){
-        const camera = createFPSCamera(this.scene, this.canvas, this, this, this.shipSounds, this.ship, this.hostilitySystem);
+        const camera = createFPSCamera(this.scene, this.canvas, this, this, this.shipSounds, this.ship, this.hostilitySystem, this.objectiveSystem, this.keyBindings);
         camera.metadata = { isFPSCamera: true }; // Marque la caméra comme FPS pour le Raycast
         this.scene.activeCamera = camera;
 
@@ -117,7 +118,7 @@ export class ShipControls{
         return this.hoveringbuttonDoorMotor1;
     }
     
-    public sHoveringButtonDoorMotor2(): boolean {
+    public isHoveringButtonDoorMotor2(): boolean {
         return this.hoveringbuttonDoorMotor2;
     }
     
@@ -131,6 +132,10 @@ export class ShipControls{
     
     public isHoveringPaperSheet(): boolean {
         return this.hoveringPaperSheet;
+    }
+
+    public isHoveringExplorerSheet(): boolean {
+        return this.hoveringExplorerSheet;
     }
 
     public isHoveringDiaries(): boolean {
@@ -250,7 +255,6 @@ export class ShipControls{
 
     powerEngine() {
         if (!this.engineRestartAllowed) {
-            console.log("Le moteur ne peut plus être rallumé !");
             return;
         }
 
@@ -344,10 +348,12 @@ export class ShipControls{
         } else if (this.hoveringMotor) {
             this.toggleEngine();
         } else if (this.hoveringPaperSheet) {
-            displayDocument(this.canvas, this, this.objectiveSystem, "doc");
+            displayDocument(this.canvas, this, this.ship.languageValue,this.keyBindings, this.objectiveSystem, "doc");
         } else if (this.hoveringDiaries) {
-            displayDocument(this.canvas, this, this.objectiveSystem, "diaries");
-        }   
+            displayDocument(this.canvas, this,this.ship.languageValue,this.keyBindings, this.objectiveSystem, "diaries");
+        } else if(this.hoveringExplorerSheet) {
+            displayDocument(this.canvas, this,this.ship.languageValue,this.keyBindings, this.objectiveSystem, "explorer");
+        }
         else if (this.isHoveringSomeButtonForNavDoor()) {
             this.toggleDoor(this.ship.getDoorByName("nav")!);
         }
@@ -398,7 +404,7 @@ export class ShipControls{
     handleKeyDown(event: KeyboardEvent): void {
         
         const key = event.code; // Utilisation de event.code pour garantir la compatibilité AZERTY/QWERTY
-        if (["KeyW", "KeyA", "KeyS", "KeyD"].includes(key) && getAffichePage()) {
+        if (["KeyW", "KeyA", "KeyS", "KeyD"].includes(key) && !getAffichePage()) {
             this.pressedKeys.add(key);
             if (this.shipSounds.getMetalFootSteps() && !this.shipSounds.getMetalFootSteps().isPlaying && !this.shipSounds.leftSpaceShip()) {
                 this.shipSounds.getMetalFootSteps().play();
@@ -408,7 +414,7 @@ export class ShipControls{
 
     handleKeyUp(event: KeyboardEvent): void {
         const key = event.code;
-        if (["KeyW", "KeyA", "KeyS", "KeyD"].includes(key) && getAffichePage()) {
+        if (["KeyW", "KeyA", "KeyS", "KeyD"].includes(key) && !getAffichePage()) {
             this.pressedKeys.delete(key);
             if (this.pressedKeys.size === 0 && this.shipSounds.getMetalFootSteps()  && this.shipSounds.getMetalFootSteps().isPlaying) {
                 this.shipSounds.getMetalFootSteps().stop();
@@ -431,6 +437,7 @@ export class ShipControls{
             this.hoveringMotor = hit?.pickedMesh === this.ship.getButtonMotor();
             this.hoveringTelephone = hit?.pickedMesh === this.ship.getTelephone();
             this.hoveringPaperSheet = hit?.pickedMesh === this.ship.getPaperSheet();
+            this.hoveringExplorerSheet = hit?.pickedMesh === this.ship.getExplorerSheet();
             this.hoveringDiaries = hit?.pickedMesh === this.ship.getDiaries();
             this.hoveringbuttonDoorMotor1 = hit?.pickedMesh=== this.ship.getButtonDoorMotor()[0];
             this.hoveringbuttonDoorMotor2 = hit?.pickedMesh=== this.ship.getButtonDoorMotor()[1];
@@ -462,6 +469,7 @@ export class ShipControls{
                 { mesh: this.ship.getButtonMotor(), hovering: this.hoveringMotor },
                 { mesh: this.ship.getPaperSheet(), hovering: this.hoveringPaperSheet },
                 { mesh: this.ship.getDiaries(), hovering: this.hoveringDiaries },
+                {mesh : this.ship.getExplorerSheet(), hovering: this.hoveringExplorerSheet},
                 { mesh: this.ship.getTelephone(), hovering: this.hoveringTelephone },
                 { mesh: this.ship.getButtonDoorMotor()[0], hovering: this.hoveringbuttonDoorMotor1},
                 { mesh: this.ship.getButtonDoorMotor()[1], hovering: this.hoveringbuttonDoorMotor2},

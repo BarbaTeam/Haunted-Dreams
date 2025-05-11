@@ -23,32 +23,42 @@ export class ObjectiveSystem {
     private nightmares: Nightmare[] = [
         {
             nmAmplitude : 1.00,
-            nmFrequency : 1.02,
+            nmFrequency : 1.01,
             nmAngle : 5.10
         },
         {
-            nmAmplitude : 0.60,
-            nmFrequency : 7.00,
+            nmAmplitude : 1.00,
+            nmFrequency : 1.02,
             nmAngle : 3.30
         },
         {
-            nmAmplitude : 1.20,
-            nmFrequency : 1.20,
+            nmAmplitude : 1.00,
+            nmFrequency : 1.03,
             nmAngle : 1.20
         },
         {
             nmAmplitude : 1.00,
-            nmFrequency : 6.00,
+            nmFrequency : 1.04,
             nmAngle : 5.70
         },
         {
-            nmAmplitude : 0.70,
-            nmFrequency : 8.00,
+            nmAmplitude : 1.00,
+            nmFrequency : 1.05,
             nmAngle : 2.70
         },
         {
-            nmAmplitude : 0.20,
-            nmFrequency : 8.90,
+            nmAmplitude : 1.00,
+            nmFrequency : 1.06,
+            nmAngle : 6.00
+        },
+        {
+            nmAmplitude : 1.00,
+            nmFrequency : 1.07,
+            nmAngle : 6.00
+        },
+        {
+            nmAmplitude : 1.00,
+            nmFrequency : 1.08,
             nmAngle : 6.00
         }
     ]
@@ -116,7 +126,6 @@ export class ObjectiveSystem {
     takePhoto(): void {
         if (this.navigationSystem.isOverlap() && !this.isTakingPhoto) {
             this.isTakingPhoto = true;
-            console.log("Cauchemar photographié !");
             this.shipSounds.playPhotoSounds();
             setTimeout(() => {
                 this.hostilitySystem.setupHostile(60);
@@ -129,7 +138,6 @@ export class ObjectiveSystem {
             }, 4000);
         } else if (!this.isTakingPhoto) {
             this.isTakingPhoto = true;
-            console.log("Rêve photographié !");
             this.shipSounds.playDreamPhotoSounds();
             this.hostilitySystem.setupHostile(10);
             this.isTakingPhoto=false;
@@ -137,7 +145,6 @@ export class ObjectiveSystem {
     }
 
     showPaper(): void {
-        console.log("showPaperTest");
         const advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
         
         const image = new GUI.Image('but', 'src/assets/nightmares/nightmare1-processed.png');

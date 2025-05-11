@@ -31,6 +31,7 @@ export class Ship {
     private buttonRight!: AbstractMesh;
     private buttonPhoto!: AbstractMesh;
     private paperSheet!: AbstractMesh;
+    private explorerSheet!: AbstractMesh;
     private diaries!: AbstractMesh;
     private buttonDoorNav1!: AbstractMesh
     private buttonDoorNav2!: AbstractMesh
@@ -61,18 +62,18 @@ export class Ship {
     private shipSounds: ShipSounds;
     private hostilitySystem: HostilitySystem;
 
-    constructor(private canvas: HTMLCanvasElement) {
+    constructor(private canvas: HTMLCanvasElement, private language: string, private subtitlesEnabled: boolean, private keyBindings: { [action: string]: string}, private intro: boolean
+    ) {
         this.engine = new Engine(this.canvas, true);
         this.scene = this.createScene();
         this.createSpaceShip();
         this.createGround();
-        
         this.shipSounds = new ShipSounds(this.scene);
         this.shiplight = new ShipLight(this.scene);
         this.narrationSystem = new NarrationSystem(this.scene, this);
         this.navigationSystem = new NavigationSystem(this.scene, this);
         this.objectiveSystem = new ObjectiveSystem(this.scene, this, this.shipSounds);
-        this.shipControls = new ShipControls(this, this.shipSounds,this.scene, this.shiplight, this.narrationSystem, canvas);
+        this.shipControls = new ShipControls(this, this.shipSounds,this.scene, this.shiplight, this.narrationSystem, keyBindings, canvas);
         this.hostilitySystem = new HostilitySystem(this.shipSounds);
 
         this.narrationSystem.setNavigationSystem(this.navigationSystem);
@@ -89,7 +90,6 @@ export class Ship {
         this.hostilitySystem.setObjectiveSystem(this.objectiveSystem);
         this.hostilitySystem.setShipControls(this.shipControls);
 
-        
         const isLocked = false;
         this.scene.onPointerDown = function () {
             if (!isLocked) {
@@ -105,6 +105,7 @@ export class Ship {
                 this.navigationSystem.updateSineWave();
             }, 50);
         });
+        window.addEventListener("resize", () => this.engine.resize());
     }
     
 
@@ -138,14 +139,10 @@ export class Ship {
 
     createSpaceShip(): void {
         SceneLoader.ImportMeshAsync("", "models/", "spaceship.glb", this.scene).then((result) => {
-            const spaceship = result.meshes[0];
-
-            console.log("Le vaisseau est bien chargé");
-            
+            const spaceship = result.meshes[0];            
             spaceship.checkCollisions = true; 
             spaceship.getChildMeshes().forEach(mesh => {
                 mesh.checkCollisions = true;
-                console.log(mesh.name);
                 switch (mesh.name) {
                     case "selecteur_onde.boutton_amplitude":
                         this.buttonAmplitude = mesh;
@@ -174,7 +171,9 @@ export class Ship {
                     case "diaries":
                         this.diaries = mesh;
                         break;
-            
+                    case "explorers_note":
+                        this.explorerSheet = mesh;
+                        break;
             
                     case "motor_controle.boutton":
                         this.buttonMotor = mesh;
@@ -271,11 +270,24 @@ export class Ship {
                         mesh.visibility = 0;
                         this.photos.push(mesh);
                         break;
+                    case "photo7":
+                        mesh.visibility = 0;
+                        this.photos.push(mesh);
+                        break;
+                    case "photo8":
+                        mesh.visibility = 0;
+                        this.photos.push(mesh);
+                        break;
                     case "telephone":
                         this.telephone = mesh;
                         break;
                 }
             });
+
+            this.photos.sort((p1, p2) => {
+                return p1.name > p2.name ? 1 : p1.name < p2.name ? -1 : 0;
+            });
+            
             this.doorList = [
                 {
                     name: "exterior",
@@ -297,7 +309,6 @@ export class Ship {
             this.navigationSystem.updateSineWave();   
             this.navigationSystem.updateDataScreen(); 
             this.navigationSystem.updateBoussoleScreen();
-            
         });
     }
 
@@ -308,7 +319,18 @@ export class Ship {
         ground.checkCollisions = true; 
     }
 
+    public get languageValue(): string {
+        return this.language;
+    }
 
+    public get introValue(): boolean {
+        return this.intro;
+    }
+
+    public get subtitlesEnabledValue(): boolean {
+        return this.subtitlesEnabled;
+    }
+    
     public getButtonUp(): AbstractMesh{
         return this.buttonUp;
     }
@@ -347,6 +369,9 @@ export class Ship {
     }
     public getDiaries(): AbstractMesh {
         return this.diaries;
+    }
+    public getExplorerSheet(): AbstractMesh {
+        return this.explorerSheet;
     }
     public getPhotos(): AbstractMesh[] {
         return this.photos;
