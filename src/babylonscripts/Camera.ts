@@ -183,17 +183,17 @@ export function createFPSCamera(
 
 function updateIndex(nightmareIndex: number): void {
     switch (nightmareIndex) {
-        case 0: maxDocIndex = 0; maxDiariesIndex = 1; maxExplorersIndex = 5; break; //la famille
-        case 1: maxDocIndex = 3; maxDiariesIndex = 7; maxExplorersIndex = 11; break; //les escaliers
-        case 2: maxDocIndex = 5; maxDiariesIndex = 12; maxExplorersIndex = 23; break; //la chose rampante
-        case 3: maxDocIndex = 6; maxDiariesIndex = 22; maxExplorersIndex = 33; break; //sally
-        case 4: maxDocIndex = 11; maxDiariesIndex = 33; maxExplorersIndex = 37; break; //la bosse
-        case 5: maxDocIndex = 13; maxDiariesIndex = 37; maxExplorersIndex = 61; break; //les scientifiques
-        case 6: maxDocIndex = 14; maxDiariesIndex = 45; maxExplorersIndex = 21; break; //le couloir
+        case 0: maxDocIndex = 0; maxDiariesIndex = 1; maxExplorersIndex = 4; break; //la famille
+        case 1: maxDocIndex = 3; maxDiariesIndex = 7; maxExplorersIndex = 10; break; //les escaliers
+        case 2: maxDocIndex = 5; maxDiariesIndex = 12; maxExplorersIndex = 22; break; //la chose rampante
+        case 3: maxDocIndex = 6; maxDiariesIndex = 22; maxExplorersIndex = 32; break; //sally
+        case 4: maxDocIndex = 11; maxDiariesIndex = 33; maxExplorersIndex = 36; break; //la bosse
+        case 5: maxDocIndex = 13; maxDiariesIndex = 37; maxExplorersIndex = 60; break; //les scientifiques
+        case 6: maxDocIndex = 14; maxDiariesIndex = 45; maxExplorersIndex = 60; break; //le couloir
         case 7:
-            maxDocIndex = 14; maxDiariesIndex = 45; maxExplorersIndex = 61; break; 
+            maxDocIndex = 14; maxDiariesIndex = 45; maxExplorersIndex = 60; break; 
         default:
-            maxDocIndex = 14; maxDiariesIndex = 45; maxExplorersIndex = 61;
+            maxDocIndex = 14; maxDiariesIndex = 45; maxExplorersIndex = 60;
     }
 }
 

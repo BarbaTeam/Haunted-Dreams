@@ -1,1 +1,8 @@
-Les solutions
+![Les solutions](public/images/SOLU/1.png)
+![alt text](public/images/SOLU/2.png)
+![alt text](public/images/SOLU/3.png)
+![alt text](public/images/SOLU/4.png)
+![alt text](public/images/SOLU/5.png)
+![alt text](public/images/SOLU/6.png)
+![alt text](public/images/SOLU/7.png)
+![alt text](public/images/SOLU/8.png)
