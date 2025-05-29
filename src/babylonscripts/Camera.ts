@@ -23,6 +23,7 @@ import { ShipSounds } from "./ShipSounds";
 import { HostilitySystem } from "./HostilitySystem";
 import { Ship } from "./Ship";
 import { ObjectiveSystem } from "./ObjectiveSystem";
+import { NarrationSystem } from "./NarrationSystem";
 
 let affichePage = false;
 let advancedTexture: AdvancedDynamicTexture | null = null;
@@ -190,10 +191,10 @@ function updateIndex(nightmareIndex: number): void {
         case 4: maxDocIndex = 11; maxDiariesIndex = 33; maxExplorersIndex = 36; break; //la bosse
         case 5: maxDocIndex = 13; maxDiariesIndex = 37; maxExplorersIndex = 60; break; //les scientifiques
         case 6: maxDocIndex = 14; maxDiariesIndex = 45; maxExplorersIndex = 60; break; //le couloir
-        case 7:
-            maxDocIndex = 14; maxDiariesIndex = 45; maxExplorersIndex = 60; break; 
+        case 7: maxDocIndex = 14; maxDiariesIndex = 55; maxExplorersIndex = 60; break; //le labo
+        case 8: maxDocIndex = 14; maxDiariesIndex = 57; maxExplorersIndex = 60; break; //fin
         default:
-            maxDocIndex = 14; maxDiariesIndex = 45; maxExplorersIndex = 60;
+             maxDocIndex = 14; maxDiariesIndex = 57; maxExplorersIndex = 60;
     }
 }
 
@@ -205,6 +206,7 @@ function mouseMove(event: MouseEvent): void {
     camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x));
 }
 
+let hasEnded = false;
 export function displayedItem(
     canvas: HTMLCanvasElement,
     controls: ShipControls,
@@ -237,6 +239,14 @@ export function displayedItem(
         advancedTexture.addControl(crosshair);
         camera.attachControl(canvas, true);
         canvas.requestPointerLock();
+
+
+        if(maxDiariesIndex === 1 && !hasEnded) {
+            const event = new CustomEvent('endReached');
+            hasEnded = true
+            window.dispatchEvent(event);
+        }
+
     } else {
         controls.disableEvents();
         camera.keysUp = [];

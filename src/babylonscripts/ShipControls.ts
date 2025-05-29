@@ -51,6 +51,7 @@ export class ShipControls{
     private handleKeyUpBound = this.handleKeyUp.bind(this);
 
     private canvas: HTMLCanvasElement;
+    hasEnded = false;
 
     constructor(ship: Ship, shipSounds: ShipSounds, scene: Scene, shipLight: ShipLight, narrationSystem: NarrationSystem, private keyBindings: { [action: string]: string }, canvas: HTMLCanvasElement){
         this.canvas = canvas;
@@ -61,6 +62,9 @@ export class ShipControls{
         this.shipLight= shipLight;
         this.setupButtonHoverDetection();
         this.enableEvents();
+        window.addEventListener('noGeneratorInteractions', (e) => {
+            this.hasEnded = true
+        })
     }
 
     public setUpCamera(){
@@ -245,6 +249,7 @@ export class ShipControls{
     enableDoor = true;
 
     toggleEngine(): void {
+        if(this.hasEnded) return;
         if (this.engineState) {
             this.shutDownEngine();
         } else {

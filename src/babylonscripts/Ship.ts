@@ -305,7 +305,7 @@ export class Ship {
                     isOpen: false
                 }
             ]
-            this.narrationSystem.setupNarrator();  
+            if(this.introValue) this.narrationSystem.setupNarrator();  
             this.navigationSystem.updateSineWave();   
             this.navigationSystem.updateDataScreen(); 
             this.navigationSystem.updateBoussoleScreen();

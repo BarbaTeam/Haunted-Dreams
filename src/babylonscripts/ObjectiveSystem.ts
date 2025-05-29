@@ -22,7 +22,7 @@ export class ObjectiveSystem {
 
     private nightmares: Nightmare[] = [
         {
-            nmAmplitude : 2.00,
+            nmAmplitude : 1.50,
             nmFrequency : 3.60,
             nmAngle : 5.10
         },
@@ -32,33 +32,38 @@ export class ObjectiveSystem {
             nmAngle : 3.30
         },
         {
-            nmAmplitude : 1.00,
-            nmFrequency : 1.03,
+            nmAmplitude : 1.10,
+            nmFrequency : 5.98,
             nmAngle : 1.20
         },
         {
-            nmAmplitude : 1.00,
-            nmFrequency : 1.04,
+            nmAmplitude : 0.40,
+            nmFrequency : 7.50,
             nmAngle : 5.70
         },
         {
-            nmAmplitude : 1.00,
-            nmFrequency : 1.05,
+            nmAmplitude : 1.36,
+            nmFrequency : 6.45,
             nmAngle : 2.70
         },
         {
-            nmAmplitude : 1.00,
-            nmFrequency : 1.06,
-            nmAngle : 6.00
+            nmAmplitude : 0.90,
+            nmFrequency : 5.23,
+            nmAngle : 1.50
         },
         {
-            nmAmplitude : 1.00,
-            nmFrequency : 1.07,
-            nmAngle : 6.00
+            nmAmplitude : 1.27,
+            nmFrequency : 4.72,
+            nmAngle : 5.80
         },
         {
-            nmAmplitude : 1.00,
-            nmFrequency : 1.08,
+            nmAmplitude : 0.19,
+            nmFrequency : 3.45,
+            nmAngle : 2.30
+        },
+        { //faux cauchemar
+            nmAmplitude : 10,
+            nmFrequency : 50,
             nmAngle : 6.00
         }
     ]

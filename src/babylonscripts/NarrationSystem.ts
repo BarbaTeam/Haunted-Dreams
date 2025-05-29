@@ -16,18 +16,18 @@ export class NarrationSystem {
     private navigationSystem!:NavigationSystem;
     private shipControls!: ShipControls;
     private subtitles : SubtitleSystem;
+    introPlayed: any;
+    hasEnded = false;
 
     constructor(scene : Scene, ship: Ship) {
         this.scene = scene;
         this.ship = ship;
         this.subtitles = new SubtitleSystem(this.ship.subtitlesEnabledValue)
-        if(ship.introValue){
-            this.ringTone = new Sound("", "sons/ringtone.mp3", this.scene, null, { volume: 0.5, autoplay: false, loop: true, spatialSound: true, maxDistance: 40});
-            this.ringTone.setPosition(new Vector3(10, 12, 22));
-        }
-        else {
-            this.ringTone = new Sound("", "", this.scene, null, { volume: 0.5, autoplay: false, loop: false});
-        }
+        
+        this.ringTone = new Sound("", "sons/ringtone.mp3", this.scene, null, { volume: 0.5, autoplay: false, loop: true, spatialSound: true, maxDistance: 40});
+        this.ringTone.setPosition(new Vector3(10, 12, 22));
+
+        
         this.narratorVoices = [
                     new Sound("", "sons/intro.mp3", this.scene, null, { volume: 2, autoplay: false, loop: false }),
                     new Sound("", "sons/tuto1.mp3", this.scene, null, { volume: 2, autoplay: false, loop: false }),
@@ -40,6 +40,9 @@ export class NarrationSystem {
                     new Sound("", "sons/tuto8.mp3", this.scene, null, { volume: 2, autoplay: false, loop: false }),
                     new Sound("", "sons/outro.mp3", this.scene, null, { volume: 2, autoplay: false, loop: false }),
                 ]
+        window.addEventListener('endReached', (e) => {
+            this.end();
+        });
     } 
 
     public setNavigationSystem(navigationSystem: NavigationSystem): void {
@@ -229,12 +232,19 @@ export class NarrationSystem {
     }
 
     answerPhone(): void {
-        if(!this.answered && this.isCalling){
+        if(this.hasEnded){
             this.ringTone.stop();
-            this.answered = true;
-            this.setupNarrator();
         }
-
+        else{
+                if(!this.answered && this.isCalling){
+                this.ringTone.stop();
+                this.answered = true;
+                if(this.ship.introValue && !this.introPlayed){
+                    this.setupNarrator();
+                    this.introPlayed = true
+                }
+            }
+        }
     }
 
     paperTutorial() {
@@ -431,6 +441,25 @@ export class NarrationSystem {
         addEventListener("pointerdown", checkValue);
 
         const valueWatcher = setInterval(checkValue, 100);
+    }
+
+    public end(): void {
+        this.hasEnded = true;
+        setTimeout(()=>{
+                this.isCalling = true;
+                this.ringTone.play() 
+            },5000);
+            
+        this.ringTone.onEndedObservable.add(() => {
+            setTimeout(()=>{
+                this.narratorVoices[9].play();
+            },1000);
+        });
+        this.narratorVoices[9].onEndedObservable.add(() => {
+            this.shipControls.shutDownEngine();
+            const event = new CustomEvent('noGeneratorInteractions');
+            window.dispatchEvent(event);
+        });
     }
     
     createFloatingText(targetMesh: Mesh, offset = { x: 0, y: 0, z: 0 }, text1: string, text2: string, text3?: string,) {
