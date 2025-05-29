@@ -232,11 +232,12 @@ export class NarrationSystem {
     }
 
     answerPhone(): void {
-        if(this.hasEnded){
+        if(this.hasEnded && !this.answered){
             this.ringTone.stop();
+            this.answered = true;
         }
         else{
-                if(!this.answered && this.isCalling){
+            if(!this.answered && this.isCalling){
                 this.ringTone.stop();
                 this.answered = true;
                 if(this.ship.introValue && !this.introPlayed){
@@ -446,6 +447,7 @@ export class NarrationSystem {
     public end(): void {
         this.hasEnded = true;
         setTimeout(()=>{
+                this.answered = false;
                 this.isCalling = true;
                 this.ringTone.play() 
             },5000);
