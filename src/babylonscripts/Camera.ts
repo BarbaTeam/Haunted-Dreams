@@ -241,7 +241,7 @@ export function displayedItem(
         canvas.requestPointerLock();
 
 
-        if(maxDiariesIndex === 1 && !hasEnded) {
+        if(maxDiariesIndex === 57 && !hasEnded) {
             const event = new CustomEvent('endReached');
             hasEnded = true
             window.dispatchEvent(event);
