@@ -253,7 +253,7 @@ export function displayedItem(
         }
 
     } else {
-        controls.clearPressedKeys();
+        controls.stopStepSound();
         camera.inputs.clear(); 
         camera.keysUp = [];
         camera.keysDown = [];
