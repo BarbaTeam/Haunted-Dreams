@@ -254,6 +254,7 @@ export class ShipControls{
             this.shutDownEngine();
         } else {
             this.powerEngine();
+            this.hostilitySystem.resetHostileSetup();
         }
     }
 
@@ -276,7 +277,7 @@ export class ShipControls{
         });
 
         this.shipSounds.getHorrorSound().stop();
-        this.hostilitySystem.setupHostile(120);
+        this.hostilitySystem.setupHostile(190);
 
         this.shipSounds.getDeathSound().stop();
         this.shipSounds.getRunningDeathSound().stop();
