@@ -442,6 +442,9 @@ export class NarrationSystem {
         addEventListener("pointerdown", checkValue);
 
         const valueWatcher = setInterval(checkValue, 100);
+
+        const event = new CustomEvent('tutoEnd');
+        window.dispatchEvent(event);
     }
 
     public end(): void {

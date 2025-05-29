@@ -19,6 +19,11 @@ export class ShipSounds {
         this.horrorSound = this.playSound("sons/dark-horror-ambience-296781.mp3", 1, false, true);
         this.buzzingSound = this.playSound("sons/buzzing-sound.wav", 0.1, true, true);
 
+
+        window.addEventListener('tutoEnd', (e) => {
+            this.playLittleSound(this.scene);            
+        });
+
     }
 
     playSound(url: string, volume: number, autoplay= true, loop=false): Sound {
@@ -41,7 +46,6 @@ export class ShipSounds {
 
     playLittleSound(scene : Scene): void {
         const soundPaths = [
-        "sons/coeur.mp3",
         "sons/grince.mp3",
         "sons/pleure.mp3",
         "sons/rire.mp3",
@@ -60,7 +64,7 @@ export class ShipSounds {
         };
 
         // Joue un son immédiatement puis toutes les 2 minutes
-        setInterval(playRandomSound, 1 * 60 * 1000);
+        setInterval(playRandomSound, 2 * 60 * 1000 + (Math.random() * 60 *1000));
     }
 
     getBuzzingSound(): Sound{
