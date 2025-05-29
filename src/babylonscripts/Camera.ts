@@ -13,7 +13,6 @@ import {
     Button,
     Image,
     Grid,
-    StackPanel,
     TextBlock,
     Control
 } from "@babylonjs/gui";
@@ -23,7 +22,6 @@ import { ShipSounds } from "./ShipSounds";
 import { HostilitySystem } from "./HostilitySystem";
 import { Ship } from "./Ship";
 import { ObjectiveSystem } from "./ObjectiveSystem";
-import { NarrationSystem } from "./NarrationSystem";
 
 let affichePage = false;
 let advancedTexture: AdvancedDynamicTexture | null = null;
