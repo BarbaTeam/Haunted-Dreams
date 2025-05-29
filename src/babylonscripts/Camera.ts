@@ -186,11 +186,11 @@ function updateIndex(nightmareIndex: number): void {
     switch (nightmareIndex) {
         case 0: maxDocIndex = 0; maxDiariesIndex = 1; maxExplorersIndex = 4; break; //la famille
         case 1: maxDocIndex = 3; maxDiariesIndex = 7; maxExplorersIndex = 10; break; //les escaliers
-        case 2: maxDocIndex = 5; maxDiariesIndex = 12; maxExplorersIndex = 22; break; //la chose rampante
-        case 3: maxDocIndex = 6; maxDiariesIndex = 22; maxExplorersIndex = 32; break; //sally
-        case 4: maxDocIndex = 11; maxDiariesIndex = 33; maxExplorersIndex = 36; break; //la bosse
-        case 5: maxDocIndex = 13; maxDiariesIndex = 37; maxExplorersIndex = 60; break; //les scientifiques
-        case 6: maxDocIndex = 14; maxDiariesIndex = 45; maxExplorersIndex = 60; break; //le couloir
+        case 2: maxDocIndex = 5; maxDiariesIndex = 12; maxExplorersIndex = 16; break; //la chose rampante
+        case 3: maxDocIndex = 6; maxDiariesIndex = 22; maxExplorersIndex = 24; break; //sally
+        case 4: maxDocIndex = 11; maxDiariesIndex = 33; maxExplorersIndex = 30; break; //la bosse
+        case 5: maxDocIndex = 13; maxDiariesIndex = 37; maxExplorersIndex = 38; break; //les scientifiques
+        case 6: maxDocIndex = 14; maxDiariesIndex = 45; maxExplorersIndex = 48; break; //le couloir
         case 7: maxDocIndex = 14; maxDiariesIndex = 55; maxExplorersIndex = 60; break; //le labo
         case 8: maxDocIndex = 14; maxDiariesIndex = 57; maxExplorersIndex = 60; break; //fin
         default:
