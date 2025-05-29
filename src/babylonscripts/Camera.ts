@@ -14,7 +14,6 @@ import {
     Button,
     Image,
     Grid,
-    StackPanel,
     TextBlock,
     Control
 } from "@babylonjs/gui";

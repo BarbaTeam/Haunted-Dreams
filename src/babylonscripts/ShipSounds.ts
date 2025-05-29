@@ -19,6 +19,28 @@ export class ShipSounds {
         this.horrorSound = this.playSound("sons/dark-horror-ambience-296781.mp3", 1, false, true);
         this.buzzingSound = this.playSound("sons/buzzing-sound.wav", 0.1, true, true);
 
+        const soundPaths = [
+        "sons/coeur.mp3",
+        "sons/grince.mp3",
+        "sons/pleure.mp3",
+        "sons/rire.mp3",
+        "sons/chuchote.mp3",
+        ];
+
+        // Chargement des sons
+        const sounds = soundPaths.map(path => new Sound("sound", path, scene));
+
+        // Fonction pour jouer un son aléatoire
+        const playRandomSound = () => {
+            const randomIndex = Math.floor(Math.random() * sounds.length);
+            const sound = sounds[randomIndex];
+            if (sound.isPlaying) sound.stop();
+            sound.play();
+        };
+
+        // Joue un son immédiatement puis toutes les 2 minutes
+        setInterval(playRandomSound, 1 * 60 * 1000);
+
     }
 
     playSound(url: string, volume: number, autoplay= true, loop=false): Sound {
