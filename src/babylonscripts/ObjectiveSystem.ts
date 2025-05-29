@@ -133,7 +133,7 @@ export class ObjectiveSystem {
             this.isTakingPhoto = true;
             this.shipSounds.playPhotoSounds();
             setTimeout(() => {
-                this.hostilitySystem.setupHostile(60);
+                this.hostilitySystem.setupHostile(190);
                 this.ship.getPhotoByIndex(this.nightMareIndex).visibility = 1;
                 if (this.nightMareIndex < this.nightmares.length - 1) {
                     this.nightMareIndex++;
