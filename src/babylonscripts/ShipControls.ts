@@ -258,7 +258,6 @@ export class ShipControls{
         }
     }
 
-
     powerEngine() {
         if (!this.engineRestartAllowed) {
             return;
@@ -407,6 +406,10 @@ export class ShipControls{
 
     private pressedKeys: Set<string> = new Set();
 
+    clearPressedKeys(){
+        this.pressedKeys.clear();
+    }
+    
     handleKeyDown(event: KeyboardEvent): void {
         
         const key = event.code; // Utilisation de event.code pour garantir la compatibilité AZERTY/QWERTY

@@ -132,12 +132,12 @@ export class MainMenu {
         advancedTexture.addControl(subtitlesButton);
         inputFields.push(subtitlesButton);
 
-        const skipIntroButton = this.createButton("skipIntroButton", `${this.texts[this.language].intro}: ${this.language === "fr" ? this.intro ? "Activés" : "Désactivés" : this.intro ? "Enabled" : "Disabled"}`, "-230px");
+        const skipIntroButton = this.createButton("skipIntroButton", `${this.texts[this.language].intro}: ${this.language === "fr" ? this.intro ? "Activée" : "Désactivée" : this.intro ? "Enabled" : "Disabled"}`, "-230px");
         skipIntroButton.onPointerUpObservable.add(() => this.toggleIntro(skipIntroButton));
         advancedTexture.addControl(skipIntroButton);
         inputFields.push(skipIntroButton);
 
-        const keysTitle = this.createButton("keysTitle", `${this.texts[this.language].keys} (locked)`, "-150px", "300px", "50px", 25);
+        const keysTitle = this.createButton("keysTitle", `${this.texts[this.language].keys} (Bloqués)`, "-150px", "300px", "50px", 25);
         keysTitle.isEnabled = false;
         advancedTexture.addControl(keysTitle);
         inputFields.push(keysTitle);
@@ -152,12 +152,12 @@ export class MainMenu {
         advancedTexture.addControl(interactionButton);
         inputFields.push(interactionButton);
 
-        const quitDocumentViewButton = this.createButton("quitDocumentView", `Quit Document View (Space)`, "0px", "300px", "50px");
+        const quitDocumentViewButton = this.createButton("quitDocumentView", `Quitter la vue du document (Espace)`, "0px", "300px", "50px");
         quitDocumentViewButton.isEnabled = false;
         advancedTexture.addControl(quitDocumentViewButton);
         inputFields.push(quitDocumentViewButton);
 
-        const mappingTitle = this.createButton("mappingTitle", this.texts[this.language].keysConfig, "80px", "300px", "50px", 25);
+        const mappingTitle = this.createButton("mappingTitle", `${this.texts[this.language].keysConfig} (Débloqués)` , "80px", "300px", "50px", 25);
         mappingTitle.isEnabled = false;
         advancedTexture.addControl(mappingTitle);
         inputFields.push(mappingTitle);

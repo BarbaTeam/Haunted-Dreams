@@ -6,7 +6,8 @@ import {
     ArcRotateCamera,
     Effect,
     PostProcess,
-    BlackAndWhitePostProcess
+    BlackAndWhitePostProcess,
+    FreeCameraKeyboardMoveInput
 } from "@babylonjs/core";
 import {
     AdvancedDynamicTexture,
@@ -224,6 +225,12 @@ export function displayedItem(
 
     if (!affichePage) {
         controls.enableEvents();
+        camera.inputs.addKeyboard();
+        camera.inputs.addMouse();
+        camera.attachControl(canvas);
+        camera.inertia = 0.1;
+        camera.speed = 5.5;
+        camera.angularSensibility = 4000;
         camera.keysUp = [keyBindings["Forward"].toUpperCase().charCodeAt(0)];
         camera.keysDown = [keyBindings["Backward"].toUpperCase().charCodeAt(0)];
         camera.keysLeft = [keyBindings["Left"].toUpperCase().charCodeAt(0)];
@@ -236,7 +243,6 @@ export function displayedItem(
         crosshair.height = "15px";
         crosshair.thickness = 0;
         advancedTexture.addControl(crosshair);
-        camera.attachControl(canvas, true);
         canvas.requestPointerLock();
 
 
@@ -247,13 +253,15 @@ export function displayedItem(
         }
 
     } else {
-        controls.disableEvents();
+        controls.clearPressedKeys();
+        camera.inputs.clear(); 
         camera.keysUp = [];
         camera.keysDown = [];
         camera.keysLeft = [];
         camera.keysRight = [];
-
+        controls.disableEvents();
         document.exitPointerLock();
+        
         if(objectiveSystem)
             updateIndex(objectiveSystem.getNightmareIndex());
 
