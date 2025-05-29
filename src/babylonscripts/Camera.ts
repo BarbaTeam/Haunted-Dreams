@@ -23,7 +23,6 @@ import { ShipSounds } from "./ShipSounds";
 import { HostilitySystem } from "./HostilitySystem";
 import { Ship } from "./Ship";
 import { ObjectiveSystem } from "./ObjectiveSystem";
-import { NarrationSystem } from "./NarrationSystem";
 
 let affichePage = false;
 let advancedTexture: AdvancedDynamicTexture | null = null;
@@ -186,7 +185,7 @@ function updateIndex(nightmareIndex: number): void {
     switch (nightmareIndex) {
         case 0: maxDocIndex = 0; maxDiariesIndex = 1; maxExplorersIndex = 4; break; //la famille
         case 1: maxDocIndex = 3; maxDiariesIndex = 7; maxExplorersIndex = 10; break; //les escaliers
-        case 2: maxDocIndex = 5; maxDiariesIndex = 12; maxExplorersIndex = 16; break; //la chose rampante
+        case 2: maxDocIndex = 5; maxDiariesIndex = 12; maxExplorersIndex = 18; break; //la chose rampante
         case 3: maxDocIndex = 6; maxDiariesIndex = 22; maxExplorersIndex = 24; break; //sally
         case 4: maxDocIndex = 11; maxDiariesIndex = 33; maxExplorersIndex = 30; break; //la bosse
         case 5: maxDocIndex = 13; maxDiariesIndex = 37; maxExplorersIndex = 38; break; //les scientifiques
