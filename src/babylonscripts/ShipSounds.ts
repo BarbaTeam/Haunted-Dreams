@@ -46,7 +46,6 @@ export class ShipSounds {
 
     playLittleSound(scene : Scene): void {
         const soundPaths = [
-        "sons/grince.mp3",
         "sons/pleure.mp3",
         "sons/rire.mp3",
         "sons/chuchote.mp3",
@@ -63,8 +62,8 @@ export class ShipSounds {
             sound.play();
         };
 
-        // Joue un son immédiatement puis toutes les 2 minutes
-        setInterval(playRandomSound, 2 * 60 * 1000 + (Math.random() * 60 *1000));
+        // Joue un son immédiatement puis toutes les 5 à 10 minutes
+        setInterval(playRandomSound, 5 * 60 * 1000 + (Math.random() * 5 * 60 *1000));
     }
 
     getBuzzingSound(): Sound{
