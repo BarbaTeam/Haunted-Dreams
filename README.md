@@ -13,8 +13,6 @@ Obéissez aux exigences du docteur, extirpez-lui les informations qu’il cherch
 
 [Voir la FAQ](https://youtu.be/GIVM2AnTUm8)
 
-[Voir le trailer sur YouTube](https://www.youtube.com/watch?v=PME4RAuYcyg)
-
 Ce jeu est développé dans le cadre du concours [Games On Web 2025](https://www.cgi.com/france/fr-fr/event/games-on-web-2025) organisé par [CGI France](https://www.cgi.com/france/fr-fr). 
 
 ## Comment jouer
